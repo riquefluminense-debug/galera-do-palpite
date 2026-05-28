@@ -2,8 +2,8 @@
   "name": "galera-do-palpite-ranking-backend-corrigido",
   "version": "1.5.1",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "node backend/server.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
