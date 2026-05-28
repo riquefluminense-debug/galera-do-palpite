@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // SERVIR FRONTEND DA PASTA ATUAL1
-app.use(express.static(path.join(__dirname, '..')));
+app.use(express.static(__dirname));
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/galeradopalpite';
@@ -267,7 +267,7 @@ app.put('/api/auth/alterar-senha', autenticarAdmin, async (req, res) => {
 
 // HOME DO SITE
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // STATUS DA API
