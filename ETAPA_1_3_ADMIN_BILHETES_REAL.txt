@@ -1,0 +1,23 @@
+
+ETAPA ADMIN REAL - BILHETES
+
+Novo arquivo:
+admin-bilhetes.html
+
+Funções:
+- Listar bilhetes do banco
+- Buscar por código GDP
+- Buscar por telefone
+- Filtrar por Pago/Pendente
+- Filtrar por Site/Manual
+- Confirmar pagamento
+- Marcar como pendente
+- Editar nome, telefone, valor e status
+- Excluir bilhete
+- Imprimir comprovante amarelo
+- Resumo financeiro básico
+
+Como usar:
+1) Abrir CMD em PALPITES/backend
+2) npm start
+3) Abrir admin-bilhetes.html no navegador

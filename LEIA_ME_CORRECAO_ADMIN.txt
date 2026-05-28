@@ -1,0 +1,22 @@
+CORREÇÃO DO ADMIN
+
+Arquivo corrigido:
+- admin-bilhetes.html
+
+Correção feita:
+- removido trecho quebrado que aparecia na tela
+- impressão amarelo corrigida
+- painel volta a listar os bilhetes normalmente
+- login admin continua funcionando
+
+Como usar:
+1) Extraia tudo em uma pasta nova.
+2) Entre em backend pela CMD.
+3) Rode:
+   npm install
+   npm start
+4) Abra:
+   login-admin.html
+5) Login:
+   admin
+   123456

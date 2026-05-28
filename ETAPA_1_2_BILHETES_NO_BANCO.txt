@@ -1,0 +1,26 @@
+
+ETAPA 1.2 FEITA - BILHETES NO BANCO
+
+Incluído:
+- API completa de bilhetes
+- Bilhete do site como PENDENTE
+- Bilhete manual como PAGO
+- Código GDP automático
+- Confirmação de pagamento no banco
+- Busca por código GDP
+- Resumo financeiro dos bilhetes reais
+- teste-bilhetes.html
+
+Como testar:
+1) Backend aberto:
+   cd backend
+   npm install
+   npm start
+
+2) Abra teste-bilhetes.html
+
+3) Clique:
+   Criar bilhete SITE pendente
+   Criar bilhete MANUAL pago
+   Listar bilhetes
+   Resumo financeiro

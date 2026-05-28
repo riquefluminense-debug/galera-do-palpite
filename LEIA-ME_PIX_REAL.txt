@@ -1,0 +1,29 @@
+GALERA DO PALPITE - PIX REAL MERCADO PAGO
+
+1) Instale o Node.js no PC/servidor.
+2) Abra a pasta do projeto no terminal.
+3) Rode: npm install
+4) Copie .env.example para .env
+5) No .env, cole seu Access Token do Mercado Pago:
+   MERCADO_PAGO_ACCESS_TOKEN=APP_USR-...
+6) Rode: npm start
+7) Abra: http://localhost:3000
+
+COMO FUNCIONA
+- O cliente monta o bilhete.
+- O sistema cria Pix real no Mercado Pago.
+- O QR Code e o copia/cola vêm do Mercado Pago.
+- O sistema consulta o pagamento automaticamente a cada 5 segundos.
+- Quando o pagamento fica approved, o bilhete muda para Pago.
+- O ranking, financeiro e bilhete amarelo são liberados.
+
+WEBHOOK EM PRODUÇÃO
+Para notificação automática real sem depender da tela aberta:
+1) Hospede esse projeto em um domínio HTTPS.
+2) Configure no .env:
+   MP_NOTIFICATION_URL=https://seudominio.com/api/mercadopago/webhook
+3) Configure também o webhook no painel do Mercado Pago, se necessário.
+
+IMPORTANTE
+Nunca coloque o Access Token dentro do script.js/front-end.
+Ele deve ficar somente no .env do servidor.

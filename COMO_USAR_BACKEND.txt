@@ -1,0 +1,17 @@
+
+PASSO A PASSO
+
+1) INSTALAR NODE.JS
+https://nodejs.org
+
+2) ABRIR A PASTA backend
+
+3) ABRIR TERMINAL E RODAR:
+npm install
+
+4) INICIAR O BACKEND:
+npm start
+
+5) ABRIR O SITE index.html
+
+O sistema agora está preparado para integração real com MongoDB.

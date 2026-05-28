@@ -1,0 +1,30 @@
+ETAPA 1.5 - RANKING AUTOMÁTICO REAL
+
+Novos arquivos:
+- admin-resultados.html
+- admin-ranking.html
+
+Incluído:
+- Resultado por jogo: CASA / EMPATE / FORA
+- Apenas jogo ENCERRADO conta ponto
+- Jogo aguardando fica pendente/neutro
+- Ranking automático por rodada
+- Botão recalcular ranking
+- Detalhes por palpite: acerto, erro ou pendente
+- Ranking salvo no MongoDB
+- Link no painel de bilhetes para Resultados e Ranking
+
+Como testar:
+1) CMD dentro de backend:
+   npm install
+   npm start
+
+2) Abrir login-admin.html
+   usuario: admin
+   senha: 123456
+
+3) Abrir admin-resultados.html
+   salvar resultados dos jogos
+
+4) Abrir admin-ranking.html
+   clicar em Recalcular ranking

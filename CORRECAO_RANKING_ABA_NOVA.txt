@@ -1,0 +1,15 @@
+CORREÇÃO APLICADA
+
+- Botão Ranking não tira mais você do painel principal.
+- Botão Resultados também abre em nova aba.
+- Ranking mostra mensagem clara se o backend não estiver conectado.
+- Mantido login, admin, bilhetes, resultados e ranking.
+
+Como usar:
+1. Extraia em uma pasta nova.
+2. Abra CMD na pasta.
+3. Rode:
+   npm install
+   npm start
+4. Abra login-admin.html.
+5. No painel, clique em Ranking. Ele abrirá em nova aba.

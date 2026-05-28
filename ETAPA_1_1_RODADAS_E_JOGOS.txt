@@ -1,0 +1,29 @@
+
+ETAPA 1.1 FEITA - RODADAS + JOGOS NO BANCO
+
+O que foi incluído:
+- API completa de Rodadas
+- API completa de Jogos
+- API de Bilhetes mantida
+- api.js com funções prontas para o front-end
+- teste-banco.html para testar salvamento no MongoDB
+
+Como testar:
+
+1) Entre na pasta backend
+2) Rode:
+   npm install
+
+3) Depois:
+   npm start
+
+4) Abra no navegador:
+   teste-banco.html
+
+5) Clique:
+   - Criar rodada teste
+   - Listar rodadas
+   - Criar jogo na última rodada
+   - Listar jogos
+
+Se ao atualizar a página os dados continuarem aparecendo, o banco está funcionando.

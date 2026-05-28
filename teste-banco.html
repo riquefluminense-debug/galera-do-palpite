@@ -1,0 +1,71 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Banco - Galera do Palpite</title>
+  <script src="api.js"></script>
+  <style>
+    body{font-family:Arial;background:#07140f;color:#fff;padding:24px}
+    button,input{padding:10px;margin:5px;border-radius:8px;border:0}
+    button{background:#19c37d;color:#001b10;font-weight:700;cursor:pointer}
+    pre{background:#0d2018;padding:16px;border-radius:10px;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <h1>Teste do Banco de Dados</h1>
+  <p>Use esta tela para confirmar se o backend está salvando Rodadas e Jogos.</p>
+
+  <button onclick="criarRodada()">Criar rodada teste</button>
+  <button onclick="listarRodadas()">Listar rodadas</button>
+  <button onclick="criarJogo()">Criar jogo na última rodada</button>
+  <button onclick="listarJogos()">Listar jogos</button>
+
+  <pre id="saida">Aguardando...</pre>
+
+  <script>
+    let ultimaRodadaId = "";
+
+    function mostrar(dados){
+      document.getElementById("saida").textContent = JSON.stringify(dados, null, 2);
+    }
+
+    async function criarRodada(){
+      const rodada = await salvarRodadaBanco({
+        nome: "Rodada Teste",
+        competicao: "Teste",
+        data: new Date().toLocaleDateString("pt-BR"),
+        horario: "20:00",
+        premioEstimado: 100,
+        valorBilhete: 10
+      });
+      ultimaRodadaId = rodada._id;
+      mostrar(rodada);
+    }
+
+    async function listarRodadas(){
+      const rodadas = await carregarRodadasBanco();
+      if (rodadas[0]) ultimaRodadaId = rodadas[0]._id;
+      mostrar(rodadas);
+    }
+
+    async function criarJogo(){
+      if (!ultimaRodadaId) await listarRodadas();
+      if (!ultimaRodadaId) return alert("Crie uma rodada primeiro.");
+      const jogo = await salvarJogoBanco({
+        rodadaId: ultimaRodadaId,
+        casa: "Vasco",
+        fora: "Goiás",
+        data: new Date().toLocaleDateString("pt-BR"),
+        horario: "21:00"
+      });
+      mostrar(jogo);
+    }
+
+    async function listarJogos(){
+      const jogos = await carregarJogosBanco(ultimaRodadaId);
+      mostrar(jogos);
+    }
+  </script>
+</body>
+</html>

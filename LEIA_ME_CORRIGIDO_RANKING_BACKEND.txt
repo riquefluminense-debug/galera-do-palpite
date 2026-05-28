@@ -1,0 +1,26 @@
+CORREÇÃO FINAL DO RANKING
+
+Problema corrigido:
+- O npm start da pasta principal rodava o server.js antigo do PIX.
+- Agora o npm start roda backend/server.js, que tem as rotas do ranking.
+
+Teste obrigatório:
+1) Abra CMD nesta pasta.
+2) Rode:
+   npm install
+   npm start
+
+3) Abra no navegador:
+   http://localhost:3000/api/ranking
+
+Se aparecer [] ou JSON, está certo.
+
+Depois:
+- login-admin.html
+- admin-bilhetes.html
+- admin-resultados.html
+- admin-ranking.html
+
+IMPORTANTE:
+Não precisa entrar na pasta backend.
+Rode o npm install e npm start na pasta principal mesmo.

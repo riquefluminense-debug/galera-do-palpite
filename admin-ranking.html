@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Ranking Automático - Galera do Palpite</title>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#03130c;color:#fff;padding:24px}
+    h1{margin:0 0 8px;font-size:30px}
+    .sub{color:#b6d6c2;margin-bottom:20px}
+    .topo{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .painel{background:linear-gradient(180deg,#092016,#06160f);border:1px solid #0f7a43;border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 0 20px rgba(0,255,120,.08)}
+    label{display:block;font-size:13px;color:#b8d8c6;font-weight:700;margin-bottom:6px}
+    select,input{width:100%;padding:12px;border-radius:10px;border:1px solid #11864b;background:#020f09;color:#fff;outline:none}
+    button{border:0;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer;color:#fff;background:#08b95f}
+    .btn-red{background:#d92035}
+    .btn-dark{background:#11251a;border:1px solid #1ba45d}
+    .grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;align-items:end}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:12px}
+    .card{background:#0b2116;border:1px solid rgba(21,187,96,.45);border-radius:14px;padding:16px}
+    .card span{display:block;color:#a9cbb7;font-size:13px;margin-bottom:6px}
+    .card strong{font-size:24px;color:#00e681}
+    table{width:100%;border-collapse:collapse;margin-top:16px;border-radius:14px;overflow:hidden}
+    th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:12px;text-align:left;vertical-align:top;font-size:14px}
+    th{background:#0b301d;color:#d9ffe8;font-size:13px;text-transform:uppercase}
+    tr{background:#071a11}
+    tr:nth-child(even){background:#092016}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+    .acerto{background:#008f35;color:white}
+    .erro{background:#dd2436;color:white}
+    .pendente{background:#777;color:white}
+    .pago{background:#d9ffe8;color:#006b35}
+    .naopago{background:#fff1c4;color:#835500}
+    .detalhes{display:flex;gap:5px;flex-wrap:wrap}
+    .pill{font-size:11px;border-radius:8px;padding:5px 7px;font-weight:800}
+    @media(max-width:900px){.grid,.cards{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<script>protegerPaginaAdmin();</script>
+<script>
+  if(!localStorage.getItem("adminToken")) window.location.href = "login-admin.html";
+</script>
+
+<div class="topo">
+  <div>
+    <h1>🏆 Ranking Automático Real</h1>
+    <div class="sub">Calcula pontos pelo resultado salvo, considerando apenas jogos encerrados.</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn-dark" onclick="window.location.href='admin-bilhetes.html'">Voltar aos bilhetes</button>
+    <button class="btn-dark" onclick="baixarRankingExcelAdmin()">📊 Excel</button>
+    <button class="btn-dark" onclick="baixarRankingPDFAdmin()">📄 PDF</button>
+    <button class="btn-red" onclick="logoutAdmin()">Sair</button>
+  </div>
+</div>
+
+<div class="painel">
+  <div class="grid">
+    <div>
+      <label>Rodada</label>
+      <select id="rodadaSelect"></select>
+    </div>
+    <div>
+      <button onclick="recalcular()">🔄 Recalcular ranking</button>
+    </div>
+    <div>
+      <button class="btn-dark" onclick="carregarRanking()">Atualizar tela</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><span>Total no ranking</span><strong id="totalRanking">0</strong></div>
+    <div class="card"><span>Maior pontuação</span><strong id="maiorPontuacao">0</strong></div>
+    <div class="card"><span>Bilhetes pagos</span><strong id="rankingPagos">0</strong></div>
+    <div class="card"><span>Com pendências</span><strong id="comPendentes">0</strong></div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+    <button onclick="baixarRankingExcelAdmin()">📊 Exportar ranking Excel</button>
+    <button class="btn-dark" onclick="baixarRankingPDFAdmin()">📄 Exportar ranking PDF</button>
+    <button class="btn-dark" onclick="baixarBackupCompleto()">🛡️ Backup completo</button>
+  </div>
+</div>
+
+<div class="painel">
+  <h2>Resultado oficial do ranking</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Pos.</th>
+        <th>Bilhete / Cliente</th>
+        <th>Pontos</th>
+        <th>Acertos</th>
+        <th>Erros</th>
+        <th>Pendentes</th>
+        <th>Status</th>
+        <th>Detalhes</th>
+      </tr>
+    </thead>
+    <tbody id="rankingBody">
+      <tr><td colspan="8">Carregando...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+let rankingCache = [];
+
+async function baixarRankingExcelAdmin(){
+  try{
+    const rodadaId = document.getElementById('rodadaSelect').value || '';
+    await exportarRankingExcel(rodadaId);
+  }catch(e){ alert(e.message); }
+}
+
+async function baixarRankingPDFAdmin(){
+  try{
+    const rodadaId = document.getElementById('rodadaSelect').value || '';
+    await exportarRankingPDF(rodadaId);
+  }catch(e){ alert(e.message); }
+}
+
+
+async function carregarRodadas(){
+  try{
+    await verificarAdmin();
+    const rodadas = await carregarRodadasBanco();
+    const select = document.getElementById('rodadaSelect');
+    select.innerHTML = rodadas.map(r => `<option value="${r._id}">${r.nome} - ${r.competicao || ''} - ${r.data || ''}</option>`).join('');
+    if(rodadas.length) await carregarRanking();
+  }catch(e){
+    document.getElementById('rankingBody').innerHTML = `<tr><td colspan="8">Erro de conexão com o backend. Confirme se o CMD está aberto com npm start.</td></tr>`;
+  }
+}
+
+async function recalcular(){
+  const rodadaId = document.getElementById('rodadaSelect').value;
+  if(!rodadaId){
+    alert('Selecione uma rodada.');
+    return;
+  }
+  const resp = await recalcularRankingBanco(rodadaId);
+  rankingCache = resp.ranking || [];
+  renderRanking();
+  alert('Ranking recalculado com sucesso!');
+}
+
+async function carregarRanking(){
+  const rodadaId = document.getElementById('rodadaSelect').value;
+  if(!rodadaId) return;
+  rankingCache = await carregarRankingBanco(rodadaId);
+  renderRanking();
+}
+
+function renderRanking(){
+  const tbody = document.getElementById('rankingBody');
+  const lista = [...rankingCache].sort((a,b) => (b.pontos||0)-(a.pontos||0) || (b.acertos||0)-(a.acertos||0));
+
+  document.getElementById('totalRanking').textContent = lista.length;
+  document.getElementById('maiorPontuacao').textContent = lista[0]?.pontos || 0;
+  document.getElementById('rankingPagos').textContent = lista.filter(x => x.pago).length;
+  document.getElementById('comPendentes').textContent = lista.filter(x => (x.pendentes||0) > 0).length;
+
+  if(!lista.length){
+    tbody.innerHTML = `<tr><td colspan="8">Nenhum ranking calculado ainda. Clique em Recalcular ranking.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = lista.map((r, idx) => `
+    <tr>
+      <td><strong>${idx + 1}º</strong></td>
+      <td><strong>${r.codigo || '-'}</strong><br>${r.nome || '-'}<br><small>${r.telefone || ''}</small></td>
+      <td><strong style="font-size:22px;color:#00e681">${r.pontos || 0}</strong></td>
+      <td>${r.acertos || 0}</td>
+      <td>${r.erros || 0}</td>
+      <td>${r.pendentes || 0}</td>
+      <td><span class="badge ${r.pago ? 'pago' : 'naopago'}">${r.pago ? 'PAGO' : 'PENDENTE'}</span></td>
+      <td>
+        <div class="detalhes">
+          ${(r.detalhes || []).map(d => `<span class="pill ${d.status === 'ACERTO' ? 'acerto' : d.status === 'ERRO' ? 'erro' : 'pendente'}">P${d.jogo}: ${d.escolha || '-'} / ${d.resultado || 'AGUARD.'}</span>`).join('')}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+carregarRodadas();
+</script>
+</body>
+</html>

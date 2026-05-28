@@ -1,0 +1,209 @@
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#07130b;color:#fff}.sidebar{position:fixed;left:0;top:0;width:220px;height:100vh;background:#08240f;padding:28px 22px;display:flex;flex-direction:column;gap:28px;z-index:5}.brand{display:flex;align-items:center;gap:10px;margin-bottom:40px;color:#dfffe8}.brand span{font-size:35px}.brand b{font-size:18px;line-height:1.05}.sidebar a{color:#b9c9bd;text-decoration:none;font-weight:700;cursor:pointer}.sidebar .admin{margin-top:auto;color:#56e878}.page{margin-left:220px;min-height:100vh;background:linear-gradient(rgba(0,0,0,.58),rgba(0,0,0,.7)),url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1600&q=80') center/cover fixed}.tela{display:none}.tela.ativa{display:block}.banner{height:430px;display:flex;align-items:center;justify-content:center;text-align:center}.banner p{color:#f1b600;text-transform:uppercase;font-weight:900;letter-spacing:1px}.banner h1{font-size:58px;max-width:860px;text-transform:uppercase;margin:0;line-height:1.05}.rodadas,.painel{background:rgba(255,255,255,.9);color:#111;margin:0 30px 40px;padding:30px;border-radius:4px}.painel{min-height:100vh;margin:0;padding:35px}.rodadas h2{text-align:center;color:#07520d}.grid-cards,.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}.rodada-card,.card-admin{background:white;border-radius:18px;box-shadow:0 15px 40px #0004;padding:24px;text-align:center}.card-admin{text-align:left}.icone{font-size:60px}.rodada-card button,.card-admin button{border:0;background:#188900;color:#fff;border-radius:6px;padding:15px 28px;font-weight:900;cursor:pointer}.card-admin button{width:100%;margin-top:8px}.sub{font-weight:700;color:#425044}.bottom{margin-top:20px}.wide{overflow:auto}.tabela{border:1px solid #ddd;border-radius:8px;overflow:hidden;background:#fff}.linha{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:12px;border-bottom:1px solid #eee}.linha:last-child{border-bottom:0}.tag{padding:6px 10px;border-radius:99px;font-weight:900;font-size:12px}.pago{background:#d7ffe0;color:#078a18}.pendente{background:#fff1c7;color:#9a6500}.excluir{background:#c21b2b!important;padding:8px 10px!important}.float{position:fixed;right:22px;width:55px;height:55px;border-radius:50%;display:grid;place-items:center;text-decoration:none;border:0;color:white;font-size:24px;box-shadow:0 10px 30px #0006;z-index:15}.cart{bottom:150px;background:#b97900}.cart span{position:absolute;right:-5px;top:-5px;background:#c21b2b;border-radius:50%;font-size:12px;width:22px;height:22px;display:grid;place-items:center}.whats{bottom:88px;background:#078a43}.telegram{bottom:26px;background:#1268a8}.overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;z-index:10;padding:14px}.overlay.active{display:flex}.modal{width:510px;max-width:100%;max-height:96vh;overflow:auto;background:#fff;color:#111;border-radius:5px;padding:8px 8px 22px;box-shadow:0 20px 80px #0008}.top-orange{height:14px;background:#f0a000;width:170px;margin:2px auto 8px;border-radius:0 0 3px 3px}.ticket-list{display:flex;flex-direction:column;gap:5px}.jogo{display:grid;grid-template-columns:20px 1fr;align-items:center;gap:4px}.numero{font-weight:900;text-align:center}.linha-jogo{display:grid;grid-template-columns:1fr .55fr 1fr;gap:3px;width:100%}.info{grid-column:1/4;text-align:center;color:#008cff;font-size:11px;font-weight:900}.opcao{border:0;border-radius:4px;background:#272d35;color:#fff;padding:7px 4px;min-height:42px;cursor:pointer;font-weight:900}.opcao small{display:block;font-style:italic;font-size:11px}.opcao.active{background:#238d00}.resumo{background:#ffc64d;text-align:center;margin:18px 0;padding:18px;font-size:13px}input,select{width:100%;height:51px;border:1px solid #209400;border-radius:5px;padding:0 12px;margin-bottom:10px;font-size:15px}label{font-weight:900;font-size:13px;color:#28502d}.phone{display:flex;border:1px solid #ddd;border-radius:5px;margin-bottom:7px}.phone span{width:42px;display:grid;place-items:center}.phone input{border:0;margin:0}.caixa-total{border:1px solid #2b6fed;background:#f2f2f2;text-align:center;padding:12px;border-radius:4px}.caixa-total h3{margin:5px 0 8px;font-size:22px}.caixa-total h3 span,.caixa-total h2 span,.tipos span{color:#199000}.tipos{display:flex;justify-content:space-around;border:2px solid #159000;border-radius:4px;padding:5px;font-size:20px}.caixa-total h2{margin:12px 0 5px}.acoes{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}.acoes button{border:0;color:white;padding:18px 5px;font-weight:900;border-radius:4px;cursor:pointer}.confirmar{background:#208d00}.filtrar{background:#e89500}#mensagem{text-align:center;font-weight:900;color:#108000}@media(max-width:800px){.sidebar{display:none}.page{margin-left:0}.banner h1{font-size:34px}.modal{width:100%}.opcao{font-size:12px}.tipos{font-size:15px}.painel{padding:18px}.linha{grid-template-columns:1fr}.rodadas{margin:0;padding:20px}}
+
+.admin-login-card{max-width:430px;margin:70px auto;background:#fff;border-radius:18px;box-shadow:0 18px 50px #0004;padding:30px;color:#111}.admin-login-card h1{margin-top:0;color:#07520d}.btn-login{width:100%;border:0;background:#188900;color:white;border-radius:6px;padding:16px 20px;font-weight:900;cursor:pointer}.erro-admin{color:#c21b2b;font-weight:900;text-align:center}.admin-protegido{display:none}.admin-protegido.liberado{display:block}.admin-topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:20px}.btn-sair{border:0;background:#c21b2b;color:white;border-radius:6px;padding:12px 18px;font-weight:900;cursor:pointer}.admin-bloqueado-msg{background:#fff1c7;color:#9a6500;padding:12px;border-radius:8px;font-weight:900;margin-bottom:14px}@media(max-width:800px){.admin-topbar{display:block}.btn-sair{width:100%;margin-bottom:15px}}
+.pix-box{display:none;margin-top:14px;border:2px solid #188900;background:#f7fff8;border-radius:10px;padding:14px;text-align:center}.pix-box.show{display:block}.pix-box h3{margin:0 0 6px;color:#07520d}.pix-box p{margin:0 0 12px;font-weight:700;color:#425044}.pix-qrcode{width:180px;height:180px;margin:10px auto;border:5px solid #111;background:#fff;display:grid;place-items:center;border-radius:8px;overflow:hidden}.pix-qrcode img{width:100%;height:100%;display:block}.pix-box textarea{width:100%;height:105px;border:1px solid #209400;border-radius:5px;padding:10px;font-size:13px;resize:none}.pix-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.pix-actions button,.pix-actions a{border:0;background:#188900;color:white;border-radius:5px;padding:13px;text-decoration:none;font-weight:900;cursor:pointer}.pix-actions a{background:#078a43}@media(max-width:800px){.pix-actions{grid-template-columns:1fr}}
+.regra-box{margin-top:18px;background:#f7fff8;border-left:6px solid #188900;padding:16px;border-radius:8px;line-height:1.7}.btn-dourado{background:#b97900!important;margin-top:10px!important}.ranking-lista{background:#fff;border-radius:14px;box-shadow:0 12px 35px #0002;overflow:hidden}.ranking-row{grid-template-columns:auto 1fr auto auto}.posicao{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#ffc64d;color:#111;font-weight:900}.pontos{font-size:20px;font-weight:900;color:#07520d}.jogo-admin{grid-template-columns:1fr 220px auto}.placar-admin{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}.placar-admin input{height:40px;margin:0;text-align:center;font-weight:900}.ranking-admin{margin-top:14px}@media(max-width:800px){.ranking-row,.jogo-admin{grid-template-columns:1fr}.placar-admin{grid-template-columns:1fr auto 1fr}.posicao{margin-bottom:8px}}
+
+
+/* Pix automático simulado */
+.pix-status{display:flex;flex-direction:column;gap:3px;margin:10px 0 12px;padding:10px;border-radius:8px;background:#062b13;border:1px solid #00a844;color:#eaffef;text-align:left}
+.pix-status b{color:#00e676;font-size:14px}.pix-status span{font-size:12px;color:#bce8c8}.pix-actions{grid-template-columns:1fr 1fr!important}.pix-actions button:disabled{opacity:.6;cursor:not-allowed;transform:none!important}#pixTicketBtn{background:#ffb300!important;color:#111!important}#pixAutoBtn{background:#00b84a!important;color:#041006!important}@media(max-width:800px){.pix-actions{grid-template-columns:1fr!important}}
+
+/* Palpites sem odds/escudos: AA - EMPATE - BB */
+.linha-jogo{grid-template-columns:1fr 1fr 1fr!important;gap:0!important;border:1px solid rgba(255,255,255,.14);border-radius:8px;overflow:hidden}
+.info{grid-column:1/4!important}
+.opcao small,.team-crest{display:none!important}
+.opcao{border-radius:0!important;text-transform:uppercase!important}
+
+/* Upgrades Admin profissional: financeiro + rodadas */
+.financeiro-actions-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.btn-mini{width:auto!important;padding:10px 14px!important;font-size:12px!important;border-radius:999px!important}
+.btn-outline-danger{background:#fff!important;color:#c21b2b!important;border:1px solid #c21b2b!important}
+.fin-limpeza-card{background:#fff7f7;border:1px solid #ffd1d1;border-radius:12px;padding:12px}
+.admin-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
+.admin-section-head h2{margin:0 0 4px;color:#07520d}
+.admin-section-head .sub{margin:0}.admin-section-head button{width:auto;margin-top:0}
+.bilhetes-por-rodada{display:flex;flex-direction:column;gap:16px}
+.rodada-bilhetes-card{background:linear-gradient(180deg,#ffffff,#f6fff7);border:1px solid #d8efdc;border-radius:18px;box-shadow:0 12px 28px #00000014;overflow:hidden}
+.rodada-bilhetes-card.ativa{border-color:#16a34a;box-shadow:0 0 0 2px #16a34a20,0 12px 28px #00000018}
+.rodada-bilhetes-head{display:grid;grid-template-columns:1.1fr 1.5fr;gap:14px;align-items:center;padding:16px;background:#08240f;color:#fff}
+.rodada-bilhetes-head h3{margin:4px 0;font-size:20px}.rodada-bilhetes-head p{margin:0;color:#cfe9d5;font-weight:700}
+.bilhete-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bilhete-kpis span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:10px;text-align:center;font-size:12px;color:#d9f7df}
+.bilhete-kpis b{display:block;color:#fff;font-size:16px;margin-bottom:2px}
+.bilhetes-lista-admin{padding:6px 10px 10px;background:#fff}
+.bilhete-admin-row{grid-template-columns:1fr auto 130px!important;border-radius:12px;margin-top:7px;border:1px solid #eef1ee;background:#fff}
+.bilhete-pendente{background:#fffaf0}.bilhete-pago{background:#f4fff6}.bilhete-actions button{width:100%;padding:10px!important;margin:0!important;border-radius:10px!important}
+.admin-empty{padding:12px;margin:0;text-align:center}
+.financeiro-bloco.geral{border:1px solid #d5ecd9;background:linear-gradient(135deg,#f8fff9,#ffffff)}
+.financeiro-bloco.rodada-atual-fin{border:1px solid #d5ecd9;background:#fff}
+@media(max-width:900px){.rodada-bilhetes-head{grid-template-columns:1fr}.bilhete-kpis{grid-template-columns:1fr 1fr}.bilhete-admin-row{grid-template-columns:1fr!important}.financeiro-actions-top,.admin-section-head{display:block}.admin-section-head button{width:100%!important;margin-top:10px}}
+
+/* Correção visual: Admin financeiro em dark profissional */
+.financeiro-bloco,
+.financeiro-bloco.geral,
+.financeiro-bloco.rodada-atual-fin{
+  background:linear-gradient(180deg,#0c1c12,#07130b)!important;
+  color:#f4fff7!important;
+  border:1px solid rgba(0,230,118,.28)!important;
+  box-shadow:0 18px 45px rgba(0,0,0,.35)!important;
+}
+.financeiro-bloco h3,
+.financeiro-bloco label,
+.financeiro-resumo h3,
+.financeiro-title h2{
+  color:#ffffff!important;
+  text-shadow:none!important;
+}
+.financeiro-title .sub,
+.financeiro-bloco .sub,
+.financeiro-bloco small,
+.financeiro-bloco span,
+.financeiro-resumo span,
+.fin-note{
+  color:#bfe9c9!important;
+  text-shadow:none!important;
+}
+.financeiro-kpis div{
+  background:rgba(255,255,255,.055)!important;
+  border:1px solid rgba(0,230,118,.22)!important;
+  box-shadow:none!important;
+}
+.financeiro-kpis b,
+.financeiro-resumo b,
+#finPremiacao{
+  color:#00e676!important;
+}
+.financeiro-kpis .red-text,
+.red-text{
+  color:#ff4d4d!important;
+}
+.financeiro-controls input,
+.financeiro-controls select,
+.card-admin input,
+.card-admin select{
+  background:#07130b!important;
+  color:#ffffff!important;
+  border:1px solid #00a844!important;
+}
+.financeiro-controls input::placeholder,
+.card-admin input::placeholder{color:#8ba894!important}
+.fin-limpeza-card{
+  background:rgba(255,255,255,.04)!important;
+  border:1px solid rgba(255,77,77,.45)!important;
+}
+.financeiro-resumo{
+  background:rgba(255,255,255,.035)!important;
+  border:1px solid rgba(0,230,118,.15)!important;
+  border-radius:14px!important;
+  padding:14px!important;
+}
+.fin-transacoes .red-text{color:#ff4d4d!important}
+.cadastrar-jogo-card{
+  border:1px solid rgba(0,230,118,.30)!important;
+}
+.cadastrar-jogo-card h2{color:#fff!important}
+.cadastrar-jogo-card .sub,.admin-note{color:#bfe9c9!important}
+
+/* Ajustes finais Admin: resultados por rodada e bilhetes sem fundo branco */
+.resultados-admin-card select,
+.cadastrar-jogo-card select,
+.card-admin select{
+  background:#06140b!important;
+  color:#f4fff6!important;
+  border:1px solid #00b957!important;
+  box-shadow:inset 0 0 0 1px rgba(0,255,120,.06)!important;
+}
+.resultado-toolbar{
+  background:linear-gradient(180deg,#08240f,#06180c)!important;
+  border:1px solid rgba(0,255,120,.18)!important;
+  color:#eaffef!important;
+}
+.tabela-resultados,
+#adminJogos.tabela{
+  background:#07130b!important;
+  border:1px solid rgba(0,255,120,.18)!important;
+}
+#adminJogos .linha,
+#adminJogos .jogo-admin{
+  background:linear-gradient(180deg,#0b1f11,#07140b)!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+  color:#f4fff6!important;
+}
+#adminJogos small{color:#c8e6ce!important}
+.rodada-bilhetes-card{
+  background:linear-gradient(180deg,#07190d,#041007)!important;
+  border:1px solid rgba(0,255,120,.18)!important;
+  box-shadow:0 15px 35px rgba(0,0,0,.38)!important;
+}
+.rodada-bilhetes-card.ativa{
+  border-color:#00c853!important;
+  box-shadow:0 0 0 1px rgba(0,200,83,.35),0 15px 35px rgba(0,0,0,.42)!important;
+}
+.rodada-bilhetes-head{
+  background:linear-gradient(180deg,#0b3a18,#061b0d)!important;
+  border-bottom:1px solid rgba(0,255,120,.18)!important;
+}
+.bilhetes-lista-admin{
+  background:#06120a!important;
+  padding:10px!important;
+}
+.bilhete-admin-row,
+.bilhete-pendente,
+.bilhete-pago{
+  background:linear-gradient(180deg,#0d2113,#07140b)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#f2fff5!important;
+}
+.bilhete-admin-row small{color:#c4e2cb!important}
+.bilhete-pago .tag,
+.bilhete-pendente .tag{box-shadow:none!important}
+.bilhete-admin-row .pago{background:#d9ffe7!important;color:#007a2c!important}
+.bilhete-admin-row .pendente{background:#fff1c7!important;color:#9a6500!important}
+
+/* Botão de impressão de cartelas manuais */
+.btn-print-a4{background:#00a844!important;color:#ffffff!important;border-radius:10px!important;box-shadow:0 10px 22px rgba(0,168,68,.25)!important;white-space:nowrap}
+.resultados-admin-card .admin-section-head{align-items:center!important}
+
+
+/* Bilhete manual no Admin */
+.manual-ticket-card{border-color:rgba(0,230,118,.35)!important;box-shadow:0 0 26px rgba(0,180,80,.10)}
+.manual-form-grid{display:grid;grid-template-columns:1.1fr 1fr .55fr;gap:12px;margin:10px 0 14px}
+.manual-jogos-box{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-height:520px;overflow:auto;padding-right:4px}
+.manual-jogo-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;background:rgba(0,0,0,.22);border:1px solid rgba(0,230,118,.18);border-radius:12px;padding:10px}
+.manual-time{font-weight:900;color:#fff;line-height:1.15}.manual-time.casa{text-align:right}.manual-time.fora{text-align:left}.manual-time small{display:block;color:#a9bdae;font-size:11px;margin-top:2px}
+.manual-opcoes{display:grid;grid-template-columns:repeat(3,42px);gap:7px;align-items:center;justify-content:center}
+.manual-opcoes input{display:none}.manual-opcoes label{height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.30);display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:900;background:#07140c;color:#fff;transition:.15s}
+.manual-opcoes label:nth-of-type(1){color:#36e36d}.manual-opcoes label:nth-of-type(2){color:#ffb000}.manual-opcoes label:nth-of-type(3){color:#ff4b4b}
+.manual-opcoes input:checked + label{background:#00c853;color:#001b0b;border-color:#00ff7f;box-shadow:0 0 12px rgba(0,230,118,.45)}
+.manual-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}.manual-actions button{width:auto;min-width:190px}
+.manual-empty{padding:16px;border:1px dashed rgba(255,255,255,.18);border-radius:12px;color:#b6c8bc;background:rgba(0,0,0,.18)}
+.manual-badge{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(0,230,118,.35);border-radius:999px;padding:3px 8px;color:#00e676;background:rgba(0,230,118,.10);font-size:11px;font-weight:900;margin-left:6px}
+@media(max-width:900px){.manual-form-grid{grid-template-columns:1fr}.manual-jogo-row{grid-template-columns:1fr}.manual-time.casa,.manual-time.fora{text-align:left}.manual-opcoes{justify-content:flex-start}}
+
+
+/* Organização do cadastro de bilhete manual */
+.manual-ticket-card{grid-column:1/-1!important;padding:26px!important}
+.manual-ticket-card .admin-section-head{margin-bottom:14px}
+.manual-form-grid{grid-template-columns:1.2fr 1fr .45fr!important;gap:18px!important;background:rgba(0,0,0,.18);border:1px solid rgba(0,230,118,.16);border-radius:16px;padding:16px;margin:12px 0 18px!important}
+.manual-jogos-box{display:grid!important;grid-template-columns:repeat(2,minmax(360px,1fr))!important;gap:12px!important;max-height:680px!important;overflow:auto!important;padding:6px!important;background:rgba(0,0,0,.12);border-radius:16px;border:1px solid rgba(255,255,255,.06)}
+.manual-jogo-row{grid-template-columns:minmax(170px,1fr) 150px minmax(170px,1fr)!important;gap:12px!important;padding:14px!important;border-radius:14px!important;background:linear-gradient(180deg,rgba(7,31,15,.95),rgba(3,16,8,.95))!important}
+.manual-opcoes{grid-template-columns:repeat(3,44px)!important;gap:8px!important}
+.manual-actions{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-top:16px!important}
+.manual-actions button{min-width:230px!important}
+.admin-note{display:block;margin-top:10px;color:#c9ead1!important;font-weight:800}
+@media(max-width:1200px){.manual-jogos-box{grid-template-columns:1fr!important}.manual-jogo-row{grid-template-columns:1fr auto 1fr!important}}
+@media(max-width:800px){.manual-form-grid{grid-template-columns:1fr!important}.manual-jogo-row{grid-template-columns:1fr!important}.manual-opcoes{justify-content:flex-start!important}}
+
+/* Upgrade Admin: resultados + ranking lado a lado e bilhetes organizados */
+.admin-workspace{display:grid!important;grid-template-columns:minmax(620px,1fr) 420px!important;gap:22px!important;align-items:start!important;margin-top:24px!important}
+.admin-main-column{display:flex!important;flex-direction:column!important;gap:22px!important;min-width:0!important}
+.admin-side-column{position:sticky!important;top:18px!important;min-width:0!important}
+.painel-profissional{background:linear-gradient(180deg,rgba(10,32,17,.97),rgba(4,15,8,.97))!important;border:1px solid rgba(0,230,118,.22)!important;border-radius:18px!important;box-shadow:0 18px 45px rgba(0,0,0,.36)!important;padding:24px!important;color:#fff!important}
+.painel-profissional h2{color:#fff!important;margin-top:0!important}.painel-profissional .sub{color:#b9d8c0!important}.admin-section-head{display:flex!important;align-items:flex-start!important;justify-content:space-between!important;gap:16px!important;margin-bottom:14px!important}.admin-section-head .btn-mini{width:auto!important;min-width:150px!important}
+.resultados-admin-card{overflow:visible!important}.tabela-resultados{display:flex!important;flex-direction:column!important;gap:10px!important;padding:12px!important;border-radius:16px!important;overflow:visible!important;background:rgba(0,0,0,.16)!important}
+.resultado-toolbar{display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:14px!important;border-radius:14px!important;padding:14px!important;margin-bottom:4px!important}.resultado-toolbar button{width:auto!important;margin:0!important;padding:13px 18px!important;border-radius:12px!important}.resultado-toolbar small{font-size:13px!important;color:#d9ffe3!important;line-height:1.35!important}
+.resultado-jogo-card{display:grid!important;grid-template-columns:42px minmax(210px,1fr) 220px 96px 96px!important;align-items:center!important;gap:12px!important;padding:14px!important;border:1px solid rgba(0,230,118,.16)!important;border-radius:14px!important;background:linear-gradient(90deg,rgba(8,36,16,.98),rgba(4,18,9,.98))!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)!important}.resultado-num{width:36px;height:36px;border-radius:10px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.28);display:flex;align-items:center;justify-content:center;font-weight:900;color:#00e676}.resultado-times b{font-size:15px!important;color:#fff!important}.resultado-times small{color:#b9d8c0!important;font-weight:800!important}.resultado-times em{font-style:normal!important;color:#00e676!important;font-size:11px!important;font-weight:900!important}.placar-admin{display:grid!important;grid-template-columns:1fr 20px 1fr!important;align-items:center!important;gap:8px!important}.placar-admin input{height:44px!important;margin:0!important;text-align:center!important;font-weight:900!important;font-size:15px!important;border-radius:10px!important}.placar-admin b{text-align:center;color:#fff}.btn-save-result{margin:0!important;width:100%!important;padding:12px 10px!important;border-radius:10px!important}.resultado-jogo-card .excluir{margin:0!important;width:100%!important;padding:12px 10px!important;border-radius:10px!important;background:#d51f38!important}
+.bilhetes-admin-card{overflow:visible!important}.bilhetes-por-rodada{display:grid!important;grid-template-columns:1fr!important;gap:14px!important}.rodada-bilhetes-card{border-radius:18px!important;overflow:hidden!important}.rodada-bilhetes-head{display:grid!important;grid-template-columns:minmax(150px,1fr) repeat(4,74px)!important;gap:8px!important;align-items:center!important;padding:14px!important}.rodada-bilhetes-head h3,.rodada-bilhetes-head h2{margin:0!important}.bilhete-admin-row{border-radius:12px!important;padding:12px!important;margin-bottom:8px!important;display:grid!important;grid-template-columns:1fr auto auto!important;gap:10px!important;align-items:center!important}.bilhete-admin-row button{width:auto!important;min-width:96px!important;margin:0!important;padding:10px 14px!important;border-radius:10px!important}.bilhete-admin-row .tag{white-space:nowrap!important}.ranking-admin-card{max-height:calc(100vh - 40px)!important;overflow:auto!important}.ranking-admin-card button{border-radius:12px!important}.ranking-admin{margin-top:14px!important;background:rgba(0,0,0,.18)!important;border-color:rgba(255,176,0,.20)!important}.ranking-admin .linha{background:linear-gradient(90deg,rgba(255,176,0,.12),rgba(0,0,0,.10))!important;border-bottom:1px solid rgba(255,255,255,.08)!important;color:#fff!important}
+@media(max-width:1350px){.admin-workspace{grid-template-columns:1fr!important}.admin-side-column{position:relative!important;top:auto!important}.ranking-admin-card{max-height:none!important}.resultado-jogo-card{grid-template-columns:38px 1fr!important}.placar-admin,.btn-save-result,.resultado-jogo-card .excluir{grid-column:2!important}.rodada-bilhetes-head{grid-template-columns:1fr 1fr 1fr!important}.bilhete-admin-row{grid-template-columns:1fr!important}}
+@media(max-width:760px){.admin-section-head{flex-direction:column!important}.resultado-toolbar{grid-template-columns:1fr!important}.resultado-jogo-card{grid-template-columns:1fr!important}.resultado-num,.placar-admin,.btn-save-result,.resultado-jogo-card .excluir{grid-column:auto!important}.placar-admin{grid-template-columns:1fr 20px 1fr!important}.manual-ticket-card{padding:18px!important}}

@@ -1,0 +1,35 @@
+
+ETAPA 1.4 - LOGIN ADMIN
+
+Arquivos novos/alterados:
+- login-admin.html
+- admin-bilhetes.html protegido
+- backend/server.js com autenticação JWT
+- api.js com token automático
+
+Primeiro acesso:
+Usuário: admin
+Senha: 123456
+
+Como usar:
+1) Abra CMD dentro de:
+   PALPITES_LOGIN/backend
+
+2) Rode:
+   npm install
+   npm start
+
+3) Abra:
+   login-admin.html
+
+4) Entre com:
+   admin / 123456
+
+5) No painel:
+   - alterar senha
+   - sair
+   - listar bilhetes
+   - confirmar pagamento
+   - editar
+   - excluir
+   - imprimir

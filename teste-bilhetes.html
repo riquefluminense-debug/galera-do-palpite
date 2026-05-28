@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Bilhetes no Banco - Galera do Palpite</title>
+  <script src="api.js"></script>
+  <style>
+    body{font-family:Arial;background:#07140f;color:#fff;padding:24px}
+    button{padding:10px 14px;margin:5px;border-radius:8px;border:0;background:#19c37d;color:#001b10;font-weight:700;cursor:pointer}
+    .box{background:#0d2018;padding:16px;border-radius:10px;margin:12px 0}
+    pre{background:#0d2018;padding:16px;border-radius:10px;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <h1>Teste de Bilhetes no Banco</h1>
+  <p>Confirma se bilhetes do site e bilhetes manuais estão salvando no MongoDB.</p>
+  <div class="box">
+    <button onclick="criarBilheteSite()">Criar bilhete SITE pendente</button>
+    <button onclick="criarBilheteManual()">Criar bilhete MANUAL pago</button>
+    <button onclick="listarBilhetes()">Listar bilhetes</button>
+    <button onclick="listarFinanceiro()">Resumo financeiro</button>
+  </div>
+  <pre id="saida">Aguardando...</pre>
+  <script>
+    let ultimaRodadaId = "";
+    function mostrar(dados){ document.getElementById("saida").textContent = JSON.stringify(dados, null, 2); }
+    async function garantirRodada(){
+      const rodadas = await carregarRodadasBanco();
+      if (rodadas.length) { ultimaRodadaId = rodadas[0]._id; return rodadas[0]; }
+      const rodada = await salvarRodadaBanco({ nome:"Rodada Teste Bilhetes", competicao:"Teste", data:new Date().toLocaleDateString("pt-BR"), horario:"20:00", premioEstimado:100, valorBilhete:10 });
+      ultimaRodadaId = rodada._id; return rodada;
+    }
+    async function criarBilheteSite(){
+      const rodada = await garantirRodada();
+      const bilhete = await salvarBilheteBanco({ nome:"Cliente Site", telefone:"21999999999", rodadaId:rodada._id, rodadaNome:rodada.nome, quantidade:1, valor:10, pago:false, manual:false, origem:"SITE", palpites:[{jogo:1,escolha:"CASA"},{jogo:2,escolha:"EMPATE"}] });
+      mostrar(bilhete);
+    }
+    async function criarBilheteManual(){
+      const rodada = await garantirRodada();
+      const bilhete = await salvarBilheteManualBanco({ nome:"Cliente Manual", telefone:"21888888888", rodadaId:rodada._id, rodadaNome:rodada.nome, quantidade:1, valor:10, palpites:[{jogo:1,escolha:"FORA"},{jogo:2,escolha:"CASA"}] });
+      mostrar(bilhete);
+    }
+    async function listarBilhetes(){ mostrar(await carregarBilhetesBanco()); }
+    async function listarFinanceiro(){ mostrar(await carregarResumoFinanceiroBanco()); }
+  </script>
+</body>
+</html>

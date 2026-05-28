@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Resultados - Galera do Palpite</title>
+<script src="api.js"></script>
+  <script src="auth.js"></script>
+<style>
+body{font-family:Arial;background:#03130c;color:white;padding:24px}
+.painel{background:#071a11;border:1px solid #0f7a43;border-radius:16px;padding:18px;margin-bottom:16px}
+select,input,button{padding:10px;border-radius:8px;margin:4px;background:#020f09;color:white;border:1px solid #11864b}
+button{background:#08b95f;color:white;font-weight:800;cursor:pointer}
+table{width:100%;border-collapse:collapse}td,th{padding:10px;border-bottom:1px solid #1e4b31}th{background:#0b301d}
+</style>
+</head>
+<body>
+<script>protegerPaginaAdmin();</script>
+<script>if(!localStorage.getItem("adminToken")) window.location.href="login-admin.html";</script>
+<h1>⚽ Resultados para Ranking</h1>
+<div class="painel">
+  <label>Rodada:</label>
+  <select id="rodadaSelect" onchange="carregarJogos()"></select>
+  <button onclick="carregarJogos()">Atualizar jogos</button>
+  <button onclick="window.location.href='admin-ranking.html'">Ver Ranking</button>
+</div>
+<div class="painel">
+<table>
+<thead><tr><th>#</th><th>Jogo</th><th>Status</th><th>Resultado</th><th>Ação</th></tr></thead>
+<tbody id="jogosBody"><tr><td colspan="5">Carregando...</td></tr></tbody>
+</table>
+</div>
+<script>
+let jogosCache=[];
+async function carregarRodadas(){
+ const rodadas=await carregarRodadasBanco();
+ rodadaSelect.innerHTML=rodadas.map(r=>`<option value="${r._id}">${r.nome} - ${r.data||''}</option>`).join('');
+ carregarJogos();
+}
+async function carregarJogos(){
+ const id=rodadaSelect.value;
+ if(!id)return;
+ jogosCache=await carregarJogosBanco(id);
+ jogosBody.innerHTML=jogosCache.map((j,i)=>`
+ <tr>
+  <td>${i+1}</td>
+  <td><strong>${j.casa}</strong> x <strong>${j.fora}</strong></td>
+  <td>${j.status||'AGUARDANDO'}</td>
+  <td>
+   <select id="res_${j._id}">
+    <option value="">AGUARDANDO</option>
+    <option value="CASA" ${j.resultadoEscolha==='CASA'?'selected':''}>CASA</option>
+    <option value="EMPATE" ${j.resultadoEscolha==='EMPATE'?'selected':''}>EMPATE</option>
+    <option value="FORA" ${j.resultadoEscolha==='FORA'?'selected':''}>FORA</option>
+   </select>
+  </td>
+  <td><button onclick="salvarResultado('${j._id}')">Salvar resultado</button></td>
+ </tr>`).join('');
+}
+async function salvarResultado(id){
+ const val=document.getElementById('res_'+id).value;
+ await atualizarJogoBanco(id,{resultadoEscolha:val,status:val?'ENCERRADO':'AGUARDANDO'});
+ alert('Resultado salvo!');
+ carregarJogos();
+}
+carregarRodadas();
+</script>
+</body>
+</html>

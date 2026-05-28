@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galera do Palpite - Palpite Agora</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="premium.css" />
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <aside class="sidebar">
+    <div class="brand premium-brand logo-brand"><img src="logo-galera-do-palpite.png" alt="Galera do Palpite"></div>
+    <a onclick="mostrarTela('inicio')">🏠 Início</a>
+    <a onclick="mostrarTela('regras')">📋 Regulamento</a>
+    <a onclick="mostrarTela('buscar')">🔎 Buscar Bilhete</a>
+    <a onclick="mostrarTela('ranking')">🏆 Ranking</a>
+    <a onclick="mostrarTela('historico')">📜 Histórico</a>
+    <a class="admin" href="login-admin.html">⚙️ Admin</a>
+  </aside>
+
+  <main class="page">
+    <section id="inicio" class="tela ativa">
+      <section class="banner premium-hero">
+        <div class="hero-card">
+          <span class="live-badge">● RODADA ABERTA</span>
+          <p>Seu palpite vale prêmio</p>
+          <h1>Palpite agora mesmo e concorra em dinheiro</h1>
+          <div class="hero-stats"><span>⚡ Ranking automático</span><span>💸 Pix</span><span>🏆 Premiação dividida em empate</span></div>
+        </div>
+      </section>
+      <section class="rodadas">
+        <h2>Bolões disponíveis</h2>
+        <div id="listaRodadas" class="grid-cards"></div>
+      </section>
+    </section>
+
+    <section id="admin" class="tela painel">
+      <div id="adminLogin" class="admin-login-card">
+        <h1>🔒 Acesso Admin</h1>
+        <p class="sub">Área restrita para gerenciamento do Galera do Palpite.</p>
+        <label>Usuário do administrador</label>
+        <input id="usuarioAdmin" type="text" value="HenriqueN1998" placeholder="Digite o usuário" onkeydown="if(event.key==='Enter')entrarAdmin()" />
+        <label>Senha do administrador</label>
+        <input id="senhaAdmin" type="password" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')entrarAdmin()" />
+        <button class="btn-login" onclick="entrarAdmin()">Entrar no painel</button>
+        <p id="erroAdmin" class="erro-admin"></p>
+      </div>
+
+      <div id="adminConteudo" class="admin-protegido">
+        <div class="admin-topbar">
+          <div>
+            <h1>Painel Admin</h1>
+            <p class="sub">Crie rodadas, cadastre jogos, lance resultados, acompanhe bilhetes e confirme pagamentos.</p>
+          </div>
+          <button class="btn-sair" onclick="sairAdmin()">Sair do admin</button>
+        </div>
+
+        <div class="financeiro-admin">
+          <div class="financeiro-title">
+            <div>
+              <span class="live-badge small">💰 SETOR FINANCEIRO</span>
+              <h2>Financeiro Geral + Rodadas</h2>
+              <p class="sub">O geral soma todas as rodadas. Abaixo, cada rodada mantém seu próprio caixa separado.</p>
+            </div>
+            <div class="financeiro-actions-top"><button class="btn-dourado btn-mini" onclick="renderFinanceiroAdmin()">Atualizar financeiro</button><button class="btn-outline-danger btn-mini" onclick="limparFinanceiroGeral()">Limpar valores geral</button></div>
+          </div>
+
+          <div class="financeiro-bloco geral">
+            <h3>📊 Financeiro Geral</h3>
+            <div class="financeiro-kpis">
+              <div><small>Total arrecadado geral</small><b id="finGeralEntradas">R$ 0,00</b><span>Bilhetes pagos + entradas extras</span></div>
+              <div><small>Pendentes geral</small><b id="finGeralPendentes">R$ 0,00</b><span>Bilhetes aguardando confirmação</span></div>
+              <div><small>Saídas geral</small><b class="red-text" id="finGeralSaidas">R$ 0,00</b><span>Prêmios / custos pagos</span></div>
+              <div><small>Saldo geral</small><b id="finGeralSaldo">R$ 0,00</b><span>Saldo acumulado no sistema</span></div>
+            </div>
+          </div>
+
+          <div class="financeiro-bloco rodada-atual-fin">
+            <h3>💵 Financeiro da Rodada Selecionada: <span id="finRodadaNome">-</span></h3>
+            <div class="financeiro-kpis">
+              <div><small>Entradas confirmadas</small><b id="finEntradas">R$ 0,00</b><span>Bilhetes pagos + entradas extras</span></div>
+              <div><small>Bilhetes pendentes</small><b id="finPendentes">R$ 0,00</b><span>Aguardando confirmação</span></div>
+              <div><small>Saídas registradas</small><b class="red-text" id="finSaidas">R$ 0,00</b><span>Pagamentos / custos</span></div>
+              <div><small>Saldo da rodada</small><b id="finSaldo">R$ 0,00</b><span>Disponível nesta rodada</span></div>
+            </div>
+
+            <div class="financeiro-controls">
+              <div>
+                <label>Percentual de premiação da rodada (%)</label>
+                <input id="finPercentualPremio" type="number" min="0" max="100" value="70" onchange="salvarPercentualPremio()">
+                <p class="fin-note">Premiação estimada: <b id="finPremiacao">R$ 0,00</b></p>
+              </div>
+              <div>
+                <label>Adicionar entrada manual nesta rodada</label>
+                <input id="finEntradaManual" type="number" min="0" step="0.01" placeholder="Ex: 100">
+                <button onclick="adicionarEntradaFinanceira()">Adicionar entrada</button>
+              </div>
+              <div>
+                <label>Registrar saída / pagamento nesta rodada</label>
+                <input id="finSaidaManual" type="number" min="0" step="0.01" placeholder="Ex: 50">
+                <button class="btn-red" onclick="adicionarSaidaFinanceira()">Registrar saída</button>
+              </div>
+              <div class="fin-limpeza-card">
+                <label>Limpeza financeira</label>
+                <p class="fin-note">Limpa apenas entradas/saídas manuais desta rodada. Bilhetes e status de pagamento continuam salvos.</p>
+                <button class="btn-outline-danger" onclick="limparFinanceiroRodadaAtual()">Limpar valores da rodada</button>
+              </div>
+            </div>
+
+            <div class="financeiro-grid-bottom">
+              <div class="financeiro-resumo">
+                <h3>Resumo da rodada</h3>
+                <p><span>Bilhetes pagos</span><b id="finQtdPagos">0</b></p>
+                <p><span>Bilhetes pendentes</span><b id="finQtdPendentes">0</b></p>
+                <p><span>Total de bilhetes equivalentes pagos</span><b id="finEquivPagos">0</b></p>
+                <p><span>Ticket médio pago</span><b id="finTicketMedio">R$ 0,00</b></p>
+              </div>
+              <div class="financeiro-resumo">
+                <h3>Últimos lançamentos da rodada</h3>
+                <div id="finTransacoes" class="fin-transacoes"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="financeiro-bloco">
+            <h3>📁 Resumo separado por rodada</h3>
+            <div id="finRodadasResumo" class="financeiro-rodadas-lista"></div>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+        <div class="card-admin rodadas-admin-card">
+          <h2>Rodadas separadas</h2>
+          <label>Selecionar rodada para administrar</label>
+          <select id="rodadaAdminSelect" onchange="selecionarRodada(this.value)"></select>
+          <div class="status-legenda"><span><i class="dot verde"></i> Aberta</span><span><i class="dot vermelha"></i> Fechada</span></div>
+          <hr class="admin-sep">
+          <label>Nome da rodada atual</label>
+          <input id="rodadaNome" value="Libertadores + Sul-Americana" />
+          <label>Valor da cartela</label>
+          <input id="rodadaValor" type="number" value="10" />
+          <label>Data exibida no card</label>
+          <input id="rodadaData" placeholder="Ex: 30/05/2026" />
+          <label>Horário exibido no card</label>
+          <input id="rodadaHora" placeholder="Ex: 21:30" />
+          <label>Prêmio estimado exibido para clientes</label>
+          <input id="rodadaPremioEstimado" type="number" min="0" step="0.01" placeholder="Ex: 250,00" />
+          <label>Status</label>
+          <select id="rodadaStatus"><option>Aberta</option><option>Encerrada</option></select>
+          <button onclick="salvarRodada()">Salvar rodada atual</button>
+          <div class="rodada-actions">
+            <button class="btn-red" onclick="fecharRodadaAtual()">Fechar palpites</button>
+            <button onclick="abrirRodadaAtual()">Abrir palpites</button>
+            <button class="btn-red" onclick="apagarRodadaAtual()">Apagar rodada ultrapassada</button>
+          </div>
+          <small class="admin-note">Ao apagar uma rodada com ranking calculado, o campeão fica salvo no Histórico.</small>
+          <hr class="admin-sep">
+          <h3>Criar nova rodada</h3>
+          <label>Nome da nova rodada</label>
+          <input id="novaRodadaNome" placeholder="Ex: Copa do Mundo" />
+          <label>Valor da cartela</label>
+          <input id="novaRodadaValor" type="number" value="10" />
+          <label>Prêmio estimado da nova rodada</label>
+          <input id="novaRodadaPremio" type="number" min="0" step="0.01" placeholder="Ex: 400" />
+          <label>Data da nova rodada</label>
+          <input id="novaRodadaData" placeholder="Ex: 30/05/2026" />
+          <label>Horário da nova rodada</label>
+          <input id="novaRodadaHora" placeholder="Ex: 21:30" />
+          <button onclick="criarNovaRodadaAdmin()">Criar nova rodada</button>
+        </div>
+        <div class="card-admin">
+          <h2>Configuração Pix</h2>
+          <label>Chave Pix</label>
+          <input id="pixChave" value="11999999999" />
+          <label>Nome do recebedor</label>
+          <input id="pixNome" value="Galera do Palpite" />
+          <label>Mensagem padrão</label>
+          <input id="pixMsg" value="Pagamento de bilhete Galera do Palpite" />
+          <button onclick="salvarPixAdmin()">Salvar Pix</button>
+        </div>
+        <div class="card-admin cadastrar-jogo-card">
+          <h2>Cadastrar jogo</h2>
+          <p class="sub">Escolha exatamente em qual competição/rodada esse jogo vai entrar.</p>
+          <label>Competição / rodada do jogo</label>
+          <select id="jogoRodadaSelect"></select>
+          <label>Data e horário do jogo</label>
+          <input id="jogoData" value="26/05 21:30" placeholder="Ex: 26/05 21:30" />
+          <label>Time da casa</label>
+          <input id="jogoCasa" placeholder="Ex: Flamengo-RJ" />
+          <label>Time visitante</label>
+          <input id="jogoFora" placeholder="Ex: Cusco-PER" />
+          <button onclick="adicionarJogoAdmin()">Adicionar jogo na rodada escolhida</button>
+          <small class="admin-note">Depois de adicionar, os jogos ficam separados dentro da rodada selecionada.</small>
+        </div>
+      </div>
+
+      <div class="admin-workspace bottom">
+        <div class="admin-main-column">
+          <div class="card-admin wide resultados-admin-card painel-profissional">
+            <div class="admin-section-head">
+              <div>
+                <h2>Jogos cadastrados / Resultados</h2>
+                <p class="sub">Escolha a competição/rodada antes de lançar os placares.</p>
+              </div>
+              <button class="btn-mini btn-print-a4" onclick="imprimirRodadaA4()">🖨️ Imprimir Rodada (A4)</button>
+            </div>
+            <label>Filtrar resultados por competição / rodada</label>
+            <select id="resultadoRodadaSelect" onchange="selecionarRodadaResultado(this.value)"></select>
+            <div id="adminJogos" class="tabela tabela-resultados"></div>
+          </div>
+
+          <div class="card-admin wide bilhetes-admin-card painel-profissional">
+            <div class="admin-section-head"><div><h2>Bilhetes recebidos para confirmar</h2><p class="sub">Separado por competição/rodada para não misturar pagamentos de bolões diferentes.</p></div><button class="btn-mini" onclick="renderAdmin()">Atualizar</button></div>
+            <div id="adminBilhetes" class="bilhetes-por-rodada"></div>
+          </div>
+        </div>
+
+        <div class="admin-side-column">
+          <div class="card-admin wide ranking-admin-card painel-profissional">
+            <h2>Ranking automático</h2>
+            <p class="sub">Fica ao lado dos resultados para você lançar placares e conferir a classificação rapidamente.</p>
+            <button onclick="calcularRanking()">Calcular ranking</button>
+            <button onclick="salvarCampeaoHistorico()" class="btn-dourado">Salvar campeão no histórico</button>
+            <div id="adminRanking" class="tabela ranking-admin"></div>
+          </div>
+        </div>
+
+        <div class="card-admin wide manual-ticket-card painel-profissional">
+          <div class="admin-section-head">
+            <div>
+              <h2>📝 Inserir bilhete manual</h2>
+              <p class="sub">Cadastre aqui as cartelas feitas à mão. O bilhete entra no financeiro e no ranking da rodada escolhida.</p>
+            </div>
+          </div>
+          <label>Competição / rodada do bilhete manual</label>
+          <select id="manualRodadaSelect" onchange="renderManualForm()"></select>
+          <div class="manual-form-grid">
+            <div>
+              <label>Nome do cliente</label>
+              <input id="manualNome" placeholder="Ex: João Silva" />
+            </div>
+            <div>
+              <label>Número do celular</label>
+              <input id="manualTelefone" placeholder="Ex: 21999999999" />
+            </div>
+            <div>
+              <label>Valor pago</label>
+              <input id="manualValor" type="number" min="0" step="0.01" placeholder="Ex: 10" />
+            </div>
+          </div>
+          <div id="manualJogos" class="manual-jogos-box"></div>
+          <div class="manual-actions">
+            <button onclick="salvarBilheteManual()">Salvar bilhete manual</button>
+            <button class="btn-outline-danger" onclick="limparBilheteManual()">Limpar marcações</button>
+          </div>
+          <small class="admin-note">Marque uma opção por jogo: Casa, Empate ou Fora. Depois de salvo, o bilhete fica como PAGO e identificado como MANUAL.</small>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <section id="regras" class="tela painel regulamento-page">
+      <h1>📋 Regulamento — Galera do Palpite</h1>
+      <p class="sub">Leia atentamente as regras antes de confirmar seu bilhete. Ao continuar utilizando a plataforma, o participante declara estar de acordo com todas as regras do regulamento.</p>
+
+      <div class="regra-box">
+        <h2>Introdução</h2>
+        <p>O <b>Galera do Palpite</b> é um sistema de bolão esportivo baseado em palpites de resultados de partidas de futebol.</p>
+        <p>Cada rodada contém <b>8 jogos</b>, e cada jogo possui <b>3 opções de marcação</b>: vitória do time da casa, empate ou vitória do time visitante.</p>
+        <p>Ganha quem fizer o maior número de acertos. Cada acerto vale <b>1 ponto</b>, sendo o máximo possível <b>8 pontos</b>.</p>
+      </div>
+
+      <div class="regra-box">
+        <h2>Funcionamento das apostas</h2>
+        <p>O participante pode marcar palpite seco, duplo ou triplo.</p>
+        <p>O sistema calcula automaticamente a quantidade equivalente de bilhetes e o valor total da aposta.</p>
+        <p>Limite máximo permitido: <b>256 bilhetes por aposta</b>.</p>
+      </div>
+
+      <div class="regra-box">
+        <h2>Critério de vitória</h2>
+        <p>Será considerado vencedor o participante que obtiver o maior número de acertos na rodada.</p>
+        <p>Em caso de empate entre dois ou mais participantes, o prêmio será dividido igualmente entre os vencedores.</p>
+        <p>O ranking considera somente bilhetes com pagamento confirmado.</p>
+      </div>
+
+      <div class="regra-box">
+        <h2>Regras dos jogos</h2>
+        <ol>
+          <li>Todos os resultados são considerados apenas no tempo normal: 90 minutos mais acréscimos.</li>
+          <li>Não são considerados prorrogação nem disputa de pênaltis.</li>
+          <li>Jogos interrompidos após os 30 minutos do segundo tempo terão o placar do momento mantido.</li>
+          <li>Jogos interrompidos antes dos 30 minutos do segundo tempo serão anulados da rodada.</li>
+          <li>Jogos adiados ou cancelados poderão ser anulados ou substituídos pela administração.</li>
+        </ol>
+      </div>
+
+      <div class="regra-box destaque-regra">
+        <h2>Observações importantes</h2>
+        <ul>
+          <li>Bilhetes com informações inválidas poderão ser cancelados.</li>
+          <li>É responsabilidade do participante conferir seus palpites antes da confirmação.</li>
+          <li>Após confirmado, o bilhete não poderá ser alterado.</li>
+        </ul>
+        <p><b>Galera do Palpite — Plataforma Oficial de Bolões Esportivos.</b></p>
+        <p>Boa sorte 🍀</p>
+      </div>
+    </section>
+    <section id="buscar" class="tela painel"><h1>Buscar Bilhete</h1><input id="buscaBilhete" placeholder="Digite código do bilhete ou celular" oninput="buscarBilhete()"><div id="resultadoBusca" class="tabela"></div></section>
+
+    <section id="mercado" class="tela painel mercado-page">
+      <div class="mercado-header">
+        <div>
+          <span class="live-badge small">🛒 ÁREA DO CLIENTE</span>
+          <h1>Meus Bilhetes</h1>
+          <p class="sub">Consulte seus palpites pelo código do bilhete ou celular. Nenhum bilhete aparece sem busca.</p>
+        </div>
+        <button class="novo-palpite" onclick="abrirBilhete()">Novo palpite</button>
+      </div>
+
+      <div class="mercado-search-card">
+        <label>Buscar bilhete</label>
+        <div class="mercado-search">
+          <input id="mercadoBusca" placeholder="Digite o código GDP-0001 ou seu celular" onkeydown="if(event.key==='Enter')buscarMercado()">
+          <button onclick="buscarMercado()">Buscar</button>
+        </div>
+        <small>Privacidade ativa: os bilhetes só aparecem após informar código ou celular.</small>
+      </div>
+
+      <div class="mercado-stats">
+        <div><b id="mercadoQtd">0</b><span>Bilhetes encontrados</span></div>
+        <div><b id="mercadoPendentes">0</b><span>Pendentes</span></div>
+        <div><b id="mercadoValidados">0</b><span>Validados</span></div>
+      </div>
+
+      <div class="mercado-tabs">
+        <button class="active" onclick="setMercadoFiltro('todos',this)">Todos</button>
+        <button onclick="setMercadoFiltro('pendentes',this)">Pendentes</button>
+        <button onclick="setMercadoFiltro('validados',this)">Validados</button>
+      </div>
+
+      <div id="mercadoResultado" class="mercado-lista vazio">
+        <div class="empty-market">
+          <div>🛒</div>
+          <h2>Busque seu bilhete</h2>
+          <p>Use o código ou celular para visualizar somente seus próprios bilhetes.</p>
+        </div>
+      </div>
+    </section>
+    <section id="ranking" class="tela painel"><h1>🏆 Ranking da Rodada</h1><p class="sub">Ranking completo liberado após a rodada ser fechada.</p><div id="rankingPublico" class="ranking-lista"></div></section>
+    <section id="historico" class="tela painel"><h1>📜 Histórico de Vitórias</h1><p class="sub">Campeões salvos pelo administrador ao final de cada rodada.</p><div id="historicoVitorias" class="tabela"></div></section>
+  </main>
+
+  <button class="float cart" onclick="mostrarTela('mercado')">🛒<span id="cartBadge">0</span></button>
+  <a class="float whats" href="#" title="WhatsApp" aria-label="WhatsApp"><span class="wa-mark">☎</span></a>
+  <a class="float telegram" href="#" title="Telegram" aria-label="Telegram">✈</a>
+
+  <div class="overlay" id="overlay" onclick="fecharFora(event)">
+    <div class="modal">
+      <div class="top-orange"></div>
+      <div id="ticketList" class="ticket-list"></div>
+      <div class="resumo">Total de palpites obrigatórios: <b id="totalObrigatorios">8</b><br>Total de palpites realizados: <b id="totalFeitos">0</b></div>
+      <input id="nome" placeholder="Nome" />
+      <div class="phone"><span>🇧🇷</span><input id="telefone" placeholder="+55" /></div>
+      <div class="caixa-total">
+        <h3>Aposta equivalente à <span id="equivalenteBilhetes">1</span> bilhete(s).</h3>
+        <div class="tipos"><b>SECOS: <span id="secos">0</span></b><b>DUPLOS: <span id="duplos">0</span></b><b>TRIPLOS: <span id="triplos">0</span></b></div>
+        <h2>Valor Total: <span id="valorTotal">10,00 R$</span></h2>
+      </div>
+      <div class="acoes"><button class="confirmar" onclick="confirmarAposta()">CONFIRMAR APOSTA</button><button class="filtrar" onclick="limparPalpites()">FILTRAR PALPITES</button></div>
+      <p id="mensagem"></p>
+        <div id="pixBox" class="pix-box">
+          <h3>💸 Pagamento Pix</h3>
+          <p>Após o Pix aprovado pelo Mercado Pago, o bilhete é ativado automaticamente e o comprovante amarelo fica liberado.</p><div id="pixStatus" class="pix-status"><b>⏳ Aguardando pagamento Pix</b><span>Bilhete ainda pendente.</span></div>
+          <div class="pix-qrcode"><img id="pixQrImg" alt="QR Code Pix" /></div>
+          <label>Pix copia e cola</label>
+          <textarea id="pixCopia" readonly></textarea>
+          <div class="pix-actions">
+            <button onclick="copiarPix()">Copiar Pix</button>
+            <button id="pixAutoBtn" type="button">Verificar pagamento</button>
+            <button id="pixTicketBtn" type="button" style="display:none">Ver bilhete amarelo</button>
+            <a id="whatsComprovante" target="_blank">WhatsApp suporte</a>
+          </div>
+        </div>
+    </div>
+  </div>
+<script src="script.js"></script>
+<script src="api.js"></script>
+</body>
+</html>

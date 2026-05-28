@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Bilhetes - Galera do Palpite</title>
+  <script src="api.js"></script>
+  <script src="auth.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#03130c;color:#fff;padding:24px}
+    h1{margin:0 0 8px;font-size:30px}
+    .sub{color:#b6d6c2;margin-bottom:20px}
+    .topo{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .top-actions{display:flex;gap:8px;align-items:center}
+    .painel{background:linear-gradient(180deg,#092016,#06160f);border:1px solid #0f7a43;border-radius:18px;padding:20px;margin-bottom:18px;box-shadow:0 0 20px rgba(0,255,120,.08)}
+    .grid{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:12px;align-items:end}
+    label{display:block;font-size:13px;color:#b8d8c6;font-weight:700;margin-bottom:6px}
+    input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #11864b;background:#020f09;color:#fff;outline:none}
+    button{border:0;border-radius:10px;padding:12px 16px;font-weight:800;cursor:pointer;color:#fff;background:#08b95f}
+    button:hover{filter:brightness(1.08)}
+    .btn-red{background:#d92035}
+    .btn-yellow{background:#e6a400;color:#151000}
+    .btn-dark{background:#11251a;border:1px solid #1ba45d}
+    .btn-small{padding:8px 10px;font-size:12px}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:12px}
+    .card{background:#0b2116;border:1px solid rgba(21,187,96,.45);border-radius:14px;padding:16px}
+    .card span{display:block;color:#a9cbb7;font-size:13px;margin-bottom:6px}
+    .card strong{font-size:24px;color:#00e681}
+    table{width:100%;border-collapse:collapse;margin-top:16px;overflow:hidden;border-radius:14px}
+    th,td{border-bottom:1px solid rgba(255,255,255,.08);padding:12px;text-align:left;vertical-align:top;font-size:14px}
+    th{background:#0b301d;color:#d9ffe8;font-size:13px;text-transform:uppercase}
+    tr{background:#071a11}
+    tr:nth-child(even){background:#092016}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+    .pago{background:#d9ffe8;color:#006b35}
+    .pendente{background:#fff1c4;color:#835500}
+    .manual{background:#0fa35b;color:white}
+    .site{background:#314a3a;color:white}
+    .acoes{display:flex;gap:6px;flex-wrap:wrap}
+    .muted{color:#b4ccb9;font-size:12px}
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px;z-index:999}
+    .modal{background:#071a11;border:1px solid #18b867;border-radius:18px;padding:22px;width:min(680px,96vw);box-shadow:0 0 40px rgba(0,255,120,.18)}
+    .modal h2{margin-top:0}
+    .form2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media(max-width:1100px){.grid{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr 1fr}}
+    @media(max-width:700px){.grid,.cards,.form2{grid-template-columns:1fr}th,td{font-size:12px;padding:8px}}
+  </style>
+</head>
+<body>
+  <script>
+    protegerPaginaAdmin();
+    if(!localStorage.getItem("adminToken")){
+      window.location.href = "login-admin.html";
+    }
+  </script>
+
+  <div class="topo">
+    <div>
+      <h1>🎟️ Painel ADMIN Real — Bilhetes</h1>
+      <div class="sub">Listar, confirmar pagamento, editar status e excluir bilhetes direto no MongoDB.</div>
+    </div>
+    <div class="top-actions">
+      <button class="btn-dark" onclick="window.open('admin-resultados.html','_blank')">Resultados</button>
+      <button class="btn-dark" onclick="window.open('admin-ranking.html','_blank')">Ranking</button>
+      <button class="btn-dark" onclick="abrirSenha()">Alterar senha</button>
+      <button class="btn-red" onclick="logoutAdmin()">Sair</button>
+    </div>
+  </div>
+
+  <div class="painel">
+    <div class="grid">
+      <div><label>Buscar por código GDP</label><input id="filtroCodigo" placeholder="Ex: GDP-0009"></div>
+      <div><label>Buscar por telefone</label><input id="filtroTelefone" placeholder="Ex: 21999999999"></div>
+      <div><label>Status</label><select id="filtroStatus"><option value="">Todos</option><option value="PAGO">Pago</option><option value="PENDENTE">Pendente</option></select></div>
+      <div><label>Origem</label><select id="filtroManual"><option value="">Todos</option><option value="true">Manual</option><option value="false">Site</option></select></div>
+      <div><button onclick="carregarBilhetesAdmin()">🔄 Atualizar</button></div>
+    </div>
+    <div class="cards">
+      <div class="card"><span>Total de bilhetes</span><strong id="totalBilhetes">0</strong></div>
+      <div class="card"><span>Pagos</span><strong id="totalPagos">0</strong></div>
+      <div class="card"><span>Pendentes</span><strong id="totalPendentes">0</strong></div>
+      <div class="card"><span>Recebido</span><strong id="totalRecebido">R$ 0,00</strong></div>
+    </div>
+  </div>
+
+  <div class="painel">
+    <h2>📦 Exportação e backup</h2>
+    <div class="sub">Baixe os dados antes de alterações grandes, fechamento de rodada ou hospedagem.</div>
+    <div class="top-actions" style="margin-top:12px;flex-wrap:wrap">
+      <button onclick="baixarBilhetesExcelAdmin()">📊 Exportar bilhetes Excel</button>
+      <button class="btn-dark" onclick="baixarBilhetesPDFAdmin()">📄 Exportar bilhetes PDF</button>
+      <button class="btn-yellow" onclick="baixarBackupAdmin()">🛡️ Backup completo JSON</button>
+    </div>
+  </div>
+
+  <div class="painel">
+    <h2>Bilhetes recebidos</h2>
+    <table>
+      <thead><tr><th>Código</th><th>Cliente</th><th>Rodada</th><th>Valor</th><th>Status</th><th>Origem</th><th>Data</th><th>Ações</th></tr></thead>
+      <tbody id="listaBilhetes"><tr><td colspan="8">Carregando...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="modal-bg" id="modalEditar">
+    <div class="modal">
+      <h2>Editar bilhete</h2><input type="hidden" id="editId">
+      <div class="form2">
+        <div><label>Nome</label><input id="editNome"></div>
+        <div><label>Telefone</label><input id="editTelefone"></div>
+        <div><label>Valor</label><input id="editValor" type="number" step="0.01"></div>
+        <div><label>Status pagamento</label><select id="editPago"><option value="true">PAGO</option><option value="false">PENDENTE</option></select></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn-dark" onclick="fecharModal()">Cancelar</button><button onclick="salvarEdicao()">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modalSenha">
+    <div class="modal">
+      <h2>Alterar senha do admin</h2>
+      <div class="form2"><div><label>Senha atual</label><input id="senhaAtual" type="password"></div><div><label>Nova senha</label><input id="novaSenha" type="password"></div></div>
+      <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn-dark" onclick="fecharSenha()">Cancelar</button><button onclick="salvarSenha()">Salvar senha</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let bilhetesCache = [];
+
+    function dinheiro(v){ return Number(v || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+    function dataBR(data){ if(!data) return "-"; return new Date(data).toLocaleString('pt-BR'); }
+
+    async function carregarBilhetesAdmin(){
+      try{
+        const params = new URLSearchParams();
+        const codigo = document.getElementById('filtroCodigo').value.trim();
+        const telefone = document.getElementById('filtroTelefone').value.trim();
+        const status = document.getElementById('filtroStatus').value;
+        const manual = document.getElementById('filtroManual').value;
+
+        if(codigo) params.append('codigo', codigo);
+        if(telefone) params.append('telefone', telefone);
+        if(status) params.append('statusPagamento', status);
+        if(manual) params.append('manual', manual);
+
+        const query = params.toString() ? `?${params.toString()}` : '';
+        bilhetesCache = await apiRequest(`/bilhetes${query}`);
+        renderizarBilhetes();
+        await carregarResumo();
+      }catch(e){
+        document.getElementById('listaBilhetes').innerHTML = `<tr><td colspan="8">Erro: ${e.message}</td></tr>`;
+      }
+    }
+
+    async function carregarResumo(){
+      const resumo = await carregarResumoFinanceiroBanco();
+      document.getElementById('totalBilhetes').textContent = resumo.totalBilhetes || 0;
+      document.getElementById('totalPagos').textContent = resumo.pagos || 0;
+      document.getElementById('totalPendentes').textContent = resumo.pendentes || 0;
+      document.getElementById('totalRecebido').textContent = dinheiro(resumo.recebido);
+    }
+
+    function renderizarBilhetes(){
+      const tbody = document.getElementById('listaBilhetes');
+      if(!bilhetesCache.length){
+        tbody.innerHTML = `<tr><td colspan="8">Nenhum bilhete encontrado.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = bilhetesCache.map(b => `
+        <tr>
+          <td><strong>${b.codigo || '-'}</strong><br><span class="muted">${b._id || ''}</span></td>
+          <td><strong>${b.nome || '-'}</strong><br><span class="muted">${b.telefone || '-'}</span></td>
+          <td>${b.rodadaNome || b.rodadaId || '-'}</td>
+          <td><strong>${dinheiro(b.valor)}</strong></td>
+          <td><span class="badge ${b.pago ? 'pago' : 'pendente'}">${b.pago ? 'PAGO' : 'PENDENTE'}</span></td>
+          <td><span class="badge ${b.manual ? 'manual' : 'site'}">${b.manual ? 'MANUAL' : 'SITE'}</span></td>
+          <td>${dataBR(b.criadoEm)}</td>
+          <td><div class="acoes">
+            ${!b.pago ? `<button class="btn-small" onclick="confirmarPagamento('${b._id}')">Confirmar</button>` : `<button class="btn-small btn-yellow" onclick="marcarPendente('${b._id}')">Pendente</button>`}
+            <button class="btn-small btn-dark" onclick="abrirEditar('${b._id}')">Editar</button>
+            <button class="btn-small btn-dark" onclick="imprimirBilhete('${b._id}')">Imprimir</button>
+            <button class="btn-small btn-red" onclick="excluirBilheteAdmin('${b._id}')">Excluir</button>
+          </div></td>
+        </tr>
+      `).join('');
+    }
+
+    async function confirmarPagamento(id){
+      if(!confirm('Confirmar pagamento deste bilhete?')) return;
+      await confirmarPagamentoBilheteBanco(id, true);
+      await carregarBilhetesAdmin();
+    }
+
+    async function marcarPendente(id){
+      if(!confirm('Marcar este bilhete como pendente?')) return;
+      await confirmarPagamentoBilheteBanco(id, false);
+      await carregarBilhetesAdmin();
+    }
+
+    function abrirEditar(id){
+      const b = bilhetesCache.find(x => x._id === id);
+      if(!b) return;
+      document.getElementById('editId').value = b._id;
+      document.getElementById('editNome').value = b.nome || '';
+      document.getElementById('editTelefone').value = b.telefone || '';
+      document.getElementById('editValor').value = Number(b.valor || 0);
+      document.getElementById('editPago').value = String(Boolean(b.pago));
+      document.getElementById('modalEditar').style.display = 'flex';
+    }
+
+    function fecharModal(){ document.getElementById('modalEditar').style.display = 'none'; }
+
+    async function salvarEdicao(){
+      const id = document.getElementById('editId').value;
+      await atualizarBilheteBanco(id, {
+        nome: document.getElementById('editNome').value,
+        telefone: document.getElementById('editTelefone').value,
+        valor: Number(document.getElementById('editValor').value || 0),
+        pago: document.getElementById('editPago').value === 'true'
+      });
+      fecharModal();
+      await carregarBilhetesAdmin();
+    }
+
+    async function excluirBilheteAdmin(id){
+      if(!confirm('Excluir definitivamente este bilhete?')) return;
+      await excluirBilheteBanco(id);
+      await carregarBilhetesAdmin();
+    }
+
+    function imprimirBilhete(id){
+      const b = bilhetesCache.find(x => x._id === id);
+      if(!b) return;
+
+      const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Bilhete ${b.codigo || ''}</title>
+<style>
+  body{font-family:Arial;background:#fff;color:#111;padding:20px}
+  .ticket{max-width:390px;border:3px solid #f2b200;border-radius:14px;padding:18px;margin:auto}
+  h1{background:#f2b200;margin:-18px -18px 16px;padding:14px;text-align:center;font-size:24px}
+  .linha{border-bottom:1px dashed #999;padding:8px 0;font-size:15px}
+  strong{display:inline-block;min-width:100px}
+  .status{font-size:20px;font-weight:900;color:${b.pago ? '#008b45' : '#c99000'}}
+  .footer{text-align:center;margin-top:18px;font-size:12px}
+</style>
+</head>
+<body>
+  <div class="ticket">
+    <h1>GALERA DO PALPITE</h1>
+    <div class="linha"><strong>Código:</strong> ${b.codigo || '-'}</div>
+    <div class="linha"><strong>Nome:</strong> ${b.nome || '-'}</div>
+    <div class="linha"><strong>Telefone:</strong> ${b.telefone || '-'}</div>
+    <div class="linha"><strong>Rodada:</strong> ${b.rodadaNome || '-'}</div>
+    <div class="linha"><strong>Valor:</strong> ${dinheiro(b.valor)}</div>
+    <div class="linha"><strong>Origem:</strong> ${b.manual ? 'MANUAL' : 'SITE'}</div>
+    <div class="linha"><strong>Status:</strong> <span class="status">${b.pago ? 'PAGO' : 'PENDENTE'}</span></div>
+    <div class="linha"><strong>Data:</strong> ${dataBR(b.criadoEm)}</div>
+    <div class="footer">Comprovante de bilhete</div>
+  </div>
+</body>
+</html>`;
+
+      const win = window.open('', '_blank');
+      win.document.open();
+      win.document.write(html);
+      win.document.close();
+      win.focus();
+      win.print();
+    }
+
+    async function baixarBilhetesExcelAdmin(){ try{ await exportarBilhetesExcel(); } catch(e){ alert(e.message); } }
+    async function baixarBilhetesPDFAdmin(){ try{ await exportarBilhetesPDF(); } catch(e){ alert(e.message); } }
+
+    async function baixarBackupAdmin(){
+      if(!confirm('Baixar backup completo do banco agora?')) return;
+      try{ await baixarBackupCompleto(); }
+      catch(e){ alert(e.message); }
+    }
+
+    async function checarLogin(){
+      try{ await verificarAdmin(); }
+      catch(e){ logoutAdmin(); }
+    }
+
+    function abrirSenha(){ document.getElementById('modalSenha').style.display='flex'; }
+    function fecharSenha(){ document.getElementById('modalSenha').style.display='none'; }
+
+    async function salvarSenha(){
+      const senhaAtual = document.getElementById('senhaAtual').value;
+      const novaSenha = document.getElementById('novaSenha').value;
+      if(!senhaAtual || !novaSenha){
+        alert('Preencha a senha atual e a nova senha.');
+        return;
+      }
+      try{
+        await alterarSenhaAdmin(senhaAtual, novaSenha);
+        alert('Senha alterada com sucesso. Faça login novamente.');
+        logoutAdmin();
+      }catch(e){ alert(e.message); }
+    }
+
+    checarLogin();
+    carregarBilhetesAdmin();
+  </script>
+</body>
+</html>

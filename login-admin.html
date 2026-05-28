@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Admin - Galera do Palpite</title>
+  <script src="api.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:radial-gradient(circle at top,#074225,#020b07 65%);
+      color:#fff;
+      font-family:Arial, Helvetica, sans-serif;
+      padding:24px;
+    }
+    .card{
+      width:min(430px,95vw);
+      background:linear-gradient(180deg,#092016,#06160f);
+      border:1px solid #18b867;
+      border-radius:22px;
+      padding:30px;
+      box-shadow:0 0 35px rgba(0,255,120,.16);
+    }
+    h1{margin:0 0 8px;text-align:center}
+    .sub{text-align:center;color:#b8d8c6;margin-bottom:24px}
+    label{display:block;margin:14px 0 7px;color:#d7ffe6;font-weight:800}
+    input{
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid #14844a;
+      background:#020f09;
+      color:#fff;
+      font-size:16px;
+      outline:none;
+    }
+    button{
+      width:100%;
+      margin-top:20px;
+      border:0;
+      border-radius:12px;
+      padding:15px;
+      font-weight:900;
+      background:#08c765;
+      color:#03130c;
+      cursor:pointer;
+      font-size:16px;
+    }
+    .erro{
+      display:none;
+      margin-top:14px;
+      padding:12px;
+      border-radius:10px;
+      background:#3a1115;
+      border:1px solid #e32b3f;
+      color:#ffd7dc;
+      font-weight:700;
+    }
+    .info{
+      margin-top:18px;
+      font-size:13px;
+      color:#9fcab0;
+      background:#071a11;
+      padding:12px;
+      border-radius:10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔐 Login Admin</h1>
+    <div class="sub">Acesso protegido ao painel do Galera do Palpite</div>
+
+    <label>Usuário</label>
+    <input id="usuario" value="admin" autocomplete="username">
+
+    <label>Senha</label>
+    <input id="senha" type="password" placeholder="Digite a senha" autocomplete="current-password">
+
+    <button onclick="entrar()">Entrar no painel</button>
+
+    <div class="erro" id="erro"></div>
+
+    <div class="info">
+      Primeiro acesso padrão:<br>
+      <strong>Usuário:</strong> admin<br>
+      <strong>Senha:</strong> definida no backend/.env<br><br>
+      Depois entre no painel e altere a senha.
+    </div>
+  </div>
+
+  <script>
+    async function entrar(){
+      const usuario = document.getElementById('usuario').value.trim();
+      const senha = document.getElementById('senha').value.trim();
+      const erro = document.getElementById('erro');
+
+      erro.style.display = 'none';
+
+      try{
+        await loginAdmin(usuario, senha);
+        window.location.href = 'admin-bilhetes.html';
+      }catch(e){
+        erro.textContent = e.message || 'Erro ao entrar';
+        erro.style.display = 'block';
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if(e.key === 'Enter') entrar();
+    });
+  </script>
+</body>
+</html>
