@@ -1,5 +1,5 @@
 
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://galera-do-palpite.onrender.com/api";
 
 async function apiRequest(endpoint, options = {}) {
   const resposta = await fetch(`${API_URL}${endpoint}`, {
