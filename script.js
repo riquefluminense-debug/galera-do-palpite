@@ -264,7 +264,6 @@ rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRoda
 salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
 }
 async function criarNovaRodadaAdmin(){
-function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
 
 const nome=(document.getElementById('novaRodadaNome')?.value||'Nova rodada').trim();
