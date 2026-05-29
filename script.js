@@ -5,7 +5,7 @@ let rodada={nome:'Nenhuma rodada cadastrada',valor:10,status:'Fechada',criadaEm:
 let rodadas=[];
 let rodadaAtualId=null;
 let pixConfig={chave:'11999999999',nome:'Galera do Palpite',msg:'Pagamento de bilhete Galera do Palpite'};
-let jogos=[];
+let jogos=[
 {id:1,data:'26/05 19:00 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'GRÊMIO-RS',fora:'MONTEVIDEO-URU',odds:['1.57','3.70','5.50'],golsCasa:null,golsFora:null},
 {id:2,data:'26/05 19:00 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'MILLONARIOS-COL',fora:"O'HIGGINS-CHI",odds:['1.67','3.50','5.50'],golsCasa:null,golsFora:null},
 {id:3,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Libertadores - Fase de Grupos',casa:'ESTUDIANTES-ARG',fora:'IND. MEDELLÍN-COL',odds:['1.75','3.50','4.50'],golsCasa:null,golsFora:null},
