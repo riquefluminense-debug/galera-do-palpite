@@ -221,3 +221,13 @@
 .float.whats .wa-mark {
   display: none !important;
 }
+.float.whats .wa-icon {
+    display:none !important;
+}
+
+.float.whats .wa-icon-img {
+    display:block !important;
+    width:34px !important;
+    height:34px !important;
+    object-fit:contain !important;
+}
