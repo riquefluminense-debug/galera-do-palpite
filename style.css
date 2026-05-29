@@ -228,3 +228,13 @@
   font-weight: 900 !important;
   line-height: 1 !important;
 }
+
+.float.whats .wa-mark {
+  display: none !important;
+}
+
+.float.whats .wa-icon {
+  width: 34px !important;
+  height: 34px !important;
+  display: block !important;
+}
