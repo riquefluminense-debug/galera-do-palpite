@@ -1,11 +1,11 @@
 const USUARIO_ADMIN = 'HenriqueN1998';
 const SENHA_ADMIN = '26549542Hn@';
 let adminLiberado = sessionStorage.getItem('adminLiberado') === 'sim';
-let rodada={nome:'Libertadores + Sul-Americana',valor:10,status:'Aberta',criadaEm:Date.now(),premioEstimadoManual:'',dataRodada:'26/05/2026',horaRodada:'21:30'};
+let rodada={nome:'Nenhuma rodada cadastrada',valor:10,status:'Fechada',criadaEm:Date.now(),premioEstimadoManual:'',dataRodada:'',horaRodada:''};
 let rodadas=[];
 let rodadaAtualId=null;
 let pixConfig={chave:'11999999999',nome:'Galera do Palpite',msg:'Pagamento de bilhete Galera do Palpite'};
-let jogos=[
+let jogos=[];
 {id:1,data:'26/05 19:00 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'GRÊMIO-RS',fora:'MONTEVIDEO-URU',odds:['1.57','3.70','5.50'],golsCasa:null,golsFora:null},
 {id:2,data:'26/05 19:00 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'MILLONARIOS-COL',fora:"O'HIGGINS-CHI",odds:['1.67','3.50','5.50'],golsCasa:null,golsFora:null},
 {id:3,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Libertadores - Fase de Grupos',casa:'ESTUDIANTES-ARG',fora:'IND. MEDELLÍN-COL',odds:['1.75','3.50','4.50'],golsCasa:null,golsFora:null},
