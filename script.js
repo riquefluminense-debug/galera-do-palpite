@@ -308,7 +308,6 @@ const hora=(document.getElementById('novaRodadaHora')?.value||'').trim();
   }
   alert('Nova rodada criada!');
 }
-}
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
 
