@@ -83,7 +83,7 @@ function selecionarRodada(id){
   renderAdmin();
 }
 function carregarDados(){
-  const raw=localStorage.getItem('gdp_dados_v6') || localStorage.getItem('gdp_dados_v5');
+  const raw = localStorage.getItem('gdp_dados_v7');
   if(raw){
     try{
       const d=JSON.parse(raw);
@@ -103,7 +103,7 @@ function carregarDados(){
 }
 function salvarDados(sync=true){
   if(sync) sincronizarRodadaAtual();
-  localStorage.setItem('gdp_dados_v6',JSON.stringify({rodadas,rodadaAtualId,historico}))
+  localStorage.setItem('gdp_dados_v7', JSON.stringify({rodadas,rodadaAtualId,historico}))
 }
 function mostrarTela(id){
   document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
