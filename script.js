@@ -272,39 +272,28 @@ function salvarRodada(){
   rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRodada||'').trim();
   salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
 }
-async function criarNovaRodadaAdmin(){
+function criarNovaRodadaAdmin(){
+  sincronizarRodadaAtual();
+
   const nome=(document.getElementById('novaRodadaNome')?.value||'Nova rodada').trim();
   const valor=Number(document.getElementById('novaRodadaValor')?.value||10)||10;
   const premio=document.getElementById('novaRodadaPremio')?.value||'';
   const data=(document.getElementById('novaRodadaData')?.value||'').trim();
   const hora=(document.getElementById('novaRodadaHora')?.value||'').trim();
 
-  try{
-    const resp = await fetch('/api/rodadas', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        nome:nome,
-        valorBilhete:valor,
-        premioEstimado:Number(premio || 0),
-        data:data,
-        horario:hora,
-        status:'ABERTA'
-      })
-    });
+  const r=novaRodadaBase(nome,valor,'Aberta',premio,data,hora);
 
-    const rodadaBanco = await resp.json();
+  r.jogos=[];
+  rodadas.unshift(r);
+  aplicarRodada(r);
 
-    if(!resp.ok){
-      throw new Error(rodadaBanco.erro || 'Erro ao criar rodada no banco');
-    }
+  salvarDados();
+  renderRodadas();
+  renderTicket();
+  renderAdmin();
 
-    alert('Nova rodada criada no banco com sucesso!');
-    location.reload();
-
-  }catch(e){
-    alert('Erro ao criar rodada no banco: ' + e.message);
-  }
+  alert('Nova rodada criada!');
+}
 }
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
