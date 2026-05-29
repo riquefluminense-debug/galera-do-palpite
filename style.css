@@ -238,3 +238,15 @@
   height: 42px !important;
   display: block !important;
 }
+
+.float.whats .wa-mark,
+.float.whats .wa-icon{
+    display:none !important;
+}
+
+.float.whats .wa-icon-img{
+    display:block !important;
+    width:34px !important;
+    height:34px !important;
+    object-fit:contain !important;
+}
