@@ -327,7 +327,6 @@ async function criarNovaRodadaAdmin(){
 
   alert('Nova rodada criada e salva no banco!');
 }
-window.criarNovaRodadaAdmin = criarNovaRodadaAdmin;
   
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
