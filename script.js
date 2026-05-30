@@ -284,19 +284,48 @@ function salvarRodada(){
   rodada.dataRodada=(document.getElementById('rodadaData')?.value||rodada.dataRodada||'').trim();
   rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRodada||'').trim();
   salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
-}
-function criarNovaRodadaAdmin(){
+async function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
+
   const nome=(document.getElementById('novaRodadaNome')?.value||'Nova rodada').trim();
   const valor=Number(document.getElementById('novaRodadaValor')?.value||10)||10;
   const premio=document.getElementById('novaRodadaPremio')?.value||'';
   const data=(document.getElementById('novaRodadaData')?.value||'').trim();
   const hora=(document.getElementById('novaRodadaHora')?.value||'').trim();
+
   const r=novaRodadaBase(nome,valor,'Aberta',premio,data,hora);
   r.jogos=[];
+
+  try{
+    const resp=await fetch('/api/rodadas',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(r)
+    });
+
+    const salva=await resp.json();
+
+    if(!resp.ok){
+      throw new Error(salva.erro || 'Erro ao salvar rodada');
+    }
+
+    r.id=salva._id || salva.id || r.id;
+
+  }catch(e){
+    alert('Erro ao salvar rodada no banco: ' + e.message);
+    return;
+  }
+
   rodadas.unshift(r);
   aplicarRodada(r);
-  salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Nova rodada criada! Ela já aparece à esquerda por ser a mais recente.');
+
+  salvarDados(false);
+  renderRodadas();
+  renderTicket();
+  renderAdmin();
+
+  alert('Nova rodada criada e salva no banco!');
+}
 }
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
