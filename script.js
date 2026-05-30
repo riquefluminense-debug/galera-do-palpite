@@ -82,24 +82,37 @@ function selecionarRodada(id){
   renderTicket();
   renderAdmin();
 }
-function carregarDados(){
-  const raw=localStorage.getItem('gdp_dados_v6') || localStorage.getItem('gdp_dados_v5');
-  if(raw){
-    try{
-      const d=JSON.parse(raw);
-      historico=d.historico||[];
-      if(Array.isArray(d.rodadas) && d.rodadas.length){
-        rodadas=d.rodadas;
-        rodadaAtualId=d.rodadaAtualId || rodadas[0].id;
-        aplicarRodada(rodadas.find(r=>r.id===rodadaAtualId)||rodadas[0]);
-        return;
-      }
-      rodada=d.rodada||rodada; rodada.premioEstimadoManual=rodada.premioEstimadoManual||''; { const dh=extrairDataHoraJogos(d.jogos||jogos); rodada.dataRodada=rodada.dataRodada||dh.data||'26/05/2026'; rodada.horaRodada=rodada.horaRodada||dh.hora||'21:30'; } pixConfig=d.pixConfig||pixConfig; jogos=d.jogos||jogos; bilhetes=d.bilhetes||[]; ranking=d.ranking||[]; financeiro=d.financeiro||financeiro;
-    }catch(e){console.warn('Falha ao carregar dados',e)}
+async function carregarDados(){
+  try{
+    const resp = await fetch('/api/rodadas');
+    const lista = await resp.json();
+
+    if(Array.isArray(lista) && lista.length){
+      rodadas = lista.map(r => ({
+        id: r._id || r.id,
+        nome: r.nome,
+        valor: Number(r.valor) || 10,
+        status: r.status || 'Aberta',
+        criadaEm: r.criadaEm ? new Date(r.criadaEm).getTime() : Date.now(),
+        premioEstimadoManual: r.premioEstimado || r.premioEstimadoManual || '',
+        dataRodada: r.data || r.dataRodada || '',
+        horaRodada: r.horario || r.horaRodada || '',
+        pixConfig: pixConfig,
+        jogos: r.jogos || [],
+        bilhetes: r.bilhetes || [],
+        ranking: r.ranking || [],
+        financeiro: r.financeiro || {entradasExtras:0,saidas:0,percentualPremio:70,transacoes:[]}
+      }));
+
+      rodadaAtualId = rodadas[0].id;
+      aplicarRodada(rodadas[0]);
+      return;
+    }
+  }catch(e){
+    console.warn('Erro ao carregar rodadas do banco', e);
   }
-  const inicial=novaRodadaBase(rodada.nome,rodada.valor,rodada.status);
-  inicial.pixConfig=pixConfig; inicial.jogos=jogos; inicial.bilhetes=bilhetes; inicial.ranking=ranking; inicial.financeiro=financeiro;
-  rodadas=[inicial]; aplicarRodada(inicial); salvarDados(false);
+
+  rodadas = [];
 }
 function salvarDados(sync=true){
   if(sync) sincronizarRodadaAtual();
