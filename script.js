@@ -288,11 +288,11 @@ function salvarRodada(){
 async function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
 
-  const nome=(document.getElementById('novaRodadaNome')?.value||'Nova rodada').trim();
-  const valor=Number(document.getElementById('novaRodadaValor')?.value||10)||10;
-  const premio=document.getElementById('novaRodadaPremio')?.value||'';
-  const data=(document.getElementById('novaRodadaData')?.value||'').trim();
-  const hora=(document.getElementById('novaRodadaHora')?.value||'').trim();
+  const nome=(document.getElementById('novaRodadaNome')?.value || 'Nova rodada').trim();
+  const valor=Number(document.getElementById('novaRodadaValor')?.value || 10) || 10;
+  const premio=document.getElementById('novaRodadaPremio')?.value || '';
+  const data=(document.getElementById('novaRodadaData')?.value || '').trim();
+  const hora=(document.getElementById('novaRodadaHora')?.value || '').trim();
 
   const r=novaRodadaBase(nome,valor,'Aberta',premio,data,hora);
   r.jogos=[];
@@ -307,7 +307,7 @@ async function criarNovaRodadaAdmin(){
     const salva=await resp.json();
 
     if(!resp.ok){
-      throw new Error(salva.erro || 'Erro ao salvar rodada');
+      throw new Error(salva.erro || salva.error || 'Erro ao salvar rodada');
     }
 
     r.id=salva._id || salva.id || r.id;
