@@ -284,6 +284,8 @@ function salvarRodada(){
   rodada.dataRodada=(document.getElementById('rodadaData')?.value||rodada.dataRodada||'').trim();
   rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRodada||'').trim();
   salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
+  }
+
 async function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
 
