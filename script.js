@@ -285,7 +285,7 @@ function salvarRodada(){
   rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRodada||'').trim();
   salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
 
-window.criarNovaRodadaAdmin = async function criarNovaRodadaAdmin(){
+async function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
 
   const nome=(document.getElementById('novaRodadaNome')?.value||'Nova rodada').trim();
@@ -327,7 +327,8 @@ window.criarNovaRodadaAdmin = async function criarNovaRodadaAdmin(){
 
   alert('Nova rodada criada e salva no banco!');
 }
-}
+window.criarNovaRodadaAdmin = criarNovaRodadaAdmin;
+  
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
 
