@@ -1237,7 +1237,7 @@ function verResumoBilhete(cod){
   alert(`Bilhete ${b.codigo}\nCliente: ${b.nome}\nStatus: ${b.status}\nValor: R$ ${b.valor.toFixed(2).replace('.',',')}\n\n${linhas}`);
 }
 
-carregarDados(); renderRodadas(); renderTicket(); renderAdmin(); renderRankingPublico(); renderHistorico();
+carregarRodadasSupabase(); renderRodadas(); renderTicket(); renderAdmin(); renderRankingPublico(); renderHistorico();
 
 /* Impressão A4 de cartelas manuais por rodada */
 function escaparHtml(txt){
