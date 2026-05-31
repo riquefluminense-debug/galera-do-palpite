@@ -668,11 +668,25 @@ function salvarTodosResultados(){
   alert('Resultados salvos com sucesso!');
 }
 
-function calcularRanking(){
+async function calcularRanking(){
   const faltam=jogos.filter(j=>resultadoJogo(j)===null).length;
   if(faltam>0 && !confirm(`Ainda faltam ${faltam} resultado(s). Calcular ranking parcial mesmo assim?`)) return;
   ranking=calcularRankingParcial();
-  salvarDados(); renderAdmin(); renderRankingPublico(); alert('Ranking calculado com sucesso!');
+
+await supabaseRequest('ranking','DELETE',null,'?id=gte.0');
+
+for(const item of ranking){
+  await supabaseRequest('ranking','POST',{
+    nome: item.nome || '',
+    pontos: Number(item.pontos) || 0,
+    bilhetes: Number(item.totalBilhetes) || 1
+  });
+}
+
+salvarDados();
+renderAdmin();
+renderRankingPublico();
+alert('Ranking calculado e salvo no Supabase!');
 }
 
 function calcularRankingParcial(){
