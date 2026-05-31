@@ -656,7 +656,7 @@ function salvarCampeaoHistorico(silencioso=false){
   if(!silencioso) alert(`Campeão salvo: ${vencedores.map(v=>v.nome).join(' / ')}${vencedores.length>1?' - prêmio dividido':''}`);
   return true;
 }
-function apagarRodadaAtual(){
+async function apagarRodadaAtual(){
   if(!rodadaAtualId) return;
   if(rodadas.length<=1){alert('Você precisa ter pelo menos uma rodada ativa no sistema. Crie uma nova antes de apagar esta.');return;}
   const temRanking=ranking && ranking.length>0;
@@ -667,6 +667,7 @@ function apagarRodadaAtual(){
   if(!confirm(aviso)) return;
   if(temRanking && !campeaoSalvo) salvarCampeaoHistorico(true);
   const apagada=rodadaAtualId;
+  await supabaseRequest('rodadas','DELETE',null,`?id=eq.${apagada}`);
   rodadas=rodadas.filter(r=>r.id!==apagada);
   const proxima=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0))[0];
   aplicarRodada(proxima);
