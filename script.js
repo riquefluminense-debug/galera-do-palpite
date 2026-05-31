@@ -77,6 +77,8 @@ async function carregarRodadasSupabase(){
     valor: Number(b.valor) || 0,
     pontos: Number(b.acertos) || 0,
     acertos: Number(b.acertos) || 0,
+    palpites: b.palpites || {},
+    combinacoes: b.combinacoes || [],
     data: b.created_at ? new Date(b.created_at).toLocaleString('pt-BR') : ''
   })),
       ranking: [],
