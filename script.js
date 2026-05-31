@@ -404,8 +404,36 @@ async function criarNovaRodadaAdmin(){
     alert('Erro ao salvar rodada no Supabase. Confira a Publishable Key.');
   }
 }
-function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
-function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
+async function fecharRodadaAtual(){
+  if(!rodadaAtualId) return;
+  rodada.status='Encerrada';
+
+  await supabaseRequest(
+    'rodadas',
+    'PATCH',
+    { status:'Encerrada' },
+    '?id=eq.'+Number(String(rodadaAtualId).replace(/\D/g,''))
+  );
+
+  salvarDados(false);
+  renderRodadas();
+  renderAdmin();
+}
+async function abrirRodadaAtual(){
+  if(!rodadaAtualId) return;
+  rodada.status='Aberta';
+
+  await supabaseRequest(
+    'rodadas',
+    'PATCH',
+    { status:'Aberta' },
+    '?id=eq.'+Number(String(rodadaAtualId).replace(/\D/g,''))
+  );
+
+  salvarDados(false);
+  renderRodadas();
+  renderAdmin();
+}
 
 async function adicionarJogoAdmin(){
   const casa=document.getElementById('jogoCasa').value.trim();
