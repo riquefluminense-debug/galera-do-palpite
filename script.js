@@ -157,6 +157,10 @@ function renderRodadas(){
   const ordenadas=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0));
   const el=document.getElementById('listaRodadas');
   if(!el) return;
+  if(!rodadas.length){
+  el.innerHTML='<p style="text-align:center;color:#9eb6a5;font-weight:900;">Nenhum bolão disponível no momento.</p>';
+  return;
+}
   el.innerHTML=ordenadas.map(r=>{
     const qtd=(r.jogos||[]).length;
     const valor=Number(r.valor||10).toFixed(2).replace('.',',');
