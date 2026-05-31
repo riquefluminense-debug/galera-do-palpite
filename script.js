@@ -350,6 +350,8 @@ async function confirmarAposta(){
   rodada_id: Number(String(rodadaAtualId).replace(/\D/g,'')),
   status: 'Aguardando Pix',
   valor: valorTotal,
+palpites: palpites,
+combinacoes: c.combos || c.combinacoes || []
 });
   salvarDados(); msg.style.color='#108000'; msg.textContent=`Aposta confirmada! Código do bilhete: ${codigo}. Agora faça o Pix.`; mostrarPix(codigo,nome,tel,valorTotal); renderAdmin();
 }
