@@ -369,7 +369,7 @@ async function criarNovaRodadaAdmin(){
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
 
-function adicionarJogoAdmin(){
+async function adicionarJogoAdmin(){
   const casa=document.getElementById('jogoCasa').value.trim();
   const fora=document.getElementById('jogoFora').value.trim();
   const dataBase=document.getElementById('jogoData').value.trim();
@@ -381,6 +381,14 @@ function adicionarJogoAdmin(){
   const nomeRodada=(r.nome||'').trim();
   const data=dataBase ? `${dataBase} - ${nomeRodada}` : `${r.dataRodada||''} ${r.horaRodada||''} - ${nomeRodada}`.trim();
   const novo={id:(r.jogos||[]).length+1,data,casa,fora,odds:['1.80','3.20','4.20'],golsCasa:null,golsFora:null};
+  await supabaseRequest('jogos','POST',{
+  rodada_id: Number(String(alvoId).replace(/\D/g,'')),
+  casa: casa,
+  fora: fora,
+  data_jogo: data,
+  gols_casa: null,
+  gols_fora: null
+});
   r.jogos=r.jogos||[];
   r.jogos.push(novo);
   if(r.id===rodadaAtualId){ aplicarRodada(r); }
