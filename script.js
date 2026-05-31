@@ -40,6 +40,7 @@ async function supabaseRequest(tabela, metodo='GET', dados=null, query=''){
 async function carregarRodadasSupabase(){
   try{
     const dados = await supabaseRequest('rodadas','GET',null,'?select=*&order=created_at.desc');
+    const jogosBanco = await supabaseRequest('jogos','GET',null,'?select=*&order=id.asc');
 
     rodadas = (dados || []).map(r => ({
       id: String(r.id),
@@ -51,7 +52,17 @@ async function carregarRodadasSupabase(){
       dataRodada: r.data_rodada || '',
       horaRodada: r.hora_rodada || '',
       pixConfig: {...pixConfig},
-      jogos: [],
+      jogos: (jogosBanco || [])
+  .filter(j => String(j.rodada_id) === String(r.id))
+  .map((j,idx) => ({
+    id: idx + 1,
+    data: j.data_jogo || '',
+    casa: j.casa || '',
+    fora: j.fora || '',
+    odds: [j.odd_casa || '1.80', j.odd_empate || '3.20', j.odd_fora || '4.20'],
+    golsCasa: j.gols_casa,
+    golsFora: j.gols_fora
+  })),
       bilhetes: [],
       ranking: [],
       financeiro:{entradasExtras:0,saidas:0,percentualPremio:70,transacoes:[]}
