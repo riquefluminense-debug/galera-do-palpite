@@ -328,6 +328,15 @@ function confirmarAposta(){
   const codigo='GDP-'+String(bilhetes.length+1).padStart(4,'0');
   const valorTotal=c.total*rodada.valor;
   bilhetes.push({codigo,nome,tel,rodadaId:rodadaAtualId,rodadaNome:rodada.nome,status:'Aguardando Pix',pagamentoMetodo:'Pix automático',txid:codigo.replace(/[^A-Za-z0-9]/g,''),valor:valorTotal,valorBase:rodada.valor,totalBilhetes:c.total,secos:c.secos,duplos:c.duplos,triplos:c.triplos,palpites:JSON.parse(JSON.stringify(palpites)),combinacoes:gerarCombinacoes(),pontos:0,acertos:0,data:new Date().toLocaleString('pt-BR')});
+  await supabaseRequest('bilhetes','POST',{
+  codigo: codigo,
+  nome: nome,
+  telefone: tel,
+  rodada_id: Number(String(rodadaAtualId).replace(/\D/g,'')),
+  status: 'Aguardando Pix',
+  valor: valorTotal,
+  pagamento_metodo: 'Pix automático'
+});
   salvarDados(); msg.style.color='#108000'; msg.textContent=`Aposta confirmada! Código do bilhete: ${codigo}. Agora faça o Pix.`; mostrarPix(codigo,nome,tel,valorTotal); renderAdmin();
 }
 
