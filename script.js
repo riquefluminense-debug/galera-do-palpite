@@ -33,6 +33,7 @@ async function supabaseRequest(tabela, metodo='GET', dados=null, query=''){
   const json = await resp.json().catch(() => null);
   if(!resp.ok){
     console.error('Erro Supabase:', tabela, metodo, json);
+    alert(JSON.stringify(json));
     throw new Error('Falha ao acessar Supabase');
   }
   return json;
