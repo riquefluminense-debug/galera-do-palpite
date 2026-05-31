@@ -88,9 +88,13 @@ function carregarDados(){
       rodada=d.rodada||rodada; rodada.premioEstimadoManual=rodada.premioEstimadoManual||''; { const dh=extrairDataHoraJogos(d.jogos||jogos); rodada.dataRodada=rodada.dataRodada||dh.data||'26/05/2026'; rodada.horaRodada=rodada.horaRodada||dh.hora||'21:30'; } pixConfig=d.pixConfig||pixConfig; jogos=d.jogos||jogos; bilhetes=d.bilhetes||[]; ranking=d.ranking||[]; financeiro=d.financeiro||financeiro;
     }catch(e){console.warn('Falha ao carregar dados',e)}
   }
-  const inicial=novaRodadaBase(rodada.nome,rodada.valor,rodada.status);
-  inicial.pixConfig=pixConfig; inicial.jogos=jogos; inicial.bilhetes=bilhetes; inicial.ranking=ranking; inicial.financeiro=financeiro;
-  rodadas=[inicial]; aplicarRodada(inicial); salvarDados(false);
+  rodadas=[];
+rodadaAtualId=null;
+jogos=[];
+bilhetes=[];
+ranking=[];
+salvarDados(false);
+return;
 }
 function salvarDados(sync=true){
   if(sync) sincronizarRodadaAtual();
