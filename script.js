@@ -16,6 +16,27 @@ const palpites={};
 let pixAtualCodigo=null;
 let pixTimer=null;
 const API_PIX_URL = (window.GDP_API_PIX_URL || window.location.origin).replace(/\/$/, '');
+const SUPABASE_URL = 'https://ieqeravzlrmggsgbrskz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_ZP_vMzA6o9DWgFkN3P8cdg_JQ3BQD9X';
+
+async function supabaseRequest(tabela, metodo='GET', dados=null, query=''){
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}${query}`, {
+    method: metodo,
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation'
+    },
+    body: dados ? JSON.stringify(dados) : null
+  });
+  const json = await resp.json().catch(() => null);
+  if(!resp.ok){
+    console.error('Erro Supabase:', tabela, metodo, json);
+    throw new Error('Falha ao acessar Supabase');
+  }
+  return json;
+}
 
 function novaRodadaBase(nome='Nova Rodada', valor=10, status='Aberta', premioEstimadoManual='', dataRodada='', horaRodada=''){
   const dh=extrairDataHoraJogos(jogos);
@@ -271,18 +292,42 @@ function salvarRodada(){
   rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRodada||'').trim();
   salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
 }
-function criarNovaRodadaAdmin(){
+async function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
+
   const nome=(document.getElementById('novaRodadaNome')?.value||'Nova rodada').trim();
   const valor=Number(document.getElementById('novaRodadaValor')?.value||10)||10;
   const premio=document.getElementById('novaRodadaPremio')?.value||'';
   const data=(document.getElementById('novaRodadaData')?.value||'').trim();
   const hora=(document.getElementById('novaRodadaHora')?.value||'').trim();
-  const r=novaRodadaBase(nome,valor,'Aberta',premio,data,hora);
-  r.jogos=[];
-  rodadas.unshift(r);
-  aplicarRodada(r);
-  salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Nova rodada criada! Ela já aparece à esquerda por ser a mais recente.');
+
+  try{
+    const salvo = await supabaseRequest('rodadas','POST',{
+      nome:nome,
+      valor:valor,
+      status:'Aberta',
+      data_rodada:data,
+      hora_rodada:hora,
+      premio_estimado:Number(String(premio||0).replace(',','.'))||0
+    });
+
+    const r=novaRodadaBase(nome,valor,'Aberta',premio,data,hora);
+    r.id=String(salvo[0].id);
+    r.jogos=[];
+
+    rodadas.unshift(r);
+    aplicarRodada(r);
+
+    salvarDados();
+    renderRodadas();
+    renderTicket();
+    renderAdmin();
+
+    alert('Nova rodada criada e salva no Supabase!');
+  }catch(e){
+    console.error(e);
+    alert('Erro ao salvar rodada no Supabase. Confira a Publishable Key.');
+  }
 }
 function fecharRodadaAtual(){rodada.status='Encerrada';salvarDados();renderRodadas();renderAdmin();}
 function abrirRodadaAtual(){rodada.status='Aberta';salvarDados();renderRodadas();renderAdmin();}
