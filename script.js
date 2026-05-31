@@ -319,7 +319,7 @@ function gerarCombinacoes(){
   return combos;
 }
 function limparPalpites(){Object.keys(palpites).forEach(k=>delete palpites[k]);renderTicket();document.getElementById('mensagem').textContent=''}
-function confirmarAposta(){
+async function confirmarAposta(){
   const msg=document.getElementById('mensagem');
   const c=totalCombinacoes();
   if(c.feitos<jogos.length){msg.style.color='#c98900';msg.textContent=`Faltam ${jogos.length-c.feitos} jogo(s) para marcar.`;return}
