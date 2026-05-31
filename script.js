@@ -37,7 +37,44 @@ async function supabaseRequest(tabela, metodo='GET', dados=null, query=''){
   }
   return json;
 }
+async function carregarRodadasSupabase(){
+  try{
+    const dados = await supabaseRequest('rodadas','GET',null,'?select=*&order=created_at.desc');
 
+    rodadas = (dados || []).map(r => ({
+      id: String(r.id),
+      nome: r.nome,
+      valor: Number(r.valor) || 10,
+      status: r.status || 'Aberta',
+      criadaEm: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
+      premioEstimadoManual: r.premio_estimado ? String(r.premio_estimado) : '',
+      dataRodada: r.data_rodada || '',
+      horaRodada: r.hora_rodada || '',
+      pixConfig: {...pixConfig},
+      jogos: [],
+      bilhetes: [],
+      ranking: [],
+      financeiro:{entradasExtras:0,saidas:0,percentualPremio:70,transacoes:[]}
+    }));
+
+    rodadaAtualId = rodadas[0]?.id || null;
+
+    if(rodadas.length){
+      aplicarRodada(rodadas[0]);
+    }else{
+      jogos=[];
+      bilhetes=[];
+      ranking=[];
+    }
+
+    renderRodadas();
+    renderTicket();
+    if(adminLiberado) renderAdmin();
+
+  }catch(e){
+    console.error('Erro ao carregar rodadas do Supabase:', e);
+  }
+  }
 function novaRodadaBase(nome='Nova Rodada', valor=10, status='Aberta', premioEstimadoManual='', dataRodada='', horaRodada=''){
   const dh=extrairDataHoraJogos(jogos);
   return {
