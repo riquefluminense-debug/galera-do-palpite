@@ -1,20 +1,11 @@
 const USUARIO_ADMIN = 'HenriqueN1998';
 const SENHA_ADMIN = '26549542Hn@';
 let adminLiberado = sessionStorage.getItem('adminLiberado') === 'sim';
-let rodada={nome:'Libertadores + Sul-Americana',valor:10,status:'Aberta',criadaEm:Date.now(),premioEstimadoManual:'',dataRodada:'26/05/2026',horaRodada:'21:30'};
+let rodada={nome:'',valor:10,status:'Aberta',criadaEm:Date.now(),premioEstimadoManual:'',dataRodada:'',horaRodada:''};
 let rodadas=[];
 let rodadaAtualId=null;
 let pixConfig={chave:'11999999999',nome:'Galera do Palpite',msg:'Pagamento de bilhete Galera do Palpite'};
-let jogos=[
-{id:1,data:'26/05 19:00 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'GRÊMIO-RS',fora:'MONTEVIDEO-URU',odds:['1.57','3.70','5.50'],golsCasa:null,golsFora:null},
-{id:2,data:'26/05 19:00 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'MILLONARIOS-COL',fora:"O'HIGGINS-CHI",odds:['1.67','3.50','5.50'],golsCasa:null,golsFora:null},
-{id:3,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Libertadores - Fase de Grupos',casa:'ESTUDIANTES-ARG',fora:'IND. MEDELLÍN-COL',odds:['1.75','3.50','4.50'],golsCasa:null,golsFora:null},
-{id:4,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Libertadores - Fase de Grupos',casa:'FLAMENGO-RJ',fora:'CUSCO-PER',odds:['1.20','6.00','8.50'],golsCasa:null,golsFora:null},
-{id:5,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Libertadores - Fase de Grupos',casa:'NACIONAL-URU',fora:'COQUIMBO-CHI',odds:['1.95','3.20','4.00'],golsCasa:null,golsFora:null},
-{id:6,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Libertadores - Fase de Grupos',casa:'UNIVERSITARIO',fora:'TOLIMA-COL',odds:['1.95','3.20','4.00'],golsCasa:null,golsFora:null},
-{id:7,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'SAN LORENZO-ARG',fora:'RECOLETA-PAR',odds:['1.40','4.33','8.00'],golsCasa:null,golsFora:null},
-{id:8,data:'26/05 21:30 - AMÉRICA DO SUL: Copa Sul-Americana - Fase de Grupos',casa:'SANTOS-SP',fora:'DEP. CUENCA-ECU',odds:['1.30','5.50','8.00'],golsCasa:null,golsFora:null}
-];
+let jogos=[];
 let bilhetes=[];
 let ranking=[];
 let historico=[];
@@ -26,7 +17,7 @@ let pixAtualCodigo=null;
 let pixTimer=null;
 const API_PIX_URL = (window.GDP_API_PIX_URL || window.location.origin).replace(/\/$/, '');
 
-function novaRodadaBase(nome='Libertadores + Sul-Americana', valor=10, status='Aberta', premioEstimadoManual='', dataRodada='', horaRodada=''){
+function novaRodadaBase(nome='Nova Rodada', valor=10, status='Aberta', premioEstimadoManual='', dataRodada='', horaRodada=''){
   const dh=extrairDataHoraJogos(jogos);
   return {
     id:'ROD-'+Date.now()+'-'+Math.floor(Math.random()*9999),
