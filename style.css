@@ -243,3 +243,16 @@
   height: 34px !important;
   object-fit: contain !important;
 }
+.team-logo-wrap{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.team-logo{
+  width:22px;
+  height:22px;
+  object-fit:cover;
+  border-radius:4px;
+}
