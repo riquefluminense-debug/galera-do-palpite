@@ -439,6 +439,8 @@ async function adicionarJogoAdmin(){
   const casa=document.getElementById('jogoCasa').value.trim();
   const fora=document.getElementById('jogoFora').value.trim();
   const dataBase=document.getElementById('jogoData').value.trim();
+  const logoCasa=document.getElementById('jogoLogoCasa')?.value.trim() || '';
+const logoFora=document.getElementById('jogoLogoFora')?.value.trim() || '';
   const select=document.getElementById('jogoRodadaSelect');
   const alvoId=(select&&select.value)||rodadaAtualId;
   if(!casa||!fora) return alert('Preencha os times.');
@@ -446,11 +448,13 @@ async function adicionarJogoAdmin(){
   if(!r) return alert('Escolha uma competição/rodada válida.');
   const nomeRodada=(r.nome||'').trim();
   const data=dataBase ? `${dataBase} - ${nomeRodada}` : `${r.dataRodada||''} ${r.horaRodada||''} - ${nomeRodada}`.trim();
-  const novo={id:(r.jogos||[]).length+1,data,casa,fora,odds:['1.80','3.20','4.20'],golsCasa:null,golsFora:null};
+  const novo={id:(r.jogos||[]).length+1,data,casa,fora,logoCasa,logoFora,odds:['1.80','3.20','4.20'],golsCasa:null,golsFora:null};
   await supabaseRequest('jogos','POST',{
   rodada_id: Number(String(alvoId).replace(/\D/g,'')),
   casa: casa,
   fora: fora,
+  logo_casa: logoCasa,
+  logo_fora: logoFora,
   data_jogo: data,
   gols_casa: null,
   gols_fora: null
