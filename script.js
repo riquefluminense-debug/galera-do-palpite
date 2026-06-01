@@ -438,9 +438,9 @@ async function abrirRodadaAtual(){
 async function adicionarJogoAdmin(){
   const casa=document.getElementById('jogoCasa').value.trim();
   const fora=document.getElementById('jogoFora').value.trim();
-  const dataBase=document.getElementById('jogoData').value.trim();
   const logoCasa=document.getElementById('jogoLogoCasa')?.value.trim() || '';
-const logoFora=document.getElementById('jogoLogoFora')?.value.trim() || '';
+  const logoFora=document.getElementById('jogoLogoFora')?.value.trim() || '';
+  const dataBase=document.getElementById('jogoData').value.trim();
   const select=document.getElementById('jogoRodadaSelect');
   const alvoId=(select&&select.value)||rodadaAtualId;
   if(!casa||!fora) return alert('Preencha os times.');
