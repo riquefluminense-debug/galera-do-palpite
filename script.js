@@ -850,6 +850,14 @@ function rankingResumo(lista){
   lista.forEach(b=>{const pts=Number(b.pontos||0);contagem[pts]=(contagem[pts]||0)+1});
   return Object.keys(contagem).map(Number).sort((a,b)=>b-a).map(pts=>`<p><b>${contagem[pts]}</b> bilhete(s) com <b>${pts}</b> ponto(s)</p>`).join('');
 }
+function timeComLogo(nome, logo){
+  const src = logo || '';
+  if(!src) return nome || '';
+  return `<span class="team-logo-wrap">
+    <img src="${src}" class="team-logo" onerror="this.style.display='none'">
+    <span>${nome || ''}</span>
+  </span>`;
+}
 function renderJogosRanking(){
   return jogos.map(j=>{
     const temResultado=j.golsCasa!==null && j.golsCasa!=='' && j.golsFora!==null && j.golsFora!=='';
@@ -862,13 +870,13 @@ function renderJogosRanking(){
     </div>`:'';
     return `<div class="rank-game-row ${simulacaoAtiva&&!temResultado?'simulando':''}">
       <span class="rank-game-status">${status}</span>
-      <span class="rank-team">${j.casa}</span>
+      <span class="rank-team">${timeComLogo(j.casa, j.logoCasa)}</span>
       <span class="rank-crest">${escudo(j.casa)}</span>
       <span class="rank-score ${vencedor==='casa'?'win':''}">${temResultado?j.golsCasa:(vencedor==='casa'?'1':'-')}</span>
       <b>x</b>
       <span class="rank-score ${vencedor==='fora'?'win':''}">${temResultado?j.golsFora:(vencedor==='fora'?'1':'-')}</span>
       <span class="rank-crest">${escudo(j.fora)}</span>
-      <span class="rank-team">${j.fora}</span>
+      <span class="rank-team">${timeComLogo(j.fora, j.logoFora)}</span>
       <small>${j.data}</small>
       ${simControls}
     </div>`
