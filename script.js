@@ -61,6 +61,8 @@ async function carregarRodadasSupabase(){
     data: j.data_jogo || '',
     casa: j.casa || '',
     fora: j.fora || '',
+    logoCasa: j.logo_casa || '',
+    logoFora: j.logo_fora || '',
     odds: [j.odd_casa || '1.80', j.odd_empate || '3.20', j.odd_fora || '4.20'],
     golsCasa: j.gols_casa,
     golsFora: j.gols_fora
