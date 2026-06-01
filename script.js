@@ -1062,11 +1062,17 @@ function salvarPercentualPremio(){
   financeiro.percentualPremio=Math.max(0,Math.min(100,v));
   salvarDados(); renderFinanceiroAdmin();
 }
-function adicionarEntradaFinanceira(){
+async function adicionarEntradaFinanceira(){
   const el=document.getElementById('finEntradaManual'); const v=Number(el?.value||0);
   if(v<=0) return alert('Informe um valor de entrada maior que zero.');
   financeiro.entradasExtras=(Number(financeiro.entradasExtras)||0)+v;
   financeiro.transacoes.unshift({tipo:'Entrada',desc:'Entrada manual',valor:v,data:new Date().toLocaleString('pt-BR')});
+  await supabaseRequest('financeiro','POST',{
+  rodada_id: Number(String(rodadaAtualId).replace(/\D/g,'')),
+  tipo: 'Entrada',
+  descricao: 'Entrada manual',
+  valor: v
+});
   if(el) el.value=''; salvarDados(); renderFinanceiroAdmin();
 }
 function adicionarSaidaFinanceira(){
