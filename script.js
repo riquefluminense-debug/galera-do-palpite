@@ -1182,7 +1182,7 @@ function proximoCodigoBilhete(prefixo='GDP'){
   todos.forEach(b=>{const m=String(b.codigo||'').match(/(\d+)$/); if(m) maior=Math.max(maior,Number(m[1]));});
   return `${prefixo}-${String(maior+1).padStart(4,'0')}`;
 }
-function salvarBilheteManual(){
+async function salvarBilheteManual(){
   const r=getRodadaManualSelecionada();
   if(!r) return alert('Escolha uma rodada.');
   const lista=(r.jogos||[]).filter(j=>j&&j.casa&&j.fora);
@@ -1209,6 +1209,17 @@ function salvarBilheteManual(){
   r.bilhetes=r.bilhetes||[];
   r.bilhetes.push(b);
   if(r.id===rodadaAtualId){bilhetes=r.bilhetes;}
+  await supabaseRequest('bilhetes','POST',{
+  codigo: codigo,
+  nome: nome,
+  telefone: tel,
+  rodada_id: Number(String(r.id).replace(/\D/g,'')),
+  status: 'Pago',
+  valor: valorInput,
+  acertos: 0,
+  palpites: palpitesManual,
+  combinacoes: [JSON.parse(JSON.stringify(palpitesManual))]
+});
   salvarDados();
   renderAdmin();
   renderRankingPublico();
