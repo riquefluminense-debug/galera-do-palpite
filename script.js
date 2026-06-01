@@ -465,7 +465,7 @@ async function adicionarJogoAdmin(){
   alert('Jogo adicionado na rodada: '+r.nome);
 }
 function excluirJogo(id){jogos=jogos.filter(j=>j.id!==id).map((j,i)=>({...j,id:i+1}));delete palpites[id];salvarDados();renderRodadas();renderTicket();renderAdmin()}
-function confirmarPagamento(cod, origem='manual', abrirBilheteDepois=false){
+async function confirmarPagamento(cod, origem='manual', abrirBilheteDepois=false){
   const b=bilhetes.find(x=>x.codigo===cod);
   if(!b) return;
   if(b.status==='Pago'){
@@ -476,6 +476,10 @@ function confirmarPagamento(cod, origem='manual', abrirBilheteDepois=false){
   b.status='Pago';
   b.pagoEm=new Date().toLocaleString('pt-BR');
   b.pagamentoOrigem=origem;
+  await supabaseRequest('bilhetes','PATCH',{
+  status: 'Pago',
+  acertos: Number(b.acertos) || 0
+}, '?codigo=eq.'+encodeURIComponent(cod));
   financeiro.transacoes.unshift({tipo:'Entrada',desc:(origem==='webhook'?'Pix automático recebido ':'Pagamento confirmado ')+cod,valor:Number(b.valor)||0,data:new Date().toLocaleString('pt-BR')});
   salvarDados();renderAdmin();buscarBilhete();renderRodadas();renderRankingPublico();
   if(abrirBilheteDepois) imprimirBilhete(cod);
