@@ -292,7 +292,7 @@ function renderTicket(){
   document.getElementById('totalObrigatorios').textContent=jogos.length;
   document.getElementById('ticketList').innerHTML=jogos.map(j=>{
     const sel=getPalpiteArray(j.id);
-    return `<div class="jogo"><div class="numero">${j.id}</div><div class="linha-jogo"><div class="info">🔍 ${j.data}</div><button class="opcao time-casa ${sel.includes('casa')?'active':''}" onclick="marcar(${j.id},'casa',this)">${j.casa}</button><button class="opcao empate ${sel.includes('empate')?'active':''}" onclick="marcar(${j.id},'empate',this)">EMPATE</button><button class="opcao time-fora ${sel.includes('fora')?'active':''}" onclick="marcar(${j.id},'fora',this)">${j.fora}</button></div></div>`
+    return `<div class="jogo"><div class="numero">${j.id}</div><div class="linha-jogo"><div class="info">🔍 ${j.data}</div><button class="opcao time-casa ${sel.includes('casa')?'active':''}" onclick="marcar(${j.id},'casa',this)">${timeComLogo(j.casa, j.logoCasa)}</button><button class="opcao empate ${sel.includes('empate')?'active':''}" onclick="marcar(${j.id},'empate',this)">EMPATE</button><button class="opcao time-fora ${sel.includes('fora')?'active':''}" onclick="marcar(${j.id},'fora',this)">${timeComLogo(j.fora, j.logoFora)}</button></div></div>`
   }).join('');
   atualizar();
 }
