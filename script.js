@@ -184,9 +184,52 @@ ranking=[];
 salvarDados(false);
 return;
 }
-function salvarDados(sync=true){
+async function salvarDados(sync=true){
   if(sync) sincronizarRodadaAtual();
-  localStorage.setItem('gdp_dados_v6',JSON.stringify({rodadas,rodadaAtualId,historico}))
+
+  localStorage.setItem('gdp_dados_v6', JSON.stringify({rodadas,rodadaAtualId,historico}));
+
+  try {
+    const rodada = rodadas.find(r => r.id === rodadaAtualId);
+    if (!rodada) return;
+
+    const respRodada = await fetch(`${API_PIX_URL}/api/rodadas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: rodada.nome,
+        status: rodada.status || 'Aberta',
+        valor: Number(rodada.valor || 10),
+        dataRodada: rodada.dataRodada || '',
+        horaRodada: rodada.horaRodada || '',
+        premioEstimadoManual: rodada.premioEstimadoManual || ''
+      })
+    });
+
+    const rodadaSalva = await respRodada.json();
+
+    for (const jogo of (rodada.jogos || [])) {
+      await fetch(`${API_PIX_URL}/api/jogos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rodadaId: rodadaSalva._id,
+          rodadaNome: rodada.nome,
+          casa: jogo.casa,
+          fora: jogo.fora,
+          logo_casa: jogo.logoCasa || jogo.logo_casa || '',
+          logo_fora: jogo.logoFora || jogo.logo_fora || '',
+          data_jogo: jogo.data_jogo || jogo.dataJogo || '',
+          gols_casa: jogo.gols_casa ?? null,
+          gols_fora: jogo.gols_fora ?? null
+        })
+      });
+    }
+
+    console.log('RODADA E JOGOS SALVOS NO MONGO:', rodada.nome);
+  } catch (e) {
+    console.warn('Erro ao salvar rodada/jogos no Mongo:', e);
+  }
 }
 function mostrarTela(id, salvarHistorico = true){
   document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
