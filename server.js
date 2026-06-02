@@ -74,7 +74,7 @@ const BilheteSchema = new mongoose.Schema({
   codigo: { type: String, unique: true, index: true },
   nome: { type: String, required: true },
   telefone: String,
-  rodadaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Rodada' },
+  rodadaId: { type: mongoose.Schema.Types.Mixed },
   rodadaNome: String,
   palpites: { type: Array, default: [] },
   quantidade: { type: Number, default: 1 },
