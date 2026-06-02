@@ -84,6 +84,9 @@ const BilheteSchema = new mongoose.Schema({
   pago: { type: Boolean, default: false },
   statusPagamento: { type: String, default: 'PENDENTE' },
   origem: { type: String, default: 'SITE' },
+  payment_id: String,
+  external_reference: String,
+  pagoEm: Date,
   observacao: String,
   criadoEm: { type: Date, default: Date.now },
   atualizadoEm: { type: Date, default: Date.now }
