@@ -188,15 +188,24 @@ function salvarDados(sync=true){
   if(sync) sincronizarRodadaAtual();
   localStorage.setItem('gdp_dados_v6',JSON.stringify({rodadas,rodadaAtualId,historico}))
 }
-function mostrarTela(id){
+function mostrarTela(id, salvarHistorico = true){
   document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
   document.getElementById(id).classList.add('ativa');
+
+  if(salvarHistorico && location.hash !== '#' + id){
+    history.pushState({ tela: id }, '', '#' + id);
+  }
+
   if(id==='admin'){verificarAdmin(); if(adminLiberado) renderAdmin();}
   if(id==='buscar') buscarBilhete();
   if(id==='mercado') renderMercadoInicial();
   if(id==='ranking') renderRankingPublico();
   if(id==='historico') renderHistorico();
 }
+window.addEventListener('popstate', () => {
+  const tela = location.hash.replace('#', '') || 'inicio';
+  mostrarTela(tela, false);
+});
 function verificarAdmin(){
   const login=document.getElementById('adminLogin'), conteudo=document.getElementById('adminConteudo'); if(!login||!conteudo)return;
   if(adminLiberado){login.style.display='none';conteudo.classList.add('liberado')} else{login.style.display='block';conteudo.classList.remove('liberado')}
