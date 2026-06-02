@@ -369,7 +369,7 @@ async function confirmarAposta(){
   codigo: codigo,
   nome: nome,
   telefone: tel,
-  rodada_id: Number(String(rodadaAtualId).replace(/\D/g,'')),
+  rodadaId: rodadaAtualId,
   status: 'Aguardando Pix',
   valor: valorTotal,
 palpites: palpites,
