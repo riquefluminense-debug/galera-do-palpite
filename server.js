@@ -369,15 +369,15 @@ app.post('/api/pix/criar', async (req, res) => {
       notification_url: 'https://galeradopalpite.com.br/api/pix/webhook'
     };
 
-    const resposta = await fetch('https://api.mercadopago.com/v1/payments', {
-      method: 'POST',
-     headers: {
-  'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
-  'Content-Type': 'application/json',
-  'X-Idempotency-Key': `pix-${codigo}-${Date.now()}`
-},
-      body: JSON.stringify(pagamento)
-    });
+   const resposta = await fetch('https://api.mercadopago.com/v1/payments', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
+    'Content-Type': 'application/json',
+    'X-Idempotency-Key': `pix-${codigo}-${Date.now()}`
+  },
+  body: JSON.stringify(pagamento)
+});
 
     const data = await resposta.json();
 
