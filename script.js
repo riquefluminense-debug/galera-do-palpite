@@ -1307,7 +1307,20 @@ async function salvarBilheteManual(){
   }
 }
 
-function renderAdmin(){
+async function renderAdmin(){
+  try {
+    const resp = await fetch(`${API_PIX_URL}/api/bilhetes`);
+    const bilhetesMongo = await resp.json();
+
+    rodadas.forEach(r => {
+      r.bilhetes = bilhetesMongo.filter(b =>
+        String(b.rodadaId) === String(r.id) ||
+        String(b.rodadaNome || '').toUpperCase() === String(r.nome || '').toUpperCase()
+      );
+    });
+  } catch (e) {
+    console.warn('Erro ao carregar bilhetes do Mongo no admin:', e);
+  }
   carregarPixAdmin();
   const sel=document.getElementById('rodadaAdminSelect');
   if(sel){
