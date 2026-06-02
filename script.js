@@ -369,7 +369,7 @@ async function confirmarAposta(){
   codigo: codigo,
   nome: nome,
   telefone: tel,
-  rodadaId: rodadaAtualId,
+  rodadaId: rodadaAtualId._id || rodadaAtualId,
   status: 'Aguardando Pix',
   valor: valorTotal,
 palpites: palpites,
