@@ -434,9 +434,13 @@ app.get('/api/pix/status/:codigo', async (req, res) => {
     }
 
     res.json({
-      status: data.status,
-      pago: data.status === 'approved'
-    });
+  status: data.status,
+  status_detail: data.status_detail,
+  payment_id: bilhete.payment_id,
+  codigo: bilhete.codigo,
+  pago: data.status === 'approved',
+  mercado_pago: data
+});
 
   } catch (e) {
     res.status(500).json({ erro: e.message });
