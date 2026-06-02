@@ -347,6 +347,15 @@ function gerarCombinacoes(){
   return combos;
 }
 function limparPalpites(){Object.keys(palpites).forEach(k=>delete palpites[k]);renderTicket();document.getElementById('mensagem').textContent=''}
+function voltarInicioPalpite(){
+    limparPalpites();
+    mostrarTela('inicio');
+    fecharFora({target: document.getElementById('overlay')});
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
 async function confirmarAposta(){
   const msg=document.getElementById('mensagem');
   const c=totalCombinacoes();
