@@ -593,7 +593,7 @@ async function mostrarPix(codigo,nome,tel,valorPix=rodada.valor){
   const box=document.getElementById('pixBox');
   box.classList.add('show');
   const msg=encodeURIComponent(`Olá! Fiz o bilhete ${codigo} no Galera do Palpite e estou com dúvida no pagamento Pix.`);
-  document.getElementById('whatsComprovante').href=`https://wa.me/55${tel.replace(/\D/g,'')}?text=${msg}`;
+  document.getElementById('whatsComprovante').href=`https://wa.me/559985114440?text=${msg}`;
   try{
     const data=await criarPixMercadoPago(codigo,nome,tel,valorPix);
     document.getElementById('pixCopia').value=data.pix_copia_cola||'';
