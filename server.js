@@ -17,6 +17,7 @@ app.use(express.static(__dirname));
 const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/galeradopalpite';
 const JWT_SECRET = process.env.JWT_SECRET || 'galera-do-palpite-chave-admin-local';
+const MP_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 
 mongoose.connect(MONGO_URL)
   .then(() => console.log('✅ MongoDB conectado'))
