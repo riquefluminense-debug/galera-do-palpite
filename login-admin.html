@@ -79,6 +79,12 @@
     <label>Usuário</label>
     <input id="usuario" type="text" placeholder="Digite o usuário" autocomplete="new-password" value="">
 
+<script>
+window.onload = () => {
+    document.getElementById('usuario').value = '';
+};
+</script>
+
     <label>Senha</label>
     <input id="senha" type="password" placeholder="Digite a senha" autocomplete="current-password">
 
@@ -87,11 +93,7 @@
     <div class="erro" id="erro"></div>
 
     <div class="info">
-      Primeiro acesso padrão:<br>
-      <strong>Usuário:</strong> admin<br>
-      <strong>Senha:</strong> definida no backend/.env<br><br>
-      Depois entre no painel e altere a senha.
-    </div>
+     
   </div>
 
   <script>
