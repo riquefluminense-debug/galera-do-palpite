@@ -99,3 +99,8 @@ async function exportarBilhetesPDF(rodadaId = "") { return baixarArquivo(`/expor
 async function exportarRankingExcel(rodadaId = "") { return baixarArquivo(`/export/ranking/excel${rodadaId ? `?rodadaId=${rodadaId}` : ""}`, "ranking.xlsx"); }
 async function exportarRankingPDF(rodadaId = "") { return baixarArquivo(`/export/ranking/pdf${rodadaId ? `?rodadaId=${rodadaId}` : ""}`, "ranking.pdf"); }
 async function baixarBackupCompleto() { return baixarArquivo('/backup/completo', 'backup-galera.json'); }
+
+window.salvarBilheteBanco = salvarBilheteBanco;
+window.carregarBilhetesBanco = carregarBilhetesBanco;
+window.buscarBilhetePorCodigoBanco = buscarBilhetePorCodigoBanco;
+window.atualizarBilheteBanco = atualizarBilheteBanco;
