@@ -335,7 +335,7 @@ app.delete('/api/jogos/:id', async (req, res) => {
 // BILHETES
 app.post('/api/bilhetes', async (req, res) => {
   try {
-    const codigo = req.body.codigo || await gerarCodigoGDP();
+    const codigo = await gerarCodigoGDP();
     const pago = Boolean(req.body.pago || req.body.manual);
 
     const bilhete = await Bilhete.create({
