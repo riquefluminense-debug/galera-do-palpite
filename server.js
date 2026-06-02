@@ -348,6 +348,128 @@ app.post('/api/bilhetes', async (req, res) => {
     res.status(400).json({ erro: e.message });
   }
 });
+// PIX MERCADO PAGO
+app.post('/api/pix/criar', async (req, res) => {
+  try {
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(500).json({ erro: 'MERCADO_PAGO_ACCESS_TOKEN não configurado' });
+    }
+
+    const { codigo, nome, telefone, valor } = req.body;
+
+    const pagamento = {
+      transaction_amount: Number(valor || 1),
+      description: `Bilhete ${codigo} - Galera do Palpite`,
+      payment_method_id: 'pix',
+      payer: {
+        email: `${codigo}@galeradopalpite.com.br`,
+        first_name: nome || 'Cliente'
+      },
+      external_reference: codigo,
+      notification_url: 'https://galeradopalpite.com.br/api/pix/webhook'
+    };
+
+    const resposta = await fetch('https://api.mercadopago.com/v1/payments', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(pagamento)
+    });
+
+    const data = await resposta.json();
+
+    if (!resposta.ok) {
+      return res.status(400).json({ erro: data.message || 'Erro ao criar Pix', detalhes: data });
+    }
+
+    await Bilhete.findOneAndUpdate(
+      { codigo },
+      {
+        payment_id: data.id,
+        external_reference: codigo
+      }
+    );
+
+    res.json({
+      payment_id: data.id,
+      status: data.status,
+      qr_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
+      pix_copia_cola: data.point_of_interaction?.transaction_data?.qr_code
+    });
+
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
+app.get('/api/pix/status/:codigo', async (req, res) => {
+  try {
+    const bilhete = await Bilhete.findOne({ codigo: req.params.codigo });
+
+    if (!bilhete || !bilhete.payment_id) {
+      return res.json({ status: 'pending' });
+    }
+
+    const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${bilhete.payment_id}`, {
+      headers: {
+        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+      }
+    });
+
+    const data = await resposta.json();
+
+    if (data.status === 'approved') {
+      bilhete.statusPagamento = 'PAGO';
+      bilhete.pago = true;
+      bilhete.status = 'Pago';
+      bilhete.pagoEm = new Date();
+      await bilhete.save();
+    }
+
+    res.json({
+      status: data.status,
+      pago: data.status === 'approved'
+    });
+
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
+app.post('/api/pix/webhook', async (req, res) => {
+  try {
+    const id = req.body?.data?.id || req.query.id;
+
+    if (id && MP_ACCESS_TOKEN) {
+      const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+        }
+      });
+
+      const data = await resposta.json();
+
+      if (data.status === 'approved' && data.external_reference) {
+        const bilhete = await Bilhete.findOne({ codigo: data.external_reference });
+
+        if (bilhete) {
+          bilhete.statusPagamento = 'PAGO';
+          bilhete.pago = true;
+          bilhete.status = 'Pago';
+          bilhete.pagoEm = new Date();
+          bilhete.payment_id = data.id;
+          await bilhete.save();
+        }
+      }
+    }
+
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(200);
+  }
+});
 
 app.post('/api/bilhetes/manual', async (req, res) => {
   try {
