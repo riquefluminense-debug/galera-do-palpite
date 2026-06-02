@@ -1329,7 +1329,15 @@ async function renderAdmin(){
   } catch (e) {
     console.warn('Erro ao carregar bilhetes do Mongo no admin:', e);
   }
-  carregarPixAdmin();
+  async function renderAdmin(){
+
+    carregarPixAdmin();
+
+    try {
+        const resp = await fetch(`${API_PIX_URL}/api/bilhetes`);
+        const bilhetesMongo = await resp.json();
+
+        ...
   const sel=document.getElementById('rodadaAdminSelect');
   if(sel){
     sel.innerHTML=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0)).map(r=>`<option value="${r.id}" ${r.id===rodadaAtualId?'selected':''}>${r.status==='Aberta'?'🟢':'🔴'} ${r.nome}</option>`).join('');
