@@ -1319,10 +1319,11 @@ async function renderAdmin(){
     const nomeBilhete = String(b.rodadaNome || '').trim().toUpperCase();
 
     return (
-      nomeBilhete === nomeRodada ||
-      nomeBilhete.includes(nomeRodada) ||
-      nomeRodada.includes(nomeBilhete)
-    );
+  String(b.rodadaId) === String(r.id) ||
+  nomeBilhete === nomeRodada ||
+  nomeBilhete.includes(nomeRodada) ||
+  nomeRodada.includes(nomeBilhete)
+);
   });
 });
   } catch (e) {
