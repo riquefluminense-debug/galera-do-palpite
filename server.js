@@ -371,10 +371,11 @@ app.post('/api/pix/criar', async (req, res) => {
 
     const resposta = await fetch('https://api.mercadopago.com/v1/payments', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
+     headers: {
+  'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
+  'Content-Type': 'application/json',
+  'X-Idempotency-Key': `pix-${codigo}-${Date.now()}`
+}
       body: JSON.stringify(pagamento)
     });
 
