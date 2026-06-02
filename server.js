@@ -358,7 +358,26 @@ app.post('/api/pix/criar', async (req, res) => {
       return res.status(500).json({ erro: 'MERCADO_PAGO_ACCESS_TOKEN não configurado' });
     }
 
-    const { codigo, nome, telefone, valor } = req.body;
+    const { codigo, nome, telefone, valor, rodadaId, rodadaNome } = req.body;
+
+let bilheteBase = await Bilhete.findOne({ codigo });
+
+if (!bilheteBase) {
+  bilheteBase = await Bilhete.create({
+    codigo,
+    nome: nome || 'Cliente',
+    telefone: telefone || '',
+    valor: Number(valor || 1),
+    rodadaId: rodadaId || null,
+    rodadaNome: rodadaNome || '',
+    palpites: [],
+    pago: false,
+    statusPagamento: 'PENDENTE',
+    origem: 'SITE'
+  });
+
+  console.log('BILHETE CRIADO ANTES DO PIX:', codigo);
+}
 
     const pagamento = {
       transaction_amount: Number(valor || 1),
