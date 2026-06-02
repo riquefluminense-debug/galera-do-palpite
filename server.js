@@ -385,13 +385,19 @@ app.post('/api/pix/criar', async (req, res) => {
       return res.status(400).json({ erro: data.message || 'Erro ao criar Pix', detalhes: data });
     }
 
-    await Bilhete.findOneAndUpdate(
-      { codigo },
-      {
-        payment_id: data.id,
-        external_reference: codigo
-      }
-    );
+   const bilheteAtualizado = await Bilhete.findOneAndUpdate(
+  { codigo },
+  {
+    payment_id: data.id,
+    external_reference: codigo,
+    statusPagamento: data.status || 'PENDENTE'
+  },
+  { new: true }
+);
+
+if (!bilheteAtualizado) {
+  console.log('Bilhete não encontrado para salvar payment_id:', codigo);
+}
 
     res.json({
   ok: true,
