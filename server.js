@@ -405,6 +405,9 @@ app.post('/api/pix/criar', async (req, res) => {
     res.status(500).json({ erro: e.message });
   }
 });
+app.get('/api/pix/webhook', (req, res) => {
+  res.json({ ok: true, rota: 'webhook ativo' });
+});
 
 app.get('/api/pix/status/:codigo', async (req, res) => {
   try {
