@@ -1312,24 +1312,26 @@ async function renderAdmin(){
     const resp = await fetch(`${API_PIX_URL}/api/bilhetes`);
     const bilhetesMongo = await resp.json();
 
-    rodadas.forEach(r => {
+  } catch (e) {
+    console.warn('Erro ao carregar bilhetes do Mongo no admin:', e);
+  }
+ carregarPixAdmin();
+  rodadas.forEach(r => {
   const nomeRodada = String(r.nome || '').trim().toUpperCase();
 
   r.bilhetes = bilhetesMongo.filter(b => {
     const nomeBilhete = String(b.rodadaNome || '').trim().toUpperCase();
 
     return (
-  String(b.rodadaId) === String(r.id) ||
-  nomeBilhete === nomeRodada ||
-  nomeBilhete.includes(nomeRodada) ||
-  nomeRodada.includes(nomeBilhete)
-);
+      String(b.rodadaId) === String(r.id) ||
+      nomeBilhete === nomeRodada ||
+      nomeBilhete.includes(nomeRodada) ||
+      nomeRodada.includes(nomeBilhete)
+    );
   });
 });
-  } catch (e) {
-    console.warn('Erro ao carregar bilhetes do Mongo no admin:', e);
-  }
- carregarPixAdmin();
+
+const sel = document.getElementById('rodadaAdminSelect');
   const sel=document.getElementById('rodadaAdminSelect');
   if(sel){
     sel.innerHTML=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0)).map(r=>`<option value="${r.id}" ${r.id===rodadaAtualId?'selected':''}>${r.status==='Aberta'?'🟢':'🔴'} ${r.nome}</option>`).join('');
