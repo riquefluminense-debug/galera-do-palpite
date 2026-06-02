@@ -393,12 +393,13 @@ app.post('/api/pix/criar', async (req, res) => {
     );
 
     res.json({
-      payment_id: data.id,
-      status: data.status,
-      qr_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
-      pix_copia_cola: data.point_of_interaction?.transaction_data?.qr_code
-    });
-
+  ok: true,
+  payment_id: data.id,
+  status: data.status,
+  qr_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
+  pix_copia_cola: data.point_of_interaction?.transaction_data?.qr_code
+});
+    
   } catch (e) {
     res.status(500).json({ erro: e.message });
   }
