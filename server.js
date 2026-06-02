@@ -413,9 +413,23 @@ app.get('/api/pix/status/:codigo', async (req, res) => {
   try {
     const bilhete = await Bilhete.findOne({ codigo: req.params.codigo });
 
-    if (!bilhete || !bilhete.payment_id) {
-      return res.json({ status: 'pending' });
-    }
+    if (!bilhete) {
+  return res.json({
+    status: 'pending',
+    motivo: 'bilhete_nao_encontrado',
+    codigo: req.params.codigo
+  });
+}
+
+if (!bilhete.payment_id) {
+  return res.json({
+    status: 'pending',
+    motivo: 'payment_id_nao_salvo',
+    codigo: bilhete.codigo,
+    pago: bilhete.pago,
+    statusPagamento: bilhete.statusPagamento
+  });
+}
 
     const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${bilhete.payment_id}`, {
       headers: {
