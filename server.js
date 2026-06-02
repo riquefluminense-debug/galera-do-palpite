@@ -375,7 +375,7 @@ app.post('/api/pix/criar', async (req, res) => {
   'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
   'Content-Type': 'application/json',
   'X-Idempotency-Key': `pix-${codigo}-${Date.now()}`
-}
+},
       body: JSON.stringify(pagamento)
     });
 
