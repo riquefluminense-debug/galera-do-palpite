@@ -1313,11 +1313,18 @@ async function renderAdmin(){
     const bilhetesMongo = await resp.json();
 
     rodadas.forEach(r => {
-      r.bilhetes = bilhetesMongo.filter(b =>
-        String(b.rodadaId) === String(r.id) ||
-        String(b.rodadaNome || '').toUpperCase() === String(r.nome || '').toUpperCase()
-      );
-    });
+  const nomeRodada = String(r.nome || '').trim().toUpperCase();
+
+  r.bilhetes = bilhetesMongo.filter(b => {
+    const nomeBilhete = String(b.rodadaNome || '').trim().toUpperCase();
+
+    return (
+      nomeBilhete === nomeRodada ||
+      nomeBilhete.includes(nomeRodada) ||
+      nomeRodada.includes(nomeBilhete)
+    );
+  });
+});
   } catch (e) {
     console.warn('Erro ao carregar bilhetes do Mongo no admin:', e);
   }
