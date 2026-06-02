@@ -54,7 +54,7 @@ const JogoSchema = new mongoose.Schema({
 });
 
 const RankingSchema = new mongoose.Schema({
-  rodadaId: { type: mongoose.Schema.Types.ObjectId, ref: 'Rodada' },
+  rodadaId: { type: mongoose.Schema.Types.Mixed },
   rodadaNome: String,
   codigo: String,
   nome: String,
