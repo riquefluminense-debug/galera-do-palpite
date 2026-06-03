@@ -469,11 +469,13 @@ if (!bilhete.payment_id) {
     const data = await resposta.json();
 
     if (data.status === 'approved') {
-      bilhete.statusPagamento = 'PAGO';
-      bilhete.pago = true;
-      bilhete.status = 'Pago';
-      bilhete.pagoEm = new Date();
-      await bilhete.save();
+    bilhete.statusPagamento = 'PAGO';
+    bilhete.pago = true;
+    bilhete.status = 'Pago';
+    bilhete.pagoEm = new Date();
+    bilhete.payment_id = data.id;
+    await bilhete.save();
+}
     }
 
     res.json({
