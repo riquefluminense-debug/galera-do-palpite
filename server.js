@@ -503,8 +503,10 @@ app.post('/api/pix/webhook', async (req, res) => {
 
       const data = await resposta.json();
 
-      if (data.status === 'approved' && data.external_reference) {
-        const bilhete = await Bilhete.findOne({ codigo: data.external_reference });
+      const codigoBilhete = data.external_reference || data.metadata?.codigo || data.description?.match(/GDP-\d+/)?.[0];
+
+if (data.status === 'approved' && codigoBilhete) {
+        const bilhete = await Bilhete.findOne({ codigo: codigoBilhete });
 
         if (bilhete) {
           bilhete.statusPagamento = 'PAGO';
