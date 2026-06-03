@@ -1352,6 +1352,11 @@ async function renderAdmin(){
 
   const jogosHtml=(jogos.length?`<div class="resultado-toolbar"><small><b>Rodada selecionada:</b> ${rodada.nome}<br>Digite os placares finais e salve. O ranking fica ao lado para conferir rápido.</small><button onclick="salvarTodosResultados()">Salvar todos resultados</button></div>`:'') + (jogos.map(j=>`<div class="resultado-jogo-card jogo-admin" id="jogoAdminLinha${j.id}"><div class="resultado-num">${j.id}</div><div class="resultado-times"><b>${j.casa}</b> <span>x</span> <b>${j.fora}</b><br><small>${j.data||''}</small><br><em id="statusResultado${j.id}" class="status-resultado salvo">SALVO</em></div><span class="placar-admin"><input type="number" min="0" placeholder="Casa" value="${j.golsCasa??''}" onchange="setResultado(${j.id},'golsCasa',this.value)"><b>x</b><input type="number" min="0" placeholder="Fora" value="${j.golsFora??''}" onchange="setResultado(${j.id},'golsFora',this.value)"></span><button class="btn-save-result" onclick="salvarResultadoJogo(${j.id})">Salvar</button><button class="excluir" onclick="excluirJogo(${j.id})">Excluir</button></div>`).join('')||'<p>Nenhum jogo cadastrado nessa competição/rodada.</p>');
   document.getElementById('adminJogos').innerHTML=jogosHtml;
+  rodadas.forEach(r => {
+  r.bilhetes = bilhetesMongo.filter(b =>
+    String(b.rodadaId) === String(r.id)
+  );
+});
   document.getElementById('adminBilhetes').innerHTML=renderBilhetesPorRodadaAdmin();
   document.getElementById('adminRanking').innerHTML=renderRankingTabela(ranking,10);
   renderFinanceiroAdmin();
