@@ -408,14 +408,14 @@ if (!bilheteBase) {
     }
    console.log('SALVANDO PAYMENT ID NO BILHETE:', codigo);
    const bilheteAtualizado = await Bilhete.findOneAndUpdate(
-  { codigo: String(codigo) },
+  { codigo },
   {
-    $set: {
-      payment_id: String(data.id),
-      external_reference: String(codigo),
-      statusPagamento: data.status || 'PENDENTE'
-    }
+    payment_id: data.id,
+    external_reference: codigo,
+    statusPagamento: data.status || 'PENDENTE'
   },
+  { new: true }
+);
   { new: true }
 );
 
