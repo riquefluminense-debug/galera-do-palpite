@@ -601,12 +601,11 @@ async function consultarPixReal(cod,abrirDepois=false){
 }
 function iniciarMonitoramentoPix(cod){
   if(pixTimer) clearInterval(pixTimer);
-  pixTimer=setInterval(async()=>{
-    const b=bilhetes.find(x=>x.codigo===cod);
-    if(!b || b.status==='Pago'){clearInterval(pixTimer); return;}
-    const ok=await consultarPixReal(cod,false);
+
+  pixTimer = setInterval(async () => {
+    const ok = await consultarPixReal(cod, false);
     if(ok) clearInterval(pixTimer);
-  },5000);
+  }, 5000);
 }
 function simularWebhookPix(cod){
   consultarPixReal(cod,false);
