@@ -416,8 +416,6 @@ if (!bilheteBase) {
   },
   { new: true }
 );
-  { new: true }
-);
 
 if (!bilheteAtualizado) {
   console.log('Bilhete não encontrado para salvar payment_id:', codigo);
