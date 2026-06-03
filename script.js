@@ -1308,9 +1308,10 @@ async function salvarBilheteManual(){
 }
 
 async function renderAdmin(){
+  let bilhetesMongo = [];
   try {
     const resp = await fetch(`${API_PIX_URL}/api/bilhetes`);
-    const bilhetesMongo = await resp.json();
+    bilhetesMongo = await resp.json();
 
   } catch (e) {
     console.warn('Erro ao carregar bilhetes do Mongo no admin:', e);
