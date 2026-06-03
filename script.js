@@ -1193,7 +1193,6 @@ function limparFinanceiroGeral(){
   alert('Valores financeiros manuais de todas as rodadas foram limpos.');
 }
 function renderBilhetesPorRodadaAdmin(){
-  sincronizarRodadaAtual();
   const ordenadas=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0));
   return ordenadas.map(r=>{
     const lista=(r.bilhetes||[]).slice().sort((a,b)=>String(b.data||'').localeCompare(String(a.data||'')));
