@@ -1195,13 +1195,15 @@ function renderBilhetesPorRodadaAdmin(){
   const ordenadas=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0));
   return ordenadas.map(r=>{
     const lista=(r.bilhetes||[]).slice().sort((a,b)=>String(b.data||'').localeCompare(String(a.data||'')));
-    const pendentes=lista.filter(b=>b.status!=='Pago');
-    const pagos=lista.filter(b=>b.status==='Pago');
+    const pendentes = lista.filter(b => !(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago'));
+    const pagos = lista.filter(b => (b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago'));
     const totalPendente=pendentes.reduce((s,b)=>s+(Number(b.valor)||0),0);
     const totalPago=pagos.reduce((s,b)=>s+(Number(b.valor)||0),0);
     const cards=lista.map(b=>`<div class="linha bilhete-admin-row ${b.status==='Pago'?'bilhete-pago':'bilhete-pendente'}">
       <span><b>${b.codigo}</b> - ${b.nome} ${b.origem==='Manual'?'<em class="manual-badge">📝 MANUAL</em>':''}<br><small>${b.tel} • ${b.totalBilhetes||1} bilhete(s) • ${dinheiro(b.valor)} • ${b.pontos||0} pts • ${b.data||''}</small></span>
-      <span class="tag ${b.status==='Pago'?'pago':'pendente'}">${b.status}</span>
+      <span class="tag ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'pago' : 'pendente'}">
+    ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'Pago' : 'Pendente'}
+    </span>
       <span class="bilhete-actions">${b.status==='Pago'?`<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button>`:`<button onclick="confirmarPagamentoManual('${b.codigo}')">Confirmar PG</button>`}</span>
     </div>`).join('') || '<p class="sub admin-empty">Nenhum bilhete recebido nesta rodada.</p>';
     return `<div class="rodada-bilhetes-card ${r.id===rodadaAtualId?'ativa':''}">
