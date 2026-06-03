@@ -408,7 +408,7 @@ if (!bilheteBase) {
     }
    console.log('SALVANDO PAYMENT ID NO BILHETE:', codigo);
    const bilheteAtualizado = await Bilhete.findOneAndUpdate(
-  { codigo },
+  { codigo: String(codigo) },
   {
     payment_id: data.id,
     external_reference: codigo,
