@@ -475,7 +475,6 @@ if (!bilhete.payment_id) {
     bilhete.pagoEm = new Date();
     bilhete.payment_id = data.id;
     await bilhete.save();
-}
     }
 
     res.json({
