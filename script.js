@@ -411,23 +411,6 @@ const palpitesSeguro = JSON.parse(JSON.stringify(palpites || {}));
 const combinacoesSeguro = JSON.parse(JSON.stringify(c.combos || c.combinacoes || []));
 codigo = `GDP-${Date.now()}`;
 pixAtualCodigo = codigo;
-bilhetes.push({
-  palpites: palpitesSeguro,
-combinacoes: combinacoesSeguro,
-totalBilhetes: c.total || 1,
-quantidade: c.total || 1,
-valor: valorTotal,
-pontos: 0,
-acertos: 0,
-  codigo,
-  nome,
-  tel,
-  rodadaId: rodada._id || rodada.id || rodadaAtualId,
-  rodadaNome: rodada.nome,
-  status: 'Pendente',
-pagamentoMetodo: 'Pix automático'
-
-});
 
   await supabaseRequest('bilhetes','POST',{
   codigo: codigo,
