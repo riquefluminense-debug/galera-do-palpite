@@ -409,7 +409,8 @@ async function confirmarAposta(){
   const valorTotal=c.total*rodada.valor;
 const palpitesSeguro = JSON.parse(JSON.stringify(palpites || {}));
 const combinacoesSeguro = JSON.parse(JSON.stringify(c.combos || c.combinacoes || []));
-codigo = codigo || pixAtualCodigo || `GDP-${Date.now()}`;
+codigo = `GDP-${Date.now()}`;
+pixAtualCodigo = codigo;
 bilhetes.push({
   palpites: palpitesSeguro,
 combinacoes: combinacoesSeguro,
@@ -1354,7 +1355,7 @@ async function salvarBilheteManual(){
   r.bilhetes.push(b);
   if(r.id===rodadaAtualId){bilhetes=r.bilhetes;}
   await supabaseRequest('bilhetes','POST',{
-  codigo: codigo,
+  codigo: codigo || pixAtualCodigo,
   nome: nome,
   telefone: tel,
   rodada_id: Number(String(r.id).replace(/\D/g,'')),
