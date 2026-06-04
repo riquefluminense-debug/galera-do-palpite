@@ -423,7 +423,7 @@ acertos: 0,
   tel,
   rodadaId: rodada._id || rodada.id || rodadaAtualId,
   rodadaNome: rodada.nome,
-  status: 'Aguardando Pix',
+  status: 'Pendente',
 pagamentoMetodo: 'Pix automático'
 
 });
@@ -433,7 +433,7 @@ pagamentoMetodo: 'Pix automático'
   nome: nome,
   telefone: tel,
   rodada_id: Number(String(rodada._id || rodada.id || rodadaAtualId).replace(/\D/g,'')),
-  status: 'Aguardando Pix',
+  status: 'Pendente',
   valor: valorTotal,
   acertos: 0,
   palpites: palpitesSeguro,
