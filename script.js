@@ -645,6 +645,8 @@ async function mostrarPix(codigo,nome,tel,valorPix=rodada.valor){
   try{
     const data=await criarPixMercadoPago(codigo,nome,tel,valorPix);
     if(data.codigo) codigo = data.codigo;
+    const msg = document.getElementById('mensagem');
+if (msg) msg.textContent = `Aposta confirmada! Código do bilhete: ${codigo}. Agora faça o Pix.`;
     const bLocal = bilhetes.find(x => x.codigo === null || x.codigo === undefined || x.codigo === '');
 if (bLocal) {
   bLocal.codigo = codigo;
