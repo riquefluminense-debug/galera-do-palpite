@@ -608,7 +608,7 @@ async function consultarPixReal(cod,abrirDepois=false){
     const resp=await fetch(`${API_PIX_URL}/api/pix/status/${encodeURIComponent(cod)}`);
     const data=await resp.json().catch(()=>({}));
     if(data.status==='approved' || data.status==='paid'){
-      confirmarPagamento(cod,'webhook',false);
+      await confirmarPagamento(cod,'webhook',false);
       if(status) status.innerHTML='<b>✅ Pagamento aprovado automaticamente</b><span>Bilhete ativo no ranking. O comprovante amarelo já foi liberado.</span>';
       const ticketBtn=document.getElementById('pixTicketBtn');
       if(ticketBtn) ticketBtn.style.display='block';
