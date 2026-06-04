@@ -881,6 +881,10 @@ function nomePalpite(b,j){
   return arr.map(op=>textoPalpite(op,j)).join(' / ') || '-';
 }
 function encontrarBilheteGlobal(cod){
+  const lista = todosBilhetesSistema();
+  const b = lista.find(x => String(x.codigo) === String(cod));
+  return b ? { bilhete: b, rodada: rodadas.find(r => String(r.id) === String(b.rodadaId)) || rodada || null } : null;
+}
   for(const r of rodadas){
     const b=(r.bilhetes||[]).find(x=>String(x.codigo)===String(cod));
     if(b) return {bilhete:b, rodada:r};
