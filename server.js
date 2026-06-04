@@ -19,6 +19,26 @@ const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/galeradopa
 const JWT_SECRET = process.env.JWT_SECRET || 'galera-do-palpite-chave-admin-local';
 const MP_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
+
+async function atualizarBilheteSupabase(codigo, dados) {
+  const resp = await fetch(`${SUPABASE_URL}/rest/v1/bilhetes?codigo=eq.${encodeURIComponent(codigo)}`, {
+    method: 'PATCH',
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation'
+    },
+    body: JSON.stringify(dados)
+  });
+
+  const json = await resp.json().catch(() => null);
+  console.log('SUPABASE UPDATE:', codigo, json);
+  return json;
+}
+
 mongoose.connect(MONGO_URL)
   .then(() => console.log('✅ MongoDB conectado'))
   .catch(err => console.error('❌ Erro MongoDB:', err.message));
