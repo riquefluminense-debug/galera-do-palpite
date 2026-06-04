@@ -430,7 +430,7 @@ pagamentoMetodo: 'Pix automático'
 });
 
   await supabaseRequest('bilhetes','POST',{
-  codigo: codigo || pixAtualCodigo,
+  codigo: codigo,
   nome: nome,
   telefone: tel,
   rodada_id: Number(String(rodada._id || rodada.id || rodadaAtualId).replace(/\D/g,'')),
@@ -1355,7 +1355,7 @@ async function salvarBilheteManual(){
   r.bilhetes.push(b);
   if(r.id===rodadaAtualId){bilhetes=r.bilhetes;}
   await supabaseRequest('bilhetes','POST',{
-  codigo: codigo || pixAtualCodigo,
+  codigo: codigo,
   nome: nome,
   telefone: tel,
   rodada_id: Number(String(r.id).replace(/\D/g,'')),
