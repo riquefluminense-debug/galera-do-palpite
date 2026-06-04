@@ -415,7 +415,14 @@ bilhetes.push({
   rodadaId: rodada._id || rodada.id || rodadaAtualId,
   rodadaNome: rodada.nome,
   status: 'Aguardando Pix',
-  pagamentoMetodo: 'Pix automático'
+pagamentoMetodo: 'Pix automático',
+
+palpites: palpites,
+combinacoes: c.combos || c.combinacoes || [],
+totalBilhetes: c.total || 1,
+valor: valorTotal,
+pontos: 0,
+acertos: 0
 });
 
 salvarDados();
