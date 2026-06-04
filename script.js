@@ -1362,7 +1362,7 @@ async function renderAdmin(){
   rodadas.forEach(r => {
   const nomeRodada = String(r.nome || '').trim().toUpperCase();
 
-  r.bilhetes = bilhetesMongo.filter(b => {
+  r.bilhetes = bilhetes.filter(b => {
     const nomeBilhete = String(b.rodadaNome || '').trim().toUpperCase();
 
     return (
