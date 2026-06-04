@@ -405,15 +405,7 @@ async function confirmarAposta(){
   if(c.feitos<jogos.length){msg.style.color='#c98900';msg.textContent=`Faltam ${jogos.length-c.feitos} jogo(s) para marcar.`;return}
   if(c.total>256){msg.style.color='#c98900';msg.textContent='⚠️ Limite máximo de 256 bilhetes por aposta atingido.';return}
   const nome=document.getElementById('nome').value.trim(), tel=document.getElementById('telefone').value.trim(); if(!nome||!tel){msg.style.color='#c98900';msg.textContent='Preencha nome e telefone.';return}
-  const agora = new Date();
-  const codigo = 'GDP-' +
-  String(agora.getFullYear()).slice(2) +
-  String(agora.getMonth()+1).padStart(2,'0') +
-  String(agora.getDate()).padStart(2,'0') +
-  String(agora.getHours()).padStart(2,'0') +
-  String(agora.getMinutes()).padStart(2,'0') +
-  String(agora.getSeconds()).padStart(2,'0') +
-  String(Math.floor(Math.random() * 1000)).padStart(3,'0');
+  let codigo = null;
   const valorTotal=c.total*rodada.valor;
   bilhetes.push({codigo,nome,tel,rodadaId:rodada._id || rodada.id || rodadaAtualId,rodadaNome:rodada.nome,status:'Aguardando Pix',pagamentoMetodo:'Pix automático',txid:codigo.replace(/[^A-Za-z0-9]/g,''),valor:valorTotal,valorBase:rodada.valor,totalBilhetes:c.total,secos:c.secos,duplos:c.duplos,triplos:c.triplos,palpites:JSON.parse(JSON.stringify(palpites)),combinacoes:gerarCombinacoes(),pontos:0,acertos:0,data:new Date().toLocaleString('pt-BR')});
   await salvarBilheteBanco({
