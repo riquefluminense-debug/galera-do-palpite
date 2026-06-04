@@ -1223,7 +1223,9 @@ function renderBilhetesPorRodadaAdmin(){
       <span class="tag ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'pago' : 'pendente'}">
     ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'Pago' : 'Pendente'}
     </span>
-      <span class="bilhete-actions">${b.status==='Pago'?`<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button>`:`<button onclick="confirmarPagamentoManual('${b.codigo}')">Confirmar PG</button>`}</span>
+      <span class="bilhete-actions">${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago')
+ ? `<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button>`
+ : `<button onclick="confirmarPagamentoManual('${b.codigo}')">Confirmar PG</button>`}</span>
     </div>`).join('') || '<p class="sub admin-empty">Nenhum bilhete recebido nesta rodada.</p>';
     return `<div class="rodada-bilhetes-card ${r.id===rodadaAtualId?'ativa':''}">
       <div class="rodada-bilhetes-head">
