@@ -1387,11 +1387,19 @@ async function renderAdmin(){
 }
 let mercadoFiltro='todos';
 let mercadoUltimaLista=[];
+function unicosPorCodigo(lista){
+  const mapa = {};
+  lista.forEach(b=>{
+    if(b && b.codigo) mapa[b.codigo] = b;
+  });
+  return Object.values(mapa);
+}
+
 function todosBilhetesSistema(){
-  return [
+  return unicosPorCodigo([
     ...(bilhetes || []),
     ...((rodadas || []).flatMap(r => r.bilhetes || []))
-  ];
+  ]);
 }
 
 function bilhetePago(b){
