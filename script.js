@@ -428,6 +428,18 @@ pagamentoMetodo: 'Pix automático'
 
 });
 
+  await supabaseRequest('bilhetes','POST',{
+  codigo: codigo,
+  nome: nome,
+  telefone: tel,
+  rodada_id: Number(String(rodada._id || rodada.id || rodadaAtualId).replace(/\D/g,'')),
+  status: 'Aguardando Pix',
+  valor: valorTotal,
+  acertos: 0,
+  palpites: palpitesSeguro,
+  combinacoes: combinacoesSeguro
+});
+
 salvarDados();
 
 msg.style.color='#108000';
