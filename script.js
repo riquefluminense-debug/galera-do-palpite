@@ -446,6 +446,7 @@ salvarDados();
 msg.style.color='#108000';
 msg.textContent='Aposta confirmada!';
 
+pixAtualCodigo = codigo;
 mostrarPix(codigo,nome,tel,valorTotal);
   
 }
