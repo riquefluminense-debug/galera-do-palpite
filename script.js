@@ -568,10 +568,13 @@ if(!b){
 }
 
 if(!b){
-  await supabaseRequest('bilhetes','PATCH',{
-    status:'Pago',
-    acertos:0
-  },'?codigo=eq.'+encodeURIComponent(cod));
+  const resp = await supabaseRequest('bilhetes','PATCH',{
+  status:'Pago',
+  acertos:0
+},'?codigo=eq.'+encodeURIComponent(cod));
+
+console.log('PATCH retorno:', resp);
+console.log('Atualizando bilhete:', cod);
 
   await carregarRodadasSupabase();
   renderAdmin();
@@ -588,10 +591,13 @@ if(!b){
   b.status='Pago';
   b.pagoEm=new Date().toLocaleString('pt-BR');
   b.pagamentoOrigem=origem;
-  await supabaseRequest('bilhetes','PATCH',{
-  status: 'Pago',
-  acertos: Number(b.acertos) || 0
+ const resp = await supabaseRequest('bilhetes','PATCH',{
+  status:'Pago',
+  acertos:Number(b.acertos) || 0
 }, '?codigo=eq.'+encodeURIComponent(cod));
+
+console.log('PATCH retorno:', resp);
+console.log('Atualizando bilhete:', cod);
   financeiro.transacoes.unshift({tipo:'Entrada',desc:(origem==='webhook'?'Pix automático recebido ':'Pagamento confirmado ')+cod,valor:Number(b.valor)||0,data:new Date().toLocaleString('pt-BR')});
   salvarDados();renderAdmin();buscarBilhete();renderRodadas();renderRankingPublico();
   if(abrirBilheteDepois) imprimirBilhete(cod);
