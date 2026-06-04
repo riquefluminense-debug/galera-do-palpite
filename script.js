@@ -888,13 +888,6 @@ function encontrarBilheteGlobal(cod){
   const b = lista.find(x => String(x.codigo) === String(cod));
   return b ? { bilhete: b, rodada: rodadas.find(r => String(r.id) === String(b.rodadaId)) || rodada || null } : null;
 }
-  for(const r of rodadas){
-    const b=(r.bilhetes||[]).find(x=>String(x.codigo)===String(cod));
-    if(b) return {bilhete:b, rodada:r};
-  }
-  const b=(bilhetes||[]).find(x=>String(x.codigo)===String(cod));
-  return b ? {bilhete:b, rodada:rodadas.find(r=>r.id===b.rodadaId)||null} : null;
-}
 
 function htmlComprovante(b){
   const dataValidade = new Date(Date.now()+24*60*60*1000).toLocaleString('pt-BR');
