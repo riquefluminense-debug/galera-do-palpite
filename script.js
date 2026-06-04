@@ -811,8 +811,10 @@ alert('Ranking calculado e salvo no Supabase!');
 }
 
 function calcularRankingParcial(){
-  const lista=gerarBilhetesRanking(bilhetes.filter(b=>b.status==='Pago'),false);
-  bilhetes.forEach(b=>{
+  const todosBilhetes = todosBilhetesSistema();
+const lista=gerarBilhetesRanking(todosBilhetes.filter(b=>bilhetePago(b)),false);
+
+todosBilhetes.forEach(b=>{
     const doBilhete=lista.filter(x=>x.codigoOriginal===b.codigo);
     const melhor=doBilhete.length?Math.max(...doBilhete.map(x=>Number(x.pontos||0))):0;
     b.pontos=melhor;
