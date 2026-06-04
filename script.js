@@ -1385,6 +1385,16 @@ async function renderAdmin(){
 }
 let mercadoFiltro='todos';
 let mercadoUltimaLista=[];
+function todosBilhetesSistema(){
+  return [
+    ...(bilhetes || []),
+    ...((rodadas || []).flatMap(r => r.bilhetes || []))
+  ];
+}
+
+function bilhetePago(b){
+  return b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago';
+}
 
 function filtrarPorCodigoOuCelular(q){
   const termo=(q||'').trim().toLowerCase();
