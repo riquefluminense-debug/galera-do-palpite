@@ -407,8 +407,17 @@ async function confirmarAposta(){
   const nome=document.getElementById('nome').value.trim(), tel=document.getElementById('telefone').value.trim(); if(!nome||!tel){msg.style.color='#c98900';msg.textContent='Preencha nome e telefone.';return}
   let codigo = null;
   const valorTotal=c.total*rodada.valor;
-
+const palpitesSeguro = JSON.parse(JSON.stringify(palpites || {}));
+const combinacoesSeguro = JSON.parse(JSON.stringify(c.combos || c.combinacoes || []));
+  
 bilhetes.push({
+  palpites: palpitesSeguro,
+combinacoes: combinacoesSeguro,
+totalBilhetes: c.total || 1,
+quantidade: c.total || 1,
+valor: valorTotal,
+pontos: 0,
+acertos: 0,
   codigo,
   nome,
   tel,
@@ -417,12 +426,6 @@ bilhetes.push({
   status: 'Aguardando Pix',
 pagamentoMetodo: 'Pix automático',
 
-palpites: palpites,
-combinacoes: c.combos || c.combinacoes || [],
-totalBilhetes: c.total || 1,
-valor: valorTotal,
-pontos: 0,
-acertos: 0
 });
 
 salvarDados();
