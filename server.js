@@ -379,7 +379,8 @@ app.post('/api/pix/criar', async (req, res) => {
     }
 
     const { nome, telefone, valor, rodadaId, rodadaNome, palpites, combinacoes, totalBilhetes, quantidade } = req.body;
-const codigo = await gerarCodigoGDP();
+const codigo = req.body.codigo;
+if (!codigo) return res.status(400).json({ erro: 'Código não recebido' });
 
 let bilheteBase = await Bilhete.findOne({ codigo });
 
