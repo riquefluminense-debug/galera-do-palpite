@@ -561,8 +561,25 @@ async function adicionarJogoAdmin(){
 }
 function excluirJogo(id){jogos=jogos.filter(j=>j.id!==id).map((j,i)=>({...j,id:i+1}));delete palpites[id];salvarDados();renderRodadas();renderTicket();renderAdmin()}
 async function confirmarPagamento(cod, origem='manual', abrirBilheteDepois=false){
-  const b=bilhetes.find(x=>x.codigo===cod);
-  if(!b) return;
+  let b=bilhetes.find(x=>String(x.codigo)===String(cod));
+
+if(!b){
+  b=todosBilhetesSistema().find(x=>String(x.codigo)===String(cod));
+}
+
+if(!b){
+  await supabaseRequest('bilhetes','PATCH',{
+    status:'Pago',
+    acertos:0
+  },'?codigo=eq.'+encodeURIComponent(cod));
+
+  await carregarRodadasSupabase();
+  renderAdmin();
+  buscarBilhete();
+  renderRodadas();
+  renderRankingPublico();
+  return;
+}
   if(b.status==='Pago'){
     salvarDados(); renderAdmin(); buscarBilhete();
     if(abrirBilheteDepois) imprimirBilhete(cod);
