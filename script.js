@@ -1400,10 +1400,7 @@ function filtrarPorCodigoOuCelular(q){
   const termo=(q||'').trim().toLowerCase();
   const numeros=termo.replace(/\D/g,'');
 
-  const todosBilhetes = [
-    ...(bilhetes || []),
-    ...((rodadas || []).flatMap(r => r.bilhetes || []))
-  ];
+  const todosBilhetes = todosBilhetesSistema();
 
   if(!termo) return [];
 
