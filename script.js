@@ -893,7 +893,7 @@ function imprimirBilhete(cod){
   const achado=encontrarBilheteGlobal(cod);
   const b=achado?.bilhete;
   if(!b){alert('Bilhete não encontrado.');return}
-  if(b.status!=='Pago'){
+  if(!(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago')){
     alert('Só é possível imprimir após confirmar o pagamento.');
     return;
   }
