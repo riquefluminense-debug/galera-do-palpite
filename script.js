@@ -1389,10 +1389,17 @@ let mercadoUltimaLista=[];
 function filtrarPorCodigoOuCelular(q){
   const termo=(q||'').trim().toLowerCase();
   const numeros=termo.replace(/\D/g,'');
+
+  const todosBilhetes = [
+    ...(bilhetes || []),
+    ...((rodadas || []).flatMap(r => r.bilhetes || []))
+  ];
+
   if(!termo) return [];
-  return bilhetes.filter(b=>{
+
+  return todosBilhetes.filter(b=>{
     const codigo=(b.codigo||'').toLowerCase();
-    const tel=(b.tel||'').replace(/\D/g,'');
+    const tel=(b.tel||b.telefone||'').replace(/\D/g,'');
     return codigo.includes(termo) || (numeros.length>=4 && tel.includes(numeros));
   });
 }
