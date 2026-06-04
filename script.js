@@ -646,6 +646,8 @@ async function mostrarPix(codigo,nome,tel,valorPix=rodada.valor){
   document.getElementById('whatsComprovante').href=`https://wa.me/559985114440?text=${msg}`;
   try{
     const data=await criarPixMercadoPago(codigo,nome,tel,valorPix);
+    if(data.codigo) codigo = data.codigo;
+    pixAtualCodigo = codigo;
     document.getElementById('pixCopia').value=data.pix_copia_cola||'';
     const qr=document.getElementById('pixQrImg');
     if(qr){qr.src=data.qr_base64 ? `data:image/png;base64,${data.qr_base64}` : `https://quickchart.io/qr?text=${encodeURIComponent(data.pix_copia_cola||'')}&size=240&margin=2`;}
