@@ -424,7 +424,7 @@ acertos: 0,
   rodadaId: rodada._id || rodada.id || rodadaAtualId,
   rodadaNome: rodada.nome,
   status: 'Aguardando Pix',
-pagamentoMetodo: 'Pix automático',
+pagamentoMetodo: 'Pix automático'
 
 });
 
