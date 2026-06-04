@@ -1219,7 +1219,7 @@ function renderBilhetesPorRodadaAdmin(){
     const totalPendente=pendentes.reduce((s,b)=>s+(Number(b.valor)||0),0);
     const totalPago=pagos.reduce((s,b)=>s+(Number(b.valor)||0),0);
     const cards=lista.map(b=>`<div class="linha bilhete-admin-row ${b.status==='Pago'?'bilhete-pago':'bilhete-pendente'}">
-      <span><b>${b.codigo}</b> - ${b.nome} ${b.origem==='Manual'?'<em class="manual-badge">📝 MANUAL</em>':''}<br><small>${b.tel} • ${b.totalBilhetes||1} bilhete(s) • ${dinheiro(b.valor)} • ${b.pontos||0} pts • ${b.data||''}</small></span>
+      <span><b>${b.codigo}</b> - ${b.nome} ${b.origem==='Manual'?'<em class="manual-badge">📝 MANUAL</em>':''}<br><small>${b.totalBilhetes||1} bilhete(s) • ${dinheiro(b.valor)} • ${b.pontos||0} pts • ${b.data||''}</small></span>
       <span class="tag ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'pago' : 'pendente'}">
     ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'Pago' : 'Pendente'}
     </span>
