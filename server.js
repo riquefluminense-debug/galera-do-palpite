@@ -425,6 +425,7 @@ if (!bilheteAtualizado) {
 
     res.json({
   ok: true,
+  codigo,
   payment_id: data.id,
   status: data.status,
   qr_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
