@@ -358,7 +358,8 @@ app.post('/api/pix/criar', async (req, res) => {
       return res.status(500).json({ erro: 'MERCADO_PAGO_ACCESS_TOKEN não configurado' });
     }
 
-    const { codigo, nome, telefone, valor, rodadaId, rodadaNome } = req.body;
+    const { nome, telefone, valor, rodadaId, rodadaNome } = req.body;
+const codigo = await gerarCodigoGDP();
 
 let bilheteBase = await Bilhete.findOne({ codigo });
 
