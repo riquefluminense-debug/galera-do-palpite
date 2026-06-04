@@ -645,6 +645,15 @@ async function mostrarPix(codigo,nome,tel,valorPix=rodada.valor){
   try{
     const data=await criarPixMercadoPago(codigo,nome,tel,valorPix);
     if(data.codigo) codigo = data.codigo;
+    const bLocal = bilhetes.find(x => x.codigo === null || x.codigo === undefined || x.codigo === '');
+if (bLocal) {
+  bLocal.codigo = codigo;
+  bLocal.payment_id = data.payment_id;
+  bLocal.external_reference = data.external_reference;
+  bLocal.status = 'Aguardando Pix';
+  bLocal.valor = valorPix;
+  salvarDados();
+}
     pixAtualCodigo = codigo;
     document.getElementById('pixCopia').value=data.pix_copia_cola||'';
     const qr=document.getElementById('pixQrImg');
