@@ -409,7 +409,7 @@ async function confirmarAposta(){
   const valorTotal=c.total*rodada.valor;
 const palpitesSeguro = JSON.parse(JSON.stringify(palpites || {}));
 const combinacoesSeguro = JSON.parse(JSON.stringify(c.combos || c.combinacoes || []));
-  
+codigo = codigo || pixAtualCodigo || `GDP-${Date.now()}`;
 bilhetes.push({
   palpites: palpitesSeguro,
 combinacoes: combinacoesSeguro,
@@ -429,7 +429,7 @@ pagamentoMetodo: 'Pix automático'
 });
 
   await supabaseRequest('bilhetes','POST',{
-  codigo: codigo,
+  codigo: codigo || pixAtualCodigo,
   nome: nome,
   telefone: tel,
   rodada_id: Number(String(rodada._id || rodada.id || rodadaAtualId).replace(/\D/g,'')),
