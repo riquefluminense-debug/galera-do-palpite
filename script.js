@@ -459,7 +459,7 @@ async function salvarRodada(){
      ? null
      : Number(rodada.premioEstimadoManual)
       data_rodada: rodada.dataRodada,
-      hora_rodada: rodada.horaRodada
+      hora_rodada: rodada.horaRodada,
     }
   );
 
