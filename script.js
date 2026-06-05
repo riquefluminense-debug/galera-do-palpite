@@ -809,8 +809,8 @@ async function salvarResultadoJogo(id){
     `jogos?id=eq.${id}`,
     'PATCH',
     {
-      golsCasa: golsCasa,
-      golsFora: golsFora,
+      gols_casa: golsCasa,
+      gols_fora: golsFora,
       resultado: golsCasa > golsFora ? 'CASA' : golsCasa < golsFora ? 'FORA' : 'EMPATE',
       status: 'ENCERRADO'
     },
