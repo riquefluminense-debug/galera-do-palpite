@@ -57,7 +57,8 @@ async function carregarRodadasSupabase(){
       jogos: (jogosBanco || [])
   .filter(j => String(j.rodada_id) === String(r.id))
   .map((j,idx) => ({
-    id: j.id,
+    id: idx + 1,
+    dbId: j.id,
     data: j.data_jogo || '',
     casa: j.casa || '',
     fora: j.fora || '',
@@ -807,7 +808,7 @@ async function salvarResultadoJogo(id){
   const golsFora = Number(j.golsFora ?? 0);
 
   const { error } = await supabaseRequest(
-    `jogos?id=eq.${id}`,
+    `jogos?id=eq.${j.dbId}`,
     'PATCH',
     {
       gols_casa: golsCasa,
