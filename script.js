@@ -798,25 +798,59 @@ function setResultado(id,campo,valor){
   const status=document.getElementById('statusResultado'+id);
   if(status){status.textContent='Não salvo';status.className='status-resultado pendente';}
 }
-function salvarResultadoJogo(id){
-  const j=jogos.find(x=>x.id===id);
-  if(!j)return;
+async function salvarResultadoJogo(id){
+  const j = jogos.find(x => String(x.id) === String(id));
+  if(!j) return;
+
+  const golsCasa = Number(j.golsCasa ?? 0);
+  const golsFora = Number(j.golsFora ?? 0);
+
+  const { error } = await supabaseRequest(
+    'jogos',
+    'PATCH',
+    {
+      golsCasa: golsCasa,
+      golsFora: golsFora,
+      resultado: golsCasa > golsFora ? 'CASA' : golsCasa < golsFora ? 'FORA' : 'EMPATE',
+      status: 'ENCERRADO'
+    },
+    `id=eq.${id}`
+  );
+
+  if(error){
+    alert('Erro ao salvar resultado: ' + error.message);
+    return;
+  }
+
+  j.golsCasa = golsCasa;
+  j.golsFora = golsFora;
+  j.resultado = golsCasa > golsFora ? 'CASA' : golsCasa < golsFora ? 'FORA' : 'EMPATE';
+  j.status = 'ENCERRADO';
+
   ranking = calcularRankingParcial();
-  salvarDados();
-  const linha=document.getElementById('jogoAdminLinha'+id);
-  if(linha) linha.classList.remove('resultado-pendente');
-  const status=document.getElementById('statusResultado'+id);
-  if(status){status.textContent='Salvo';status.className='status-resultado salvo';}
-  renderRodadas();
+
+  const status = document.getElementById('statusResultado' + id);
+  if(status){
+    status.textContent = 'Salvo';
+    status.className = 'status-resultado salvo';
+  }
+
+  await carregarSupabase();
+  renderAdmin();
   renderRankingPublico();
 }
-function salvarTodosResultados(){
+async function salvarTodosResultados(){
+  for(const j of jogos){
+    if(j.golsCasa !== undefined && j.golsCasa !== '' && j.golsFora !== undefined && j.golsFora !== ''){
+      await salvarResultadoJogo(j.id);
+    }
+  }
+
   ranking = calcularRankingParcial();
-  salvarDados();
-  renderRodadas();
-  renderRankingPublico();
   renderAdmin();
-  alert('Resultados salvos com sucesso!');
+  renderRankingPublico();
+
+  alert('Resultados salvos no Supabase!');
 }
 
 async function calcularRanking(){
