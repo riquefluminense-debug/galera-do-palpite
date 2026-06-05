@@ -444,6 +444,10 @@ async function salvarRodada(){
   rodada.dataRodada = (document.getElementById('rodadaData')?.value || rodada.dataRodada || '').trim();
   rodada.horaRodada = (document.getElementById('rodadaHora')?.value || rodada.horaRodada || '').trim();
 
+  if(!rodadaAtualId){
+  alert('Nenhuma rodada selecionada');
+  return;
+}
   const { error } = await supabaseRequest(
     `rodadas?id=eq.${rodadaAtualId}`,
     'PATCH',
