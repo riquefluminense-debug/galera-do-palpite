@@ -806,7 +806,7 @@ async function salvarResultadoJogo(id){
   const golsFora = Number(j.golsFora ?? 0);
 
   const { error } = await supabaseRequest(
-    'jogos',
+    `jogos?id=eq.${id}`,
     'PATCH',
     {
       golsCasa: golsCasa,
@@ -814,7 +814,6 @@ async function salvarResultadoJogo(id){
       resultado: golsCasa > golsFora ? 'CASA' : golsCasa < golsFora ? 'FORA' : 'EMPATE',
       status: 'ENCERRADO'
     },
-    `id=eq.${id}`
   );
 
   if(error){
