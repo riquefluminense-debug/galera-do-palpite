@@ -445,7 +445,7 @@ async function salvarRodada(){
   rodada.horaRodada = (document.getElementById('rodadaHora')?.value || rodada.horaRodada || '').trim();
 
   const { error } = await supabaseRequest(
-    `rodadas?id=eq.${rodada.id}`,
+    `rodadas?id=eq.${rodadaAtualId}`,
     'PATCH',
     {
       nome: rodada.nome,
