@@ -451,7 +451,7 @@ async function salvarRodada(){
       nome: rodada.nome,
       valor: rodada.valor,
       status: rodada.status,
-      premio_estimado: rodada.premioEstimadoManual,
+      premio_estimado: Number(rodada.premioEstimadoManual) || 0,
       data_rodada: rodada.dataRodada,
       hora_rodada: rodada.horaRodada
     }
