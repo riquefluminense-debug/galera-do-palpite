@@ -456,10 +456,10 @@ async function salvarRodada(){
       valor: rodada.valor,
       status: rodada.status,
       premio_estimado: rodada.premioEstimadoManual === ''
-     ? null
-     : Number(rodada.premioEstimadoManual)
-      data_rodada: rodada.dataRodada,
-      hora_rodada: rodada.horaRodada,
+    ? null
+    : Number(rodada.premioEstimadoManual),
+    data_rodada: rodada.dataRodada,
+    hora_rodada: rodada.horaRodada
     }
   );
 
