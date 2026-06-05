@@ -57,7 +57,7 @@ async function carregarRodadasSupabase(){
       jogos: (jogosBanco || [])
   .filter(j => String(j.rodada_id) === String(r.id))
   .map((j,idx) => ({
-    id: idx + 1,
+    id: j.id,
     data: j.data_jogo || '',
     casa: j.casa || '',
     fora: j.fora || '',
