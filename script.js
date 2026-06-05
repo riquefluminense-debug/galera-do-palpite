@@ -821,8 +821,6 @@ async function salvarResultadoJogo(id){
 
   j.golsCasa = golsCasa;
   j.golsFora = golsFora;
-  j.resultado = golsCasa > golsFora ? 'CASA' : golsCasa < golsFora ? 'FORA' : 'EMPATE';
-  j.status = 'ENCERRADO';
 
   ranking = calcularRankingParcial();
 
