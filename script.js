@@ -64,9 +64,10 @@ async function carregarRodadasSupabase(){
     logoCasa: j.logo_casa || '',
     logoFora: j.logo_fora || '',
     odds: [j.odd_casa || '1.80', j.odd_empate || '3.20', j.odd_fora || '4.20'],
-    golsCasa: j.gols_casa,
-    golsFora: j.gols_fora
-  })),
+    golsCasa: j.gols_casa ?? null,
+    golsFora: j.gols_fora ?? null
+    
+})),
       bilhetes: (bilhetesBanco || [])
   .filter(b => String(b.rodada_id) === String(r.id))
   .map(b => ({
