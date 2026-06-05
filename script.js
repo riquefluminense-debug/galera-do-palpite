@@ -436,14 +436,37 @@ mostrarPix(codigo,nome,tel,valorTotal);
   
 }
 
-function salvarRodada(){
-  rodada.nome=document.getElementById('rodadaNome').value||rodada.nome;
-  rodada.valor=Number(document.getElementById('rodadaValor').value)||10;
-  rodada.status=document.getElementById('rodadaStatus').value;
-  rodada.premioEstimadoManual=document.getElementById('rodadaPremioEstimado')?.value||'';
-  rodada.dataRodada=(document.getElementById('rodadaData')?.value||rodada.dataRodada||'').trim();
-  rodada.horaRodada=(document.getElementById('rodadaHora')?.value||rodada.horaRodada||'').trim();
-  salvarDados();renderRodadas();renderTicket();renderAdmin();alert('Rodada atualizada!')
+async function salvarRodada(){
+  rodada.nome = document.getElementById('rodadaNome').value || rodada.nome;
+  rodada.valor = Number(document.getElementById('rodadaValor').value) || rodada.valor || 10;
+  rodada.status = document.getElementById('rodadaStatus').value;
+  rodada.premioEstimadoManual = document.getElementById('rodadaPremioEstimado')?.value || '';
+  rodada.dataRodada = (document.getElementById('rodadaData')?.value || rodada.dataRodada || '').trim();
+  rodada.horaRodada = (document.getElementById('rodadaHora')?.value || rodada.horaRodada || '').trim();
+
+  const { error } = await supabaseRequest(
+    `rodadas?id=eq.${rodada.id}`,
+    'PATCH',
+    {
+      nome: rodada.nome,
+      valor: rodada.valor,
+      status: rodada.status,
+      premio_estimado: rodada.premioEstimadoManual,
+      data_rodada: rodada.dataRodada,
+      hora_rodada: rodada.horaRodada
+    }
+  );
+
+  if(error){
+    alert('Erro ao salvar rodada: ' + error.message);
+    return;
+  }
+
+  await carregarSupabase();
+  renderRodadas();
+  renderTicket();
+  renderAdmin();
+  alert('Rodada atualizada!');
 }
 async function criarNovaRodadaAdmin(){
   sincronizarRodadaAtual();
