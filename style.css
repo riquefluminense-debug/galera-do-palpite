@@ -260,7 +260,7 @@
 @media (max-width: 800px) {
   .rank-game-row {
     display: grid !important;
-    grid-template-columns: 68px 1fr 28px 12px 28px 1fr 58px !important;
+    grid-template-columns: 80px 1fr 35px 15px 35px 1fr 85px !important;
     align-items: center !important;
     gap: 3px !important;
     padding: 6px !important;
