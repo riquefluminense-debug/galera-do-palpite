@@ -1041,11 +1041,9 @@ function renderJogosRanking(){
     return `<div class="rank-game-row ${simulacaoAtiva&&!temResultado?'simulando':''}">
       <span class="rank-game-status">${status}</span>
       <span class="rank-team">${timeComLogo(j.casa, j.logoCasa)}</span>
-      <span class="rank-crest">${escudo(j.casa)}</span>
       <span class="rank-score ${vencedor==='casa'?'win':''}">${temResultado?j.golsCasa:(vencedor==='casa'?'1':'-')}</span>
       <b>x</b>
       <span class="rank-score ${vencedor==='fora'?'win':''}">${temResultado?j.golsFora:(vencedor==='fora'?'1':'-')}</span>
-      <span class="rank-crest">${escudo(j.fora)}</span>
       <span class="rank-team">${timeComLogo(j.fora, j.logoFora)}</span>
       <small>${j.data}</small>
       ${simControls}
