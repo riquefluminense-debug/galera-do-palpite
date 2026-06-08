@@ -313,12 +313,34 @@
 }
 
 @media (min-width: 801px) {
-  .rank-game-row {
-    grid-template-columns: 90px 1fr 35px 45px 35px 45px 35px 1fr 170px !important;
-  }
-
   .rank-crest {
     display: none !important;
+  }
+
+  .rank-game-row {
+    display: grid !important;
+    grid-template-columns: 90px 170px 45px 25px 45px 170px 170px !important;
+    align-items: center !important;
+    max-width: 850px !important;
+    margin: 5px auto !important;
+    column-gap: 6px !important;
+  }
+
+  .rank-team {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  .rank-score {
+    text-align: center !important;
+    min-width: 32px !important;
+  }
+
+  .rank-score.win {
+    background: #18a832 !important;
+    color: #fff !important;
+    border-radius: 6px !important;
+    padding: 3px 8px !important;
   }
 
   .rank-game-row small {
@@ -326,5 +348,6 @@
     text-align: right !important;
     white-space: nowrap !important;
     font-size: 9px !important;
+    overflow: hidden !important;
   }
 }
