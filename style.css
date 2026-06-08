@@ -263,29 +263,48 @@
   }
 
   .rank-game-row {
-    grid-template-columns: 1fr auto 1fr !important;
-    gap: 6px !important;
-    padding: 8px 6px !important;
-    min-height: auto !important;
+    display: grid !important;
+    grid-template-columns: 90px 1fr 45px 18px 45px 1fr 90px !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 6px 4px !important;
+    min-height: 44px !important;
+  }
+
+  .rank-status {
+    font-size: 8px !important;
+    text-align: center !important;
   }
 
   .rank-team {
-    font-size: 11px !important;
-    gap: 4px !important;
+    font-size: 9px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
   }
 
   .rank-crest {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
 
   .rank-score {
-    font-size: 18px !important;
-    padding: 3px 8px !important;
-    min-width: 28px !important;
+    font-size: 16px !important;
+    padding: 2px 6px !important;
+    min-width: 24px !important;
+    text-align: center !important;
+  }
+
+  .rank-game-row b,
+  .rank-game-row strong {
+    font-size: 11px !important;
   }
 
   .rank-date {
-    font-size: 9px !important;
+    font-size: 7px !important;
+    text-align: right !important;
+    line-height: 1.1 !important;
   }
 }
