@@ -298,7 +298,7 @@
   }
 
   .rank-game-row small {
-   display: block !important;
+    display: none !important;
     font-size: 7px !important;
     line-height: 1 !important;
     text-align: right !important;
