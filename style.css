@@ -318,8 +318,8 @@
   }
 
   .rank-crest {
-    display: grid !important;
-  }
+    visibility: hidden !important;
+}
 
   .rank-game-row small {
     display: block !important;
