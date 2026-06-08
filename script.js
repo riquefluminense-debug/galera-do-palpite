@@ -1047,7 +1047,7 @@ function renderJogosRanking(){
       <span class="rank-score ${vencedor==='fora'?'win':''}">${temResultado?j.golsFora:(vencedor==='fora'?'1':'-')}</span>
       <span class="rank-team">${timeComLogo(j.fora, j.logoFora)}</span>
       <span class="rank-crest">${escudo(j.fora)}</span>
-      <small>${j.data}</small>
+      <small>${(j.data || '').split(' - ')[0]}</small>
       ${simControls}
     </div>`
   }).join('') || '<p>Nenhum jogo cadastrado para esta rodada.</p>';
