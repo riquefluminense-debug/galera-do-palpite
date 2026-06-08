@@ -303,3 +303,7 @@
     text-align: right !important;
   }
 }
+
+.rank-crest {
+    display: none !important;
+}
