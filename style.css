@@ -307,3 +307,11 @@
 .rank-crest {
     display: none !important;
 }
+
+.rank-game-row {
+  grid-template-columns: 90px 1fr 45px 18px 45px 1fr 130px !important;
+}
+
+.rank-crest {
+  display: none !important;
+}
