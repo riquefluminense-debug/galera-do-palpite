@@ -260,64 +260,46 @@
 @media (max-width: 800px) {
   .rank-game-row {
     display: grid !important;
-    grid-template-columns: 70px 1fr 30px 14px 30px 1fr !important;
-    grid-template-areas:
-      "status casa placarCasa x placarFora fora"
-      "data data data data data data" !important;
+    grid-template-columns: 68px 1fr 28px 12px 28px 1fr 58px !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 3px !important;
     padding: 6px !important;
-    min-height: 58px !important;
+    min-height: 46px !important;
   }
 
   .rank-status {
-    grid-area: status !important;
-    font-size: 8px !important;
-  }
-
-  .rank-team:nth-of-type(1) {
-    grid-area: casa !important;
-  }
-
-  .rank-score:nth-of-type(1) {
-    grid-area: placarCasa !important;
-  }
-
-  .rank-game-row b {
-    grid-area: x !important;
-    text-align: center !important;
-    font-size: 10px !important;
-  }
-
-  .rank-score:nth-of-type(2) {
-    grid-area: placarFora !important;
-  }
-
-  .rank-team:nth-of-type(2) {
-    grid-area: fora !important;
-  }
-
-  .rank-date {
-    grid-area: data !important;
-    text-align: center !important;
     font-size: 8px !important;
     white-space: nowrap !important;
-    line-height: 1 !important;
   }
 
   .rank-team {
     font-size: 9px !important;
+    gap: 2px !important;
     white-space: nowrap !important;
+    overflow: hidden !important;
   }
 
-  .rank-crest {
-    width: 16px !important;
-    height: 16px !important;
+  .rank-team img,
+  .team-logo {
+    width: 15px !important;
+    height: 15px !important;
   }
 
   .rank-score {
     font-size: 15px !important;
-    padding: 2px 6px !important;
-    min-width: 24px !important;
+    padding: 2px 5px !important;
+    min-width: 22px !important;
+    text-align: center !important;
+  }
+
+  .rank-game-row b {
+    font-size: 10px !important;
+    text-align: center !important;
+  }
+
+  .rank-game-row small {
+    font-size: 7px !important;
+    line-height: 1 !important;
+    text-align: right !important;
   }
 }
