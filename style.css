@@ -256,3 +256,36 @@
   object-fit:cover;
   border-radius:4px;
 }
+
+@media (max-width: 800px) {
+  .rank-games-box {
+    padding: 10px !important;
+  }
+
+  .rank-game-row {
+    grid-template-columns: 1fr auto 1fr !important;
+    gap: 6px !important;
+    padding: 8px 6px !important;
+    min-height: auto !important;
+  }
+
+  .rank-team {
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+
+  .rank-crest {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .rank-score {
+    font-size: 18px !important;
+    padding: 3px 8px !important;
+    min-width: 28px !important;
+  }
+
+  .rank-date {
+    font-size: 9px !important;
+  }
+}
