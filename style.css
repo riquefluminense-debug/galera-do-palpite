@@ -322,7 +322,7 @@
   }
 
   .rank-game-row {
-    grid-template-columns: 90px 1fr 35px 45px 18px 45px 35px 2fr 120px !important;
+    grid-template-columns: 90px 1fr 35px 45px 18px 45px 35px 2fr 90px !important;
   }
 
   .rank-score.win {
