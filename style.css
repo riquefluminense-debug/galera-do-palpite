@@ -312,3 +312,15 @@
     display: none !important;
 }
 
+@media (min-width: 801px) {
+  .rank-game-row small {
+    display: block !important;
+    min-width: 170px !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    font-size: 9px !important;
+  }
+
+  .rank-game-row {
+    grid-template-columns: 90px 1fr 35px 45px 18px 45px 35px 1fr 170px !important;
+  }
