@@ -247,3 +247,48 @@
 }
   
 .float.whats .wa-mark:after{content:'☎';position:absolute;inset:0;display:grid;place-items:center;font-size:18px;color:#fff;transform:rotate(-18deg)}
+
+  /* MODAL PIX */
+.pix-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 99999 !important;
+  width: 92% !important;
+  max-width: 420px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  padding: 18px !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,.45) !important;
+}
+
+.pix-modal-close {
+  position: absolute !important;
+  top: 8px !important;
+  right: 12px !important;
+  border: none !important;
+  background: #ff2b2b !important;
+  color: #fff !important;
+  font-size: 24px !important;
+  font-weight: 900 !important;
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+}
+
+#pixQrImg {
+  display: block !important;
+  max-width: 240px !important;
+  width: 100% !important;
+  margin: 12px auto !important;
+}
+
+#pixCopia {
+  width: 100% !important;
+  min-height: 80px !important;
+  font-size: 12px !important;
+}
