@@ -178,7 +178,7 @@
   #rankingPublico table,
   .ranking-lista table {
     width: 100% !important;
-    min-width: 370px !important;
+    min-width: 345px !important;
     border-collapse: collapse !important;
     font-size: 10px !important;
   }
@@ -198,10 +198,10 @@
   #rankingPublico td:first-child,
   .ranking-lista th:first-child,
   .ranking-lista td:first-child {
-   width: 88px !important;
-  min-width: 88px !important;
-  max-width: 88px !important;
-  font-size: 6px !important;
+   width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+  font-size: 5.5px !important;
   line-height: 1.05 !important;
   padding: 2px 1px !important;
     white-space: normal !important;
@@ -221,19 +221,19 @@
     font-size: 16px !important;
   }
 
-  #rankingPublico th:not(:first-child),
+#rankingPublico th:not(:first-child),
 #rankingPublico td:not(:first-child),
 .ranking-lista th:not(:first-child),
 .ranking-lista td:not(:first-child) {
-  width: 31px !important;
-  min-width: 31px !important;
-  max-width: 31px !important;
+  width: 29px !important;
+  min-width: 29px !important;
+  max-width: 29px !important;
   height: 20px !important;
-  font-size: 7px !important;
-  padding: 2px 1px !important;
+  font-size: 6px !important;
+  padding: 1px !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-align: center !important;
-}
+
 }
 .float.whats .wa-mark:after{content:'☎';position:absolute;inset:0;display:grid;place-items:center;font-size:18px;color:#fff;transform:rotate(-18deg)}
