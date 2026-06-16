@@ -383,7 +383,8 @@ alt="WhatsApp">
       </div>
       <div class="acoes"><button class="confirmar" onclick="confirmarAposta()">CONFIRMAR APOSTA</button><button class="filtrar" onclick="voltarInicioPalpite()">🏠 VOLTAR AO INÍCIO</button></div>
       <p id="mensagem"></p>
-        <div id="pixBox" class="pix-box">
+        <div id="pixBox" class="pix-box pix-modal">
+       <button type="button" class="pix-modal-close" onclick="fecharPixModal()">×</button>
           <h3>💸 Pagamento Pix</h3>
           <p>Após o Pix aprovado pelo Mercado Pago, o bilhete é ativado automaticamente e o comprovante amarelo fica liberado.</p><div id="pixStatus" class="pix-status"><b>⏳ Aguardando pagamento Pix</b><span>Bilhete ainda pendente.</span></div>
           <div class="pix-qrcode"><img id="pixQrImg" alt="QR Code Pix" /></div>
