@@ -1647,3 +1647,9 @@ function imprimirRodadaA4(){
   w.document.close();
 }
 
+function fecharPixModal() {
+  const pixBox = document.getElementById("pixBox");
+  if (pixBox) {
+    pixBox.style.display = "none";
+  }
+}
