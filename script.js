@@ -1653,3 +1653,19 @@ function fecharPixModal() {
     pixBox.style.display = "none";
   }
 }
+
+function abrirPixModal() {
+  const pixBox = document.getElementById("pixBox");
+  const pixCopia = document.getElementById("pixCopia");
+  const pixQrImg = document.getElementById("pixQrImg");
+
+  if (!pixBox) return;
+
+  const temPix =
+    (pixCopia && pixCopia.value && pixCopia.value.trim() !== "") ||
+    (pixQrImg && pixQrImg.src && pixQrImg.src.trim() !== "");
+
+  if (temPix) {
+    pixBox.style.display = "block";
+  }
+}
