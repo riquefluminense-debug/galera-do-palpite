@@ -236,4 +236,14 @@
   text-align: center !important;
 
 }
+
+ #rankingPublico td:first-child,
+#rankingPublico td:first-child *,
+.ranking-lista td:first-child,
+.ranking-lista td:first-child * {
+  font-size: 4px !important;
+  line-height: 0.95 !important;
+  font-weight: 700 !important;
+}
+  
 .float.whats .wa-mark:after{content:'☎';position:absolute;inset:0;display:grid;place-items:center;font-size:18px;color:#fff;transform:rotate(-18deg)}
