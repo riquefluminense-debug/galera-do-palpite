@@ -167,4 +167,61 @@
 .float.whats{font-family:Arial,Helvetica,sans-serif;font-weight:1000}
 .float.whats .wa-mark{font-size:0;position:relative;width:30px;height:30px;display:block;border:3px solid #fff;border-radius:50%}
 .float.whats .wa-mark:before{content:'';position:absolute;left:2px;bottom:-6px;border-width:7px 5px 0 0;border-style:solid;border-color:#fff transparent transparent transparent;transform:rotate(22deg)}
+
+/* RANKING MOBILE - VISÃO COMPACTA */
+@media (max-width: 800px) {
+  #rankingPublico {
+    overflow-x: auto !important;
+    width: 100% !important;
+  }
+
+  #rankingPublico table,
+  .ranking-lista table {
+    width: 100% !important;
+    min-width: 560px !important;
+    border-collapse: collapse !important;
+    font-size: 10px !important;
+  }
+
+  #rankingPublico th,
+  #rankingPublico td,
+  .ranking-lista th,
+  .ranking-lista td {
+    padding: 4px 3px !important;
+    font-size: 10px !important;
+    line-height: 1.1 !important;
+    text-align: center !important;
+    border: 1px solid #222 !important;
+  }
+
+  #rankingPublico th:first-child,
+  #rankingPublico td:first-child,
+  .ranking-lista th:first-child,
+  .ranking-lista td:first-child {
+    min-width: 120px !important;
+    max-width: 140px !important;
+    font-size: 9px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  #rankingPublico td:not(:first-child),
+  .ranking-lista td:not(:first-child) {
+    min-width: 38px !important;
+    height: 28px !important;
+    font-weight: 800 !important;
+  }
+
+  #rankingPublico .ranking-card,
+  .ranking-lista .ranking-card {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #rankingPublico h1,
+  #rankingPublico h2,
+  #rankingPublico h3 {
+    font-size: 16px !important;
+  }
+}
 .float.whats .wa-mark:after{content:'☎';position:absolute;inset:0;display:grid;place-items:center;font-size:18px;color:#fff;transform:rotate(-18deg)}
