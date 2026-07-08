@@ -389,3 +389,11 @@
         border-radius:10px;
     }
 }
+
+.sim-opcoes-mobile button.ativo{
+  background:#16a34a !important;
+  color:#fff !important;
+  border-color:#16a34a !important;
+  box-shadow:0 4px 10px rgba(0,0,0,.22) !important;
+  transform:scale(1.05);
+}
