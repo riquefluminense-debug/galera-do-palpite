@@ -1032,7 +1032,7 @@ function renderJogosRanking(){
     const temResultado=j.golsCasa!==null && j.golsCasa!=='' && j.golsFora!==null && j.golsFora!=='';
     const vencedor=temResultado?resultadoJogo(j):(simulacaoAtiva?simulacaoResultados[j.id]:'');
     const status=temResultado?'ENCERRADO':(simulacaoAtiva?'SIMULAÇÃO':'AGUARDANDO');
-    const simControls=(temResultado && simulacaoAtiva)?`
+    const simControls=(!temResultado && simulacaoAtiva)?`
 <div class="sim-opcoes-mobile">
     <div class="sim-coluna">
         <button class="${vencedor==='casa'?'ativo':''}"
