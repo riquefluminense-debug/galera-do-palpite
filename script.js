@@ -772,9 +772,8 @@ function resultadoJogoSimulado(j){
   return null;
 }
 function iniciarSimulacaoRanking(){
-  simulacaoAtiva=true;
-  jogos.forEach(j=>{ if(!resultadoJogo(j) && !simulacaoResultados[j.id]) simulacaoResultados[j.id]='casa'; });
-  renderRankingPublico();
+    simulacaoAtiva = true;
+    renderRankingPublico();
 }
 function cancelarSimulacaoRanking(){
   simulacaoAtiva=false;
