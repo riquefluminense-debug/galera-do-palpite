@@ -1035,24 +1035,27 @@ function renderJogosRanking(){
     const simControls=(!temResultado && simulacaoAtiva)?`
 <div class="sim-opcoes-mobile">
     <div class="sim-coluna">
-        <button class="${vencedor==='casa'?'ativo':''}"
-            onclick="alterarSimulacaoResultado('${j.id}','casa')">
-            CASA
-        </button>
+        <button class="${simulacaoResultados[j.id]==='casa'?'ativo':''}"
+            <button class="${simulacaoResultados[j.id]==='casa'?'ativo':''}"
+onclick="alterarSimulacaoResultado('${j.id}','casa')">
+CASA
+</button>
     </div>
 
     <div class="sim-coluna">
-        <button class="${vencedor==='empate'?'ativo':''}"
-            onclick="alterarSimulacaoResultado('${j.id}','empate')">
-            EMPATE
-        </button>
+        <button class="${simulacaoResultados[j.id]==='empate'?'ativo':''}"
+            <button class="${simulacaoResultados[j.id]==='empate'?'ativo':''}"
+onclick="alterarSimulacaoResultado('${j.id}','empate')">
+EMPATE
+</button>
     </div>
 
     <div class="sim-coluna">
-        <button class="${vencedor==='fora'?'ativo':''}"
-            onclick="alterarSimulacaoResultado('${j.id}','fora')">
-            FORA
-        </button>
+        <button class="${simulacaoResultados[j.id]==='fora'?'ativo':''}"
+            <button class="${simulacaoResultados[j.id]==='fora'?'ativo':''}"
+onclick="alterarSimulacaoResultado('${j.id}','fora')">
+FORA
+</button>
     </div>
 </div>`:'';
     
