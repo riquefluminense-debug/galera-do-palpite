@@ -1035,8 +1035,7 @@ function renderJogosRanking(){
     const simControls=(!temResultado && simulacaoAtiva)?`
 <div class="sim-opcoes-mobile">
     <div class="sim-coluna">
-        <button class="${simulacaoResultados[j.id]==='casa'?'ativo':''}"
-            <button class="${simulacaoResultados[j.id]==='casa'?'ativo':''}"
+     <button class="${simulacaoResultados[j.id]==='casa'?'ativo':''}"
 onclick="alterarSimulacaoResultado('${j.id}','casa')">
 CASA
 </button>
@@ -1044,7 +1043,6 @@ CASA
 
     <div class="sim-coluna">
         <button class="${simulacaoResultados[j.id]==='empate'?'ativo':''}"
-            <button class="${simulacaoResultados[j.id]==='empate'?'ativo':''}"
 onclick="alterarSimulacaoResultado('${j.id}','empate')">
 EMPATE
 </button>
@@ -1052,7 +1050,6 @@ EMPATE
 
     <div class="sim-coluna">
         <button class="${simulacaoResultados[j.id]==='fora'?'ativo':''}"
-            <button class="${simulacaoResultados[j.id]==='fora'?'ativo':''}"
 onclick="alterarSimulacaoResultado('${j.id}','fora')">
 FORA
 </button>
