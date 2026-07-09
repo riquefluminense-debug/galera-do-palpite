@@ -353,38 +353,31 @@
 }
 
 .sim-opcoes-mobile{
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:10px;
-    margin-top:10px;
-    width:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:8px;
+  width:100%;
+  max-width:360px;
+  margin-left:auto;
+  margin-right:auto;
 }
 
 .sim-coluna{
-    display:flex;
-    justify-content:center;
+  display:flex;
+  justify-content:center;
 }
 
 .sim-opcoes-mobile button{
-    width:100%;
-    max-width:95px;
-    height:38px;
-    border-radius:12px;
-    font-size:12px;
-    font-weight:700;
-}
-
-
-@media (max-width:600px){
-    .sim-opcoes-mobile{
-        gap:6px;
-    }
-
-    .sim-opcoes-mobile button{
-        height:34px;
-        font-size:11px;
-        border-radius:10px;
-    }
+  width:100%;
+  height:38px;
+  border-radius:14px;
+  font-size:12px;
+  font-weight:800;
+  border:1px solid #16a34a;
+  background:#f8f8f8;
+  color:#087832;
+  transition:all .2s ease;
 }
 
 .sim-opcoes-mobile button.ativo{
@@ -393,4 +386,18 @@
   border-color:#16a34a !important;
   box-shadow:0 4px 10px rgba(0,0,0,.22) !important;
   transform:scale(1.05);
+}
+
+@media (max-width:600px){
+  .sim-opcoes-mobile{
+    max-width:100%;
+    gap:6px;
+    margin-top:6px;
+  }
+
+  .sim-opcoes-mobile button{
+    height:40px;
+    font-size:11px;
+    border-radius:12px;
+  }
 }
