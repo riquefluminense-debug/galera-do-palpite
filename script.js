@@ -234,18 +234,39 @@ async function salvarDados(sync=true){
   }
 }
 function mostrarTela(id, salvarHistorico = true){
-  document.querySelectorAll('.tela').forEach(t=>t.classList.remove('ativa'));
-  document.getElementById(id).classList.add('ativa');
+    document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
 
-  if(salvarHistorico && location.hash !== '#' + id){
-    history.pushState({ tela: id }, '', '#' + id);
-  }
+    const tela = document.getElementById(id);
+    if (!tela) return;
 
-  if(id==='admin'){verificarAdmin(); if(adminLiberado) renderAdmin();}
-  if(id==='buscar') buscarBilhete();
-  if(id==='mercado') renderMercadoInicial();
-  if(id==='ranking') renderRankingPublico();
-  if(id==='historico') renderHistorico();
+    tela.classList.add('ativa');
+
+    if (salvarHistorico && location.hash !== '#' + id) {
+        history.pushState({ tela: id }, '', '#' + id);
+    }
+
+    if (id === 'admin') {
+        verificarAdmin();
+        if (adminLiberado) renderAdmin();
+    }
+
+    if (id === 'buscar') {
+        buscarBilhete();
+    }
+
+    if (id === 'mercado') {
+        renderMercadoInicial();
+    }
+
+    if (id === 'ranking') {
+        setTimeout(() => {
+            renderRankingPublico();
+        }, 50);
+    }
+
+    if (id === 'historico') {
+        renderHistorico();
+    }
 }
 window.addEventListener('popstate', () => {
   const tela = location.hash.replace('#', '') || 'inicio';
