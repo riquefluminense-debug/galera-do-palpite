@@ -1222,9 +1222,21 @@ function renderRankingPublico(){
     return;
   }
   const lista=simulacaoAtiva ? rankingComResultadosSimulados() : calcularRankingParcial();
-  const bilhetesConfirmados=todosBilhetesSistema().filter(b=>bilhetePago(b));
-  const totalBilhetes=bilhetesConfirmados.reduce((s,b)=>s+(Number(b.totalBilhetes)||1),0);
-  const pagos=totalBilhetes;
+  const bilhetesConfirmados = todosBilhetesSistema().filter(b => {
+    const bilheteRodadaId = b.rodada_id || b.rodadaId;
+
+    return (
+        bilhetePago(b) &&
+        String(bilheteRodadaId) === String(rodadaAtualId)
+    );
+});
+
+const totalBilhetes = bilhetesConfirmados.reduce(
+    (s, b) => s + Number(b.totalBilhetes || 1),
+    0
+);
+
+const pagos = totalBilhetes;
   const campeoes=lista.length?lista.filter(b=>b.pontos===lista[0].pontos):[];
   el.innerHTML=`
     <div class="ranking-page-modelo">
