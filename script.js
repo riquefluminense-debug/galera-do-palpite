@@ -878,27 +878,47 @@ async function salvarTodosResultados(){
   alert('Resultados salvos no Supabase!');
 }
 
-async function calcularRanking(){
-  const faltam=jogos.filter(j=>resultadoJogo(j)===null).length;
-  if(faltam>0 && !confirm(`Ainda faltam ${faltam} resultado(s). Calcular ranking parcial mesmo assim?`)) return;
-  ranking=calcularRankingParcial();
+async function recalcularRanking(){
+    const faltam = jogos.filter(j => resultadoJogo(j) === null).length;
 
-await supabaseRequest('ranking','DELETE',null,'?id=gte.0');
+    if (
+        faltam > 0 &&
+        !confirm(`Ainda faltam ${faltam} resultado(s). Calcular ranking parcial mesmo assim?`)
+    ) {
+        return;
+    }
 
-for(const item of ranking){
-  await supabaseRequest('ranking','POST',{
-    nome: item.nome || '',
-    pontos: Number(item.pontos) || 0,
-    bilhetes: Number(item.totalBilhetes) || 1
-  });
+    if (!rodadaAtualId) {
+        alert('Nenhuma rodada selecionada.');
+        return;
+    }
+
+    ranking = calcularRankingParcial();
+
+    // Apaga somente o ranking da rodada selecionada
+    await supabaseRequest(
+        'ranking',
+        'DELETE',
+        null,
+        `?rodada_id=eq.${rodadaAtualId}`
+    );
+
+    // Salva o ranking vinculado à rodada selecionada
+    for (const item of ranking) {
+        await supabaseRequest('ranking', 'POST', {
+            rodada_id: rodadaAtualId,
+            nome: item.nome || '',
+            pontos: Number(item.pontos) || 0,
+            bilhetes: Number(item.totalBilhetes) || 1
+        });
+    }
+
+    salvarDados();
+    renderAdmin();
+    renderRankingPublico();
+
+    alert('Ranking calculado e salvo no Supabase!');
 }
-
-salvarDados();
-renderAdmin();
-renderRankingPublico();
-alert('Ranking calculado e salvo no Supabase!');
-}
-
 function calcularRankingParcial(){
   const todosBilhetes = todosBilhetesSistema();
 const lista=gerarBilhetesRanking(todosBilhetes.filter(b=>bilhetePago(b)),false);
