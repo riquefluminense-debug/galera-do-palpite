@@ -153,15 +153,33 @@ function aplicarRodada(r){
   simulacaoAtiva=false;
   simulacaoResultados={};
 }
-function selecionarRodada(id){
-  sincronizarRodadaAtual();
-  const r=rodadas.find(x=>x.id===id);
-  if(!r) return;
-  aplicarRodada(r);
-  salvarDados(false);
-  renderRodadas();
-  renderTicket();
-  renderAdmin();
+async function selecionarRodada(id){
+    sincronizarRodadaAtual();
+
+    const idSelecionado = Number(id);
+
+    let r = rodadas.find(x => Number(x.id) === idSelecionado);
+    if (!r) return;
+
+    rodadaAtualId = idSelecionado;
+    aplicarRodada(r);
+
+    // Recarrega os dados do Supabase para evitar ranking vazio ao trocar de rodada
+    await carregarSupabase();
+
+    // Garante que a rodada escolhida continue selecionada após o carregamento
+    rodadaAtualId = idSelecionado;
+
+    r = rodadas.find(x => Number(x.id) === idSelecionado);
+    if (r) {
+        aplicarRodada(r);
+    }
+
+    salvarDados(false);
+    renderRodadas();
+    renderTicket();
+    renderAdmin();
+    renderRankingPublico();
 }
 function carregarDados(){
   const raw=localStorage.getItem('gdp_dados_v6') || localStorage.getItem('gdp_dados_v5');
