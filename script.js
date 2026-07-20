@@ -92,9 +92,21 @@ async function carregarRodadasSupabase(){
     combinacoes: b.combinacoes || [],
     data: b.created_at ? new Date(b.created_at).toLocaleString('pt-BR') : ''
   })),
-      ranking: [],
-      financeiro:{entradasExtras:0,saidas:0,percentualPremio:70,transacoes:[]}
-    }));
+      ranking: (rankingBanco || [])
+  .filter(item => String(item.rodada_id) === String(r.id))
+  .map(item => ({
+    nome: item.nome || '',
+    pontos: Number(item.pontos) || 0,
+    totalBilhetes: Number(item.bilhetes) || 1
+  })),
+
+financeiro: {
+  entradasExtras: 0,
+  saidas: 0,
+  percentualPremio: 70,
+  transacoes: []
+}
+  }));
 
     rodadaAtualId = rodadas[0]?.id || null;
 
