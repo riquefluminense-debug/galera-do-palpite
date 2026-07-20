@@ -363,7 +363,6 @@ function premioEstimadoRodada(r=null){
   return estimado.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 }
 function renderRodadas(){
-  sincronizarRodadaAtual();
   const ordenadas=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0));
   const el=document.getElementById('listaRodadas');
   if(!el) return;
@@ -1374,7 +1373,6 @@ function financeiroTotaisDaRodada(r=null){
 }
 function financeiroTotais(){return financeiroTotaisDaRodada(null)}
 function financeiroTotaisGeral(){
-  sincronizarRodadaAtual();
   const geral={entradas:0,pendenteValor:0,saidas:0,saldo:0,pagos:0,pendentes:0,equivPagos:0,premiacao:0};
   rodadas.forEach(r=>{
     const t=financeiroTotaisDaRodada(r);
@@ -1388,7 +1386,6 @@ function selecionarRodadaFinanceiro(id){
   setTimeout(()=>document.querySelector('.rodada-atual-fin')?.scrollIntoView({behavior:'smooth',block:'start'}),50);
 }
 function renderFinanceiroAdmin(){
-  sincronizarRodadaAtual();
   const t=financeiroTotais();
   const g=financeiroTotaisGeral();
   const set=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt};
