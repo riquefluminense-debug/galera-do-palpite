@@ -216,12 +216,23 @@ function carregarDados(){
     try{
       const d=JSON.parse(raw);
       historico=d.historico||[];
-      if(Array.isArray(d.rodadas) && d.rodadas.length){
-        rodadas=d.rodadas;
-        rodadaAtualId=d.rodadaAtualId || rodadas[0].id;
-        aplicarRodada(rodadas.find(r=>r.id===rodadaAtualId)||rodadas[0]);
-        return;
-      }
+      if (Array.isArray(d.rodadas) && d.rodadas.length) {
+    historico = d.historico || historico || [];
+
+    if (!rodadaAtualId && d.rodadaAtualId) {
+        rodadaAtualId = d.rodadaAtualId;
+    }
+
+    const rodadaSelecionada =
+        rodadas.find(r => String(r.id) === String(rodadaAtualId)) ||
+        rodadas[0];
+
+    if (rodadaSelecionada) {
+        aplicarRodada(rodadaSelecionada);
+    }
+
+    return;
+}
       rodada=d.rodada||rodada; rodada.premioEstimadoManual=rodada.premioEstimadoManual||''; { const dh=extrairDataHoraJogos(d.jogos||jogos); rodada.dataRodada=rodada.dataRodada||dh.data||'26/05/2026'; rodada.horaRodada=rodada.horaRodada||dh.hora||'21:30'; } pixConfig=d.pixConfig||pixConfig; jogos=d.jogos||jogos; bilhetes=d.bilhetes||[]; ranking=d.ranking||[]; financeiro=d.financeiro||financeiro;
     }catch(e){console.warn('Falha ao carregar dados',e)}
   }
