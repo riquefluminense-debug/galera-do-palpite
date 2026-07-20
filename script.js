@@ -43,6 +43,13 @@ async function carregarRodadasSupabase(){
     const dados = await supabaseRequest('rodadas','GET',null,'?select=*&order=created_at.desc');
     const jogosBanco = await supabaseRequest('jogos','GET',null,'?select=*&order=id.asc');
     const bilhetesBanco = await supabaseRequest('bilhetes','GET',null,'?select=*&order=id.asc');
+
+    const rankingBanco = await supabaseRequest(
+  'ranking',
+  'GET',
+  null,
+  '?select=*&order=pontos.desc'
+);
     
     rodadas = (dados || []).map(r => ({
       id: String(r.id),
