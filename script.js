@@ -1392,9 +1392,19 @@ function financeiroTotaisGeral(){
   });
   return geral;
 }
-function selecionarRodadaFinanceiro(id){
-  selecionarRodada(id);
-  setTimeout(()=>document.querySelector('.rodada-atual-fin')?.scrollIntoView({behavior:'smooth',block:'start'}),50);
+async function selecionarRodadaFinanceiro(id){
+    await selecionarRodada(id);
+
+    renderFinanceiroAdmin();
+
+    setTimeout(() => {
+        document
+            .querySelector('.rodada-atual-fin')
+            ?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+    }, 100);
 }
 function renderFinanceiroAdmin(){
   const t=financeiroTotais();
