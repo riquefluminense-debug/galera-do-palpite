@@ -1043,10 +1043,9 @@ async function apagarRodadaAtual() {
       null,
       `?id=eq.${apagada}&select=id`
     );
+await carregarRodadasSupabase();
 
-    if (!Array.isArray(resultadoDelete) || resultadoDelete.length === 0) {
-      throw new Error('O Supabase não confirmou a exclusão da rodada.');
-    }
+console.log("Rodadas após DELETE:", rodadas);
 
     rodadas = rodadas.filter(r => Number(r.id) !== apagada);
 
