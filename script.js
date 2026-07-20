@@ -43,7 +43,9 @@ async function carregarRodadasSupabase(){
     const dados = await supabaseRequest('rodadas','GET',null,'?select=*&order=created_at.desc');
     const jogosBanco = await supabaseRequest('jogos','GET',null,'?select=*&order=id.asc');
     const bilhetesBanco = await supabaseRequest('bilhetes','GET',null,'?select=*&order=id.asc');
-
+   console.log('BILHETES DO SUPABASE:', bilhetesBanco);
+   console.log('TOTAL DE BILHETES:', bilhetesBanco?.length);
+    
     const rankingBanco = await supabaseRequest(
   'ranking',
   'GET',
@@ -108,6 +110,14 @@ financeiro: {
 }
   }));
 
+    console.log(
+  'BILHETES POR RODADA:',
+  rodadas.map(r => ({
+    id: r.id,
+    nome: r.nome,
+    total: r.bilhetes?.length || 0
+  }))
+);
     rodadaAtualId = rodadas[0]?.id || null;
 
     if(rodadas.length){
