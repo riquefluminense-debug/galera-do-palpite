@@ -958,16 +958,36 @@ async function recalcularRanking(){
 
     alert('Ranking calculado e salvo no Supabase!');
 }
-function calcularRankingParcial(){
-  const todosBilhetes = todosBilhetesSistema();
-const lista=gerarBilhetesRanking(todosBilhetes.filter(b=>bilhetePago(b)),false);
+function calcularRankingParcial() {
+  const rodadaSelecionada = rodadas.find(
+    r => String(r.id) === String(rodadaAtualId)
+  );
 
-todosBilhetes.forEach(b=>{
-    const doBilhete=lista.filter(x=>x.codigoOriginal===b.codigo);
-    const melhor=doBilhete.length?Math.max(...doBilhete.map(x=>Number(x.pontos||0))):0;
-    b.pontos=melhor;
-    b.acertos=melhor;
+  if (!rodadaSelecionada) {
+    return [];
+  }
+
+  const bilhetesDaRodada = (rodadaSelecionada.bilhetes || []).filter(
+    b =>
+      String(b.rodada_id || b.rodadaId || '') === String(rodadaAtualId) &&
+      bilhetePago(b)
+  );
+
+  const lista = gerarBilhetesRanking(bilhetesDaRodada, false);
+
+  bilhetesDaRodada.forEach(b => {
+    const bilheteNaLista = lista.filter(
+      x => x.codigoOriginal === b.codigo
+    );
+
+    const melhor = bilheteNaLista.length
+      ? Math.max(...bilheteNaLista.map(x => Number(x.pontos) || 0))
+      : 0;
+
+    b.pontos = melhor;
+    b.acertos = melhor;
   });
+
   return lista;
 }
 function campeaoJaSalvo(id=rodadaAtualId){
