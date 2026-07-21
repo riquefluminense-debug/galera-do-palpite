@@ -4,6 +4,7 @@ let adminLiberado = sessionStorage.getItem('adminLiberado') === 'sim';
 let rodada={nome:'',valor:10,status:'Aberta',criadaEm:Date.now(),premioEstimadoManual:'',dataRodada:'',horaRodada:''};
 let rodadas=[];
 let rodadaAtualId=null;
+let rodadaAdminId = null;
 let pixConfig={chave:'11999999999',nome:'Galera do Palpite',msg:'Pagamento de bilhete Galera do Palpite'};
 let jogos=[];
 let bilhetes=[];
