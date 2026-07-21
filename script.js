@@ -120,6 +120,9 @@ financeiro: {
   }))
 );
     rodadaAtualId = rodadas[0]?.id || null;
+    if (!rodadaAdminId) {
+    rodadaAdminId = rodadaAtualId;
+}
 
     if(rodadas.length){
       aplicarRodada(rodadas[0]);
