@@ -221,36 +221,6 @@
           </div>
         </div>
 
-
-              
-              <p class="sub">Cadastre aqui as cartelas feitas à mão. O bilhete entra no financeiro e no ranking da rodada escolhida.</p>
-            </div>
-          </div>
-          <label>Competição / rodada do bilhete manual</label>
-          <select id="manualRodadaSelect" onchange="renderManualForm()"></select>
-          <div class="manual-form-grid">
-            <div>
-              <label>Nome do cliente</label>
-              <input id="manualNome" placeholder="Ex: João Silva" />
-            </div>
-            <div>
-              <label>Número do celular</label>
-              <input id="manualTelefone" placeholder="Ex: 21999999999" />
-            </div>
-            <div>
-              <label>Valor pago</label>
-              <input id="manualValor" type="number" min="0" step="0.01" placeholder="Ex: 10" />
-            </div>
-          </div>
-          <div id="manualJogos" class="manual-jogos-box"></div>
-          <div class="manual-actions">
-            <button onclick="salvarBilheteManual()">Salvar bilhete manual</button>
-            <button class="btn-outline-danger" onclick="limparBilheteManual()">Limpar marcações</button>
-          </div>
-          <small class="admin-note">Marque uma opção por jogo: Casa, Empate ou Fora. Depois de salvo, o bilhete fica como PAGO e identificado como MANUAL.</small>
-        </div>
-      </div>
-      </div>
     </section>
 
     <section id="regras" class="tela painel regulamento-page">
