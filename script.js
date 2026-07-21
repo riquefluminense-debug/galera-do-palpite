@@ -1396,10 +1396,30 @@ function financeiroTotaisGeral(){
   });
   return geral;
 }
-async function selecionarRodadaFinanceiro(id){
-    rodadaAdminId = Number(id);
-await selecionarRodada(id);
+function selecionarRodadaFinanceiro(id) {
+    const idSelecionado = Number(id);
 
+    const rodadaSelecionada = rodadas.find(
+        r => Number(r.id) === idSelecionado
+    );
+
+    if (!rodadaSelecionada) {
+        alert('Rodada não encontrada.');
+        return;
+    }
+
+    // Guarda os dados da rodada que estava aberta
+    sincronizarRodadaAtual();
+
+    // Define a rodada escolhida como rodada do administrador
+    rodadaAdminId = idSelecionado;
+    rodadaAtualId = idSelecionado;
+
+    // Carrega os dados específicos dessa rodada
+    aplicarRodada(rodadaSelecionada);
+
+    // Atualiza o painel e o financeiro
+    renderAdmin();
     renderFinanceiroAdmin();
 
     setTimeout(() => {
