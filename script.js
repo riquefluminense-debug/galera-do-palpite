@@ -593,20 +593,42 @@ async function criarNovaRodadaAdmin(){
     alert('Erro ao salvar rodada no Supabase. Confira a Publishable Key.');
   }
 }
-async function fecharRodadaAtual(){
-  if(!rodadaAtualId) return;
-  rodada.status='Encerrada';
+async function fecharRodadaAtual() {
+    const idParaFechar = Number(rodadaAdminId || rodadaAtualId);
 
-  await supabaseRequest(
-    'rodadas',
-    'PATCH',
-    { status:'Encerrada' },
-    '?id=eq.'+Number(String(rodadaAtualId).replace(/\D/g,''))
-  );
+    const rodadaParaFechar = rodadas.find(
+        r => Number(r.id) === idParaFechar
+    );
 
-  salvarDados(false);
-  renderRodadas();
-  renderAdmin();
+    if (!rodadaParaFechar) {
+        alert('Nenhuma rodada válida foi selecionada.');
+        return;
+    }
+
+    try {
+        await supabaseRequest(
+            'rodadas',
+            'PATCH',
+            { status: 'Encerrada' },
+            `?id=eq.${idParaFechar}`
+        );
+
+        rodadaParaFechar.status = 'Encerrada';
+
+        rodadaAdminId = idParaFechar;
+        rodadaAtualId = idParaFechar;
+
+        aplicarRodada(rodadaParaFechar);
+
+        salvarDados(false);
+        renderRodadas();
+        renderAdmin();
+
+        alert('Palpites fechados com sucesso!');
+    } catch (erro) {
+        console.error('Erro ao fechar rodada:', erro);
+        alert('Não foi possível fechar os palpites: ' + erro.message);
+    }
 }
 async function abrirRodadaAtual(){
   if(!rodadaAtualId) return;
