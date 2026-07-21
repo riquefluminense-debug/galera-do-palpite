@@ -1397,7 +1397,8 @@ function financeiroTotaisGeral(){
   return geral;
 }
 async function selecionarRodadaFinanceiro(id){
-    await selecionarRodada(id);
+    rodadaAdminId = Number(id);
+await selecionarRodada(id);
 
     renderFinanceiroAdmin();
 
