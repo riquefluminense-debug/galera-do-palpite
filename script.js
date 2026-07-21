@@ -1628,6 +1628,12 @@ async function renderAdmin(){
  
  carregarPixAdmin();
 
+  const rodadaAdmin = rodadas.find(r => Number(r.id) === Number(rodadaAdminId));
+
+if (rodadaAdmin) {
+    aplicarRodada(rodadaAdmin);
+}
+  
   const sel=document.getElementById('rodadaAdminSelect');
   if(sel){
     sel.innerHTML=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0)).map(r=>`<option value="${r.id}" ${r.id===rodadaAtualId?'selected':''}>${r.status==='Aberta'?'🟢':'🔴'} ${r.nome}</option>`).join('');
