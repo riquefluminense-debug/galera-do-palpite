@@ -630,20 +630,42 @@ async function fecharRodadaAtual() {
         alert('Não foi possível fechar os palpites: ' + erro.message);
     }
 }
-async function abrirRodadaAtual(){
-  if(!rodadaAtualId) return;
-  rodada.status='Aberta';
+async function abrirRodadaAtual() {
+    const idParaAbrir = Number(rodadaAdminId || rodadaAtualId);
 
-  await supabaseRequest(
-    'rodadas',
-    'PATCH',
-    { status:'Aberta' },
-    '?id=eq.'+Number(String(rodadaAtualId).replace(/\D/g,''))
-  );
+    const rodadaParaAbrir = rodadas.find(
+        r => Number(r.id) === idParaAbrir
+    );
 
-  salvarDados(false);
-  renderRodadas();
-  renderAdmin();
+    if (!rodadaParaAbrir) {
+        alert('Nenhuma rodada válida foi selecionada.');
+        return;
+    }
+
+    try {
+        await supabaseRequest(
+            'rodadas',
+            'PATCH',
+            { status: 'Aberta' },
+            `?id=eq.${idParaAbrir}`
+        );
+
+        rodadaParaAbrir.status = 'Aberta';
+
+        rodadaAdminId = idParaAbrir;
+        rodadaAtualId = idParaAbrir;
+
+        aplicarRodada(rodadaParaAbrir);
+
+        salvarDados(false);
+        renderRodadas();
+        renderAdmin();
+
+        alert('Palpites abertos com sucesso!');
+    } catch (erro) {
+        console.error('Erro ao abrir rodada:', erro);
+        alert('Não foi possível abrir os palpites: ' + erro.message);
+    }
 }
 
 async function adicionarJogoAdmin(){
