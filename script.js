@@ -846,7 +846,11 @@ if (bLocal) {
     pixAtualCodigo = codigo;
     document.getElementById('pixCopia').value=data.pix_copia_cola||'';
     const qr=document.getElementById('pixQrImg');
-    if(qr){qr.src=data.qr_base64 ? `data:image/png;base64,${data.qr_base64}` : `https://quickchart.io/qr?text=${encodeURIComponent(data.pix_copia_cola||'')}&size=240&margin=2`;}
+   if (qr) {
+    const qrSize = window.innerWidth <= 600 ? 220 : 240;
+    const pixTexto = data.pix_copia_cola || "";
+    qr.src = `https://quickchart.io/qr?text=${encodeURIComponent(pixTexto)}&size=${qrSize}&margin=4`;
+}
     const b=bilhetes.find(x=>x.codigo===codigo);
     if(b){b.payment_id=data.payment_id;b.external_reference=data.external_reference;salvarDados();}
     if(status) status.innerHTML='<b>⏳ Aguardando pagamento Pix</b><span>Assim que pagar, o Mercado Pago avisa o sistema e o bilhete libera automaticamente.</span>';
@@ -857,7 +861,10 @@ if (bLocal) {
     const texto=gerarPixCopiaCola({chave:pixConfig.chave,nome:pixConfig.nome,cidade:'RIO DE JANEIRO',valor:valorPix,txid:codigo.replace(/[^A-Za-z0-9]/g,''),descricao:pixConfig.msg});
     document.getElementById('pixCopia').value=texto;
     const qr=document.getElementById('pixQrImg');
-    if(qr){qr.src=`https://quickchart.io/qr?text=${encodeURIComponent(texto)}&size=240&margin=2`;}
+    if (qr) {
+    const qrSize = window.innerWidth <= 600 ? 220 : 240;
+    qr.src = `https://quickchart.io/qr?text=${encodeURIComponent(texto)}&size=${qrSize}&margin=4`;
+}
     if(status) status.innerHTML='<b>⚠️ Pix real ainda não conectado</b><span>Use o servidor Node com MERCADO_PAGO_ACCESS_TOKEN. Este QR é apenas Pix copia e cola sem confirmação automática.</span>';
     if(btn) btn.disabled=false;
   }
