@@ -533,7 +533,13 @@
     }
 
     .mobile-admin-link {
-        margin-top: auto;
-        color: #00e676 !important;
-    }
+    margin-top: auto !important;
+    margin-bottom: 8px !important;
+    background: linear-gradient(135deg, #7f1111, #b42323) !important;
+    border: 1px solid #ff3030 !important;
+    color: #ffffff !important;
+    font-size: 19px !important;
+    font-weight: 900 !important;
+    padding: 18px 16px !important;
+    box-shadow: 0 8px 24px rgba(180, 35, 35, 0.25) !important;
 }
