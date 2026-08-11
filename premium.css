@@ -475,3 +475,21 @@
     }
 
 }
+
+  /* RODADAS ADMIN - BOTÕES EM 2 COLUNAS NO CELULAR */
+@media (max-width: 600px) {
+    #admin .rodada-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    #admin .rodada-actions button {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 10px 6px !important;
+        font-size: 13px !important;
+    }
+}
