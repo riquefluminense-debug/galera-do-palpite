@@ -398,3 +398,20 @@
     font-size:10px;
   }
 }
+
+@media (max-width: 600px) {
+    .pix-qrcode {
+        width: 220px !important;
+        height: auto !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
+        overflow: visible !important;
+        background: #fff !important;
+    }
+
+    .pix-qrcode img {
+        width: 100% !important;
+        height: auto !important;
+        display: block !important;
+    }
+}
