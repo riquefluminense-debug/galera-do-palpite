@@ -418,12 +418,12 @@
 
 /* CABEÇALHO MOBILE */
 .mobile-header {
-    display: none;
+    display: none !important;
 }
 
 @media (max-width: 600px) {
     .mobile-header {
-        display: flex;
+    display: flex !important;
         align-items: center;
         justify-content: center;
         position: relative;
