@@ -1934,3 +1934,19 @@ function abrirPixModal() {
     pixBox.style.display = "block";
   }
 }
+
+function abrirMenuMobile() {
+    const menu = document.getElementById('mobileMenu');
+
+    if (menu) {
+        menu.classList.add('aberto');
+    }
+}
+
+function fecharMenuMobile() {
+    const menu = document.getElementById('mobileMenu');
+
+    if (menu) {
+        menu.classList.remove('aberto');
+    }
+}
