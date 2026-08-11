@@ -330,6 +330,23 @@ function mostrarTela(id, salvarHistorico = true){
         renderHistorico();
     }
 }
+// Mantém a tela atual após atualizar a página
+window.addEventListener('DOMContentLoaded', () => {
+    const telaSalva = location.hash.replace('#', '');
+
+    const telasPermitidas = [
+        'inicio',
+        'regras',
+        'buscar',
+        'ranking',
+        'historico',
+        'admin'
+    ];
+
+    if (telaSalva && telasPermitidas.includes(telaSalva)) {
+        mostrarTela(telaSalva, false);
+    }
+});
 window.addEventListener('popstate', () => {
   const tela = location.hash.replace('#', '') || 'inicio';
   mostrarTela(tela, false);
