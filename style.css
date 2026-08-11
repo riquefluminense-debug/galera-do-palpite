@@ -415,3 +415,52 @@
         display: block !important;
     }
 }
+
+/* CABEÇALHO MOBILE */
+.mobile-header {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .mobile-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        height: 72px;
+        background: linear-gradient(180deg, #071a0f, #0b2b18);
+        border-bottom: 1px solid rgba(0, 230, 118, 0.35);
+        padding: 0 16px;
+        box-sizing: border-box;
+        z-index: 9998;
+    }
+
+    .mobile-menu-btn {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border: none;
+        border-radius: 10px;
+        background: #00e676;
+        color: #07130b;
+        font-size: 28px;
+        font-weight: 900;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .mobile-logo {
+        display: block;
+        width: auto;
+        height: 58px;
+        max-width: 170px;
+        object-fit: contain;
+    }
+}
