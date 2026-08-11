@@ -690,3 +690,77 @@
         box-sizing: border-box !important;
     }
 }
+
+/* ADMIN MOBILE - COMPACTAÇÃO */
+@media (max-width: 600px) {
+
+    #admin {
+        padding: 8px !important;
+    }
+
+    #admin .card-admin,
+    #admin .admin-login-card,
+    #admin .financeiro-admin,
+    #admin .regra-box,
+    #admin .ranking-admin-card {
+        padding: 12px !important;
+        margin: 10px 0 !important;
+        border-radius: 14px !important;
+    }
+
+    #admin h1 {
+        font-size: 23px !important;
+        margin-bottom: 8px !important;
+    }
+
+    #admin h2 {
+        font-size: 19px !important;
+        margin-bottom: 8px !important;
+    }
+
+    #admin h3 {
+        font-size: 17px !important;
+        margin-bottom: 6px !important;
+    }
+
+    #admin p,
+    #admin label {
+        line-height: 1.25 !important;
+    }
+
+    #admin label {
+        margin-bottom: 4px !important;
+        display: block !important;
+    }
+
+    #admin input,
+    #admin select,
+    #admin textarea {
+        min-height: 44px !important;
+        padding: 10px 12px !important;
+        font-size: 16px !important;
+        margin-bottom: 10px !important;
+        border-radius: 8px !important;
+    }
+
+    #admin textarea {
+        min-height: 80px !important;
+    }
+
+    #admin button {
+        min-height: 42px !important;
+        padding: 10px 12px !important;
+        font-size: 15px !important;
+        border-radius: 9px !important;
+    }
+
+    #admin .financeiro-actions-top,
+    #admin .admin-actions,
+    #admin .rodada-actions {
+        gap: 7px !important;
+    }
+
+    #admin hr {
+        margin: 12px 0 !important;
+    }
+}
