@@ -292,3 +292,13 @@
   min-height: 80px !important;
   font-size: 12px !important;
 }
+
+  @media (max-width: 600px) {
+    #pixQrImg {
+        max-width: 210px !important;
+        width: 210px !important;
+        height: auto !important;
+        margin: 16px auto !important;
+        display: block !important;
+    }
+}
