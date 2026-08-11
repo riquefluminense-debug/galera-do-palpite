@@ -19,6 +19,21 @@
          alt="Galera do Palpite"
          class="mobile-logo">
 </header>
+
+  <!-- MENU MOBILE -->
+<nav id="mobileMenu" class="mobile-menu">
+    <button class="mobile-menu-close" onclick="fecharMenuMobile()">✕</button>
+
+    <a onclick="mostrarTela('inicio'); fecharMenuMobile()">🏠 Início</a>
+    <a onclick="mostrarTela('regras'); fecharMenuMobile()">📜 Regulamento</a>
+    <a onclick="mostrarTela('buscar'); fecharMenuMobile()">🔎 Buscar Bilhete</a>
+    <a onclick="mostrarTela('ranking'); fecharMenuMobile()">🏆 Ranking</a>
+    <a onclick="mostrarTela('historico'); fecharMenuMobile()">🕘 Histórico</a>
+
+    <div class="mobile-menu-separator"></div>
+
+    <a class="mobile-admin-link" onclick="mostrarTela('admin'); fecharMenuMobile()">⚙️ Administração</a>
+</nav>
   <aside class="sidebar">
     <div class="brand premium-brand logo-brand"><img src="logo-galera-do-palpite.png" alt="Galera do Palpite"></div>
     <a onclick="mostrarTela('inicio')">🏠 Início</a>
