@@ -516,3 +516,50 @@
         grid-column: auto !important;
     }
 }
+
+  /* ===== RESULTADOS ADMIN - MOBILE COMPACTO ===== */
+@media (max-width: 600px) {
+
+  #admin .resultados-admin-card {
+    padding: 12px !important;
+    margin: 10px 0 !important;
+    border-radius: 14px !important;
+  }
+
+  #admin .resultado-toolbar {
+    padding: 10px !important;
+    margin: 8px 0 !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  #admin .resultado-toolbar button,
+  #admin .btn-save-result {
+    min-height: 44px !important;
+    padding: 8px 12px !important;
+    font-size: 15px !important;
+  }
+
+  #admin .tabela-resultados {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #admin .jogo-admin {
+    padding: 12px !important;
+    margin: 10px 0 !important;
+    border-radius: 12px !important;
+  }
+
+  #admin .jogo-admin input,
+  #admin .jogo-admin select {
+    min-height: 44px !important;
+    padding: 8px 10px !important;
+    font-size: 16px !important;
+  }
+
+  #admin .status-resultado {
+    font-size: 12px !important;
+  }
+}
