@@ -367,3 +367,111 @@
     }
 }
  
+/* =========================================
+   ADMIN - LAYOUT OTIMIZADO PARA CELULAR
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    /* Estrutura principal */
+    #admin .admin-grid,
+    #admin .admin-workspace,
+    #admin .admin-main-column {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+
+    /* Cards principais do administrador */
+    #admin .card-admin,
+    #admin .rodadas-admin-card,
+    #admin .cadastrar-jogo-card,
+    #admin .resultados-admin-card,
+    #admin .ranking-admin-card,
+    #admin .financeiro-bloco,
+    #admin .financeiro-resumo {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 14px !important;
+        margin: 10px 0 !important;
+        box-sizing: border-box !important;
+        border-radius: 14px !important;
+    }
+
+    /* Títulos */
+    #admin .card-admin h2,
+    #admin .card-admin h3,
+    #admin .financeiro-bloco h2,
+    #admin .financeiro-bloco h3 {
+        margin-top: 5px !important;
+        margin-bottom: 10px !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Textos explicativos */
+    #admin .sub,
+    #admin .admin-note {
+        margin: 5px 0 10px !important;
+        line-height: 1.3 !important;
+    }
+
+    /* Labels */
+    #admin .card-admin label {
+        margin-top: 8px !important;
+        margin-bottom: 3px !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Campos */
+    #admin .card-admin input,
+    #admin .card-admin select,
+    #admin .card-admin textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 44px !important;
+        height: auto !important;
+        padding: 9px 11px !important;
+        margin: 0 0 7px !important;
+        font-size: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Botões */
+    #admin .card-admin button {
+        min-height: 42px !important;
+        padding: 9px 12px !important;
+        margin-top: 5px !important;
+        margin-bottom: 5px !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Linha dos botões da rodada */
+    #admin .admin-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 7px !important;
+        margin-top: 8px !important;
+    }
+
+    #admin .admin-actions button {
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* Separadores */
+    #admin .admin-sep {
+        margin: 12px 0 !important;
+    }
+
+    /* Financeiro */
+    #admin .financeiro-grid-bottom {
+        display: block !important;
+    }
+
+    #admin .financeiro-resumo {
+        margin-bottom: 10px !important;
+    }
+
+}
