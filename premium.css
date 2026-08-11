@@ -493,3 +493,26 @@
         font-size: 13px !important;
     }
 }
+
+@media (max-width: 600px) {
+    #admin .rodada-actions {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+    #admin .rodada-actions button {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        white-space: normal !important;
+    }
+
+    #admin .rodada-actions button:nth-child(1),
+    #admin .rodada-actions button:nth-child(2),
+    #admin .rodada-actions button:nth-child(3),
+    #admin .rodada-actions button:nth-child(4) {
+        grid-column: auto !important;
+    }
+}
