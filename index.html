@@ -6,6 +6,7 @@
   <title>Galera do Palpite - Palpite Agora</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="premium.css?v=4" />
+  <link rel="stylesheet" href="campeoes.css?v=8" />
 </head>
 <body>
   <div class="bg-glow"></div>
@@ -268,10 +269,10 @@
           <h2>💰 Gerenciar campeões</h2><p>Cadastre cada prêmio pago. O ranking soma os valores por nome e sobrenome.</p>
           <div id="campeoesEditor">
             <div class="campeoes-actions"><button onclick="adicionarPremio()">+ Adicionar prêmio</button><button onclick="carregarPremiosAdmin()">Atualizar lançamentos</button></div>
-            <p>Use sempre o mesmo nome para a mesma pessoa. Em caso de divisão, informe apenas a parte que ela recebeu. Salve cada linha.</p>
+            <p>Use sempre o mesmo nome para a mesma pessoa. Em caso de divisão, informe apenas a parte que ela recebeu. Salve cada linha. Para outra pessoa, clique em + Adicionar prêmio. Para corrigir um registro salvo, clique em Editar.</p>
             <datalist id="nomesCampeoes"></datalist>
             <div class="campeoes-scroll"><table class="campeoes-table"><thead><tr><th>Nome e sobrenome</th><th>Prêmio pago (R$)</th><th>Ações</th></tr></thead><tbody id="premiosLinhas"></tbody></table></div>
-          </div><p id="campeoesMensagem" role="status"></p>
+          </div><p id="campeoesMensagem" role="status"></p><div class="cp-records"><span class="cp-version">CAMPEÕES · VERSÃO 8</span><div id="cpListaSalvos" aria-live="polite"></div><button type="button" onclick="cpImprimirLista()">Imprimir / Salvar em PDF</button></div>
         </section>
       </div>
     </section>
@@ -413,6 +414,6 @@ alt="WhatsApp">
   </div>
 <script src="api.js?v=2000"></script>
 <script src="script.js?v=2002"></script>
-<script src="campeoes.js?v=4"></script>
+<script src="campeoes.js?v=8"></script>
 </body>
 </html>
