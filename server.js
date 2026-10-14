@@ -304,6 +304,8 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+require('./campeoes-routes')(app, autenticarAdmin, {url: SUPABASE_URL, key: SUPABASE_KEY, jwt, jwtSecret: JWT_SECRET});
+
 // RODADAS
 app.post('/api/rodadas', async (req, res) => {
   try {

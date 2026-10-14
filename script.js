@@ -312,6 +312,8 @@ function mostrarTela(id, salvarHistorico = true){
         if (adminLiberado) renderAdmin();
     }
 
+    if (id === 'campeoes') carregarCampeoesPublico();
+
     if (id === 'buscar') {
         buscarBilhete();
     }
@@ -337,6 +339,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const telasPermitidas = [
         'inicio',
         'regras',
+        'campeoes',
         'buscar',
         'ranking',
         'historico',
@@ -1713,6 +1716,7 @@ async function salvarBilheteManual(){
 }
 
 async function renderAdmin(){
+ if(adminLiberado && typeof carregarPremiosAdmin === 'function') carregarPremiosAdmin();
  
  carregarPixAdmin();
 

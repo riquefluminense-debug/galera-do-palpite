@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Galera do Palpite - Palpite Agora</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="premium.css" />
+  <link rel="stylesheet" href="premium.css?v=4" />
 </head>
 <body>
   <div class="bg-glow"></div>
@@ -34,6 +34,7 @@
 
     <a onclick="mostrarTela('inicio'); fecharMenuMobile()">🏠 Início</a>
     <a onclick="mostrarTela('regras'); fecharMenuMobile()">📜 Regulamento</a>
+    <a onclick="mostrarTela('campeoes'); fecharMenuMobile()">💰 Campeões</a>
     <a onclick="mostrarTela('buscar'); fecharMenuMobile()">🔎 Buscar Bilhete</a>
     <a onclick="mostrarTela('ranking'); fecharMenuMobile()">🏆 Ranking</a>
     <a onclick="mostrarTela('historico'); fecharMenuMobile()">🕘 Histórico</a>
@@ -46,6 +47,7 @@
     <div class="brand premium-brand logo-brand"><img src="logo-galera-do-palpite.png" alt="Galera do Palpite"></div>
     <a onclick="mostrarTela('inicio')">🏠 Início</a>
     <a onclick="mostrarTela('regras')">📋 Regulamento</a>
+    <a onclick="mostrarTela('campeoes')">💰 Campeões</a>
     <a onclick="mostrarTela('buscar')">🔎 Buscar Bilhete</a>
     <a onclick="mostrarTela('ranking')">🏆 Ranking</a>
     <a onclick="mostrarTela('historico')">📜 Histórico</a>
@@ -53,6 +55,12 @@
   </aside>
 
   <main class="page">
+    <section id="campeoes" class="tela painel campeoes-page">
+      <span class="live-badge">GALERA DO PALPITE</span><h1>💰 Campeões</h1>
+      <p>Os 10 participantes que mais receberam em prêmios.</p>
+      <div id="campeoesPublico" aria-live="polite"></div>
+      <button onclick="carregarCampeoesPublico()">Atualizar ranking</button>
+    </section>
     <section id="inicio" class="tela ativa">
       <section class="banner premium-hero">
         <div class="hero-card">
@@ -88,6 +96,7 @@
           </div>
           <button class="btn-sair" onclick="sairAdmin()">Sair do admin</button>
         </div>
+
 
         <div class="financeiro-admin">
           <div class="financeiro-title">
@@ -254,6 +263,17 @@
           </div>
         </div>
 
+      </div>
+        <section class="campeoes-admin">
+          <h2>💰 Gerenciar campeões</h2><p>Cadastre cada prêmio pago. O ranking soma os valores por nome e sobrenome.</p>
+          <div id="campeoesEditor">
+            <div class="campeoes-actions"><button onclick="adicionarPremio()">+ Adicionar prêmio</button><button onclick="carregarPremiosAdmin()">Atualizar lançamentos</button></div>
+            <p>Use sempre o mesmo nome para a mesma pessoa. Em caso de divisão, informe apenas a parte que ela recebeu. Salve cada linha.</p>
+            <datalist id="nomesCampeoes"></datalist>
+            <div class="campeoes-scroll"><table class="campeoes-table"><thead><tr><th>Nome e sobrenome</th><th>Prêmio pago (R$)</th><th>Ações</th></tr></thead><tbody id="premiosLinhas"></tbody></table></div>
+          </div><p id="campeoesMensagem" role="status"></p>
+        </section>
+      </div>
     </section>
 
     <section id="regras" class="tela painel regulamento-page">
@@ -392,6 +412,7 @@ alt="WhatsApp">
     </div>
   </div>
 <script src="api.js?v=2000"></script>
-<script src="script.js?v=2000"></script>
+<script src="script.js?v=2002"></script>
+<script src="campeoes.js?v=4"></script>
 </body>
 </html>
