@@ -4,7 +4,9 @@ module.exports = function(app, autenticarAdmin, config) {
   function igual(a,b) { const x=Buffer.from(a || ''), y=Buffer.from(b || ''); return x.length===y.length && timingSafeEqual(x,y); }
   async function banco(method='GET', dados, id) {
     if(!config.url || !config.key) throw new Error('Configure SUPABASE_URL e SUPABASE_KEY no servidor.');
-    const query=id ? `?id=eq.${encodeURIComponent(id)}` : '?select=id,nome,valor_centavos&order=created_at.desc,id.asc';
+    const query = method === 'GET'
+      ? '?select=id,nome,valor_centavos&order=created_at.desc,id.asc'
+      : (id ? `?id=eq.${encodeURIComponent(id)}` : '');
     const resposta=await fetch(`${config.url}/rest/v1/campeoes_premios${query}`, {
       method, headers:{apikey:config.key, Authorization:`Bearer ${config.key}`, 'Content-Type':'application/json', Prefer:method==='POST'?'return=representation,resolution=merge-duplicates':'return=representation'},
       ...(dados ? {body:JSON.stringify(dados)} : {})
