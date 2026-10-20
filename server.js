@@ -295,6 +295,14 @@ app.get('/', (req, res) => {
 });
 
 // STATUS DA API
+// Read-only crest lookup. Fixed upstream host; bounded query/cache and timeout.
+app.get('/api/escudos', async (req, res) => {
+  const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+  if (q.length < 2 || q.length > 100) return res.status(400).json({erro:'Digite entre 2 e 100 caracteres.'});
+  try { res.json({items:await require('./crest-search').searchCrests(q)}); }
+  catch (_) { res.status(502).json({erro:'Não foi possível buscar os escudos. Tente novamente ou cole o link manualmente.'}); }
+});
+
 app.get('/api/status', (req, res) => {
   res.json({
     ok: true,

@@ -718,6 +718,7 @@ async function adicionarJogoAdmin(){
   salvarDados(false);
   document.getElementById('jogoCasa').value='';
   document.getElementById('jogoFora').value='';
+  if(window.resetCrestPickers) window.resetCrestPickers();
   renderRodadas();renderTicket();renderAdmin();
   alert('Jogo adicionado na rodada: '+r.nome);
 }

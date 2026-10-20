@@ -1,0 +1,25 @@
+ATUALIZAÇÃO — BUSCA DE ESCUDOS
+
+1. Publique os arquivos deste projeto no mesmo repositório usado pelo Render.
+2. O Render precisa atualizar o backend também: foi acrescentada a rota GET /api/escudos.
+3. Não é necessário alterar tabelas no Supabase nem contratar uma API.
+4. Atualize a página com Ctrl+F5 depois da implantação.
+
+COMO USAR
+Preencha o nome curto do time normalmente (ex.: Bragantino).
+No campo separado de busca, pesquise o nome completo (ex.: Red Bull Bragantino).
+Clique em Buscar e escolha a imagem correta. Somente o link do escudo é alterado.
+Você pode continuar colando o link manualmente e conferir sua prévia.
+Após adicionar um jogo, os escudos e as buscas são limpos.
+
+ARQUIVOS ALTERADOS: index.html, script.js, server.js.
+ARQUIVOS NOVOS: crest-picker.js, crest-picker.css, crest-search.js, tests/crest-picker.test.js e tests/crest-search.test.js.
+
+FONTE E LIMITES
+A busca consulta imagens das páginas da Wikipédia em português. A imagem principal de uma página pode não ser um escudo: confira a prévia antes de selecionar. Clubes sem imagem disponível podem exigir o link manual. A disponibilidade depende da Wikipédia e da conexão do servidor.
+Nenhuma mudança de banco ou de pagamento foi realizada.
+
+VERIFICAÇÃO
+node --test tests/crest*.test.js
+Testes de seleção sem alteração dos nomes, separação casa/visitante, link manual, limpeza, cache, resultados vazios e falhas do serviço.
+A integração completa no Render e a aparência no navegador precisam ser conferidas após publicar.

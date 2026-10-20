@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="premium.css?v=4" />
   <link rel="stylesheet" href="campeoes.css?v=9" />
+<link rel="stylesheet" href="crest-picker.css?v=1">
 </head>
 <body>
   <div class="bg-glow"></div>
@@ -222,11 +223,25 @@
           <input id="jogoData" value="26/05 21:30" placeholder="Ex: 26/05 21:30" />
           <label>Time da casa</label>
           <input id="jogoCasa" placeholder="Ex: Flamengo-RJ" />
-          <label>Logo do time da casa (URL)</label>
+          <section class="crest-picker" data-side="Casa" aria-label="Escudo do time casa">
+            <label for="buscaEscudoCasa">Buscar escudo — casa</label>
+            <div class="crest-search-row"><input id="buscaEscudoCasa" maxlength="100" placeholder="Nome para buscar o escudo" /><button type="button" class="crest-search-button">Buscar</button></div>
+            <small>A busca altera somente o escudo. O nome do jogo permanece como você digitou.</small>
+            <p class="crest-status" role="status" aria-live="polite"></p>
+            <div class="crest-results"></div><div class="crest-preview"></div>
+          </section>
+          <label for="jogoLogoCasa">Escudo — link manual (opcional)</label>
           <input id="jogoLogoCasa" placeholder="https://site.com/logo-casa.png" />
           <label>Time visitante</label>
           <input id="jogoFora" placeholder="Ex: Cusco-PER" />
-          <label>Logo do time visitante (URL)</label>
+          <section class="crest-picker" data-side="Fora" aria-label="Escudo do time visitante">
+            <label for="buscaEscudoFora">Buscar escudo — visitante</label>
+            <div class="crest-search-row"><input id="buscaEscudoFora" maxlength="100" placeholder="Nome para buscar o escudo" /><button type="button" class="crest-search-button">Buscar</button></div>
+            <small>A busca altera somente o escudo. O nome do jogo permanece como você digitou.</small>
+            <p class="crest-status" role="status" aria-live="polite"></p>
+            <div class="crest-results"></div><div class="crest-preview"></div>
+          </section>
+          <label for="jogoLogoFora">Escudo — link manual (opcional)</label>
           <input id="jogoLogoFora" placeholder="https://site.com/logo-fora.png" />
           <button onclick="adicionarJogoAdmin()">Adicionar jogo na rodada escolhida</button>
           <small class="admin-note">Depois de adicionar, os jogos ficam separados dentro da rodada selecionada.</small>
@@ -414,6 +429,7 @@ alt="WhatsApp">
   </div>
 <script src="api.js?v=2000"></script>
 <script src="script.js?v=2002"></script>
+<script src="crest-picker.js?v=1"></script>
 <script src="campeoes.js?v=9"></script>
 </body>
 </html>
