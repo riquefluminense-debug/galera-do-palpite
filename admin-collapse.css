@@ -1,0 +1,7 @@
+.admin-fold-header{position:relative;padding-right:58px;min-height:44px}
+.admin-fold-toggle{position:absolute!important;right:0;top:0;width:44px!important;height:44px;min-width:44px;padding:0!important;display:flex;align-items:center;justify-content:center;background:#123a26!important;border:1px solid #28794d!important;border-radius:10px;color:#59efa2!important;font-size:28px!important;line-height:1;cursor:pointer}
+.admin-fold-toggle:hover{background:#1c5135!important}
+.admin-fold-toggle:focus-visible{outline:3px solid #65ffaf;outline-offset:3px}
+.admin-fold-body[hidden]{display:none!important}
+.admin-fold-body{min-width:0}
+@media(max-width:600px){.admin-fold-header{padding-right:52px;flex-wrap:wrap;gap:12px}.admin-fold-header h2{font-size:20px}.admin-fold-toggle{touch-action:manipulation}}

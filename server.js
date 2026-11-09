@@ -995,6 +995,12 @@ app.get('/api/financeiro/resumo', async (req, res) => {
   });
 });
 
+require('./sportscore').install(app, {
+  supabaseUrl: process.env.SUPABASE_URL,
+  key: process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY,
+  enabled: process.env.SPORTSCORE_AUTO_SYNC === 'true'
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
 });

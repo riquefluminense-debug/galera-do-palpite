@@ -1,0 +1,61 @@
+GALERA DO PALPITE — TESTE DO PLACAR AUTOMÁTICO
+
+Esta versão usa os jogos e bilhetes existentes do Supabase. Não migra para MongoDB.
+Não importa partidas sozinho nem cria apostas. Cada vínculo é escolhido pelo administrador.
+
+1. BACKUP
+Guarde o ZIP anterior. Faça também um backup do banco Supabase: o ZIP contém código, não uma cópia dos bilhetes/resultados no banco.
+
+2. SUPABASE
+Execute SPORTScore_MIGRACAO.sql uma vez no SQL Editor. São apenas novas colunas em jogos.
+Nenhum resultado antigo é alterado. Mantêm-se as políticas de acesso existentes.
+
+3. SERVIDOR NODE (hospedagem atual / Render)
+Atualize o código do servidor com este pacote, incluindo sportscore.js.
+Configure no painel de variáveis da hospedagem:
+  SUPABASE_URL = URL do seu projeto Supabase
+  SUPABASE_SERVICE_ROLE_KEY = chave secreta de servidor do mesmo projeto
+  SPORTSCORE_AUTO_SYNC = true
+A chave secreta fica SOMENTE na hospedagem do servidor. Nunca coloque no HTML, script.js ou Git.
+A chave SUPABASE_KEY existente também é aceita pelo servidor se ela já tiver permissão para ler/atualizar jogos.
+Reinicie/reimplante o servidor. Requer Node 18+ (recomendado Node 22).
+A hospedagem deve manter o processo ativo. Se o plano dormir, o agendamento também para: esta versão não impede suspensão do provedor.
+
+4. FRONTEND
+Atualize index.html, script.js, sportscore-ui.js e sportscore.css (ou publique todo o pacote).
+Por padrão usa a mesma base de api.js: https://galera-do-palpite.onrender.com.
+Se a hospedagem do backend for outra, configure window.GDP_SPORTSCORE_API_URL antes de carregar sportscore-ui.js.
+
+5. TESTE SEM RISCO PARA A RODADA OFICIAL
+Crie uma rodada de TESTE e adicione os jogos normalmente. Não use bilhetes pagos reais no primeiro teste.
+Em Admin, logo abaixo dos resultados, aparece 'Placar automático · SportScore'.
+Escolha o jogo da rodada e a data. Clique 'Buscar partidas', filtre pelo time e clique 'Vincular'.
+Confira mandante, visitante, data e horário na confirmação.
+Os horários da busca são de Brasília. O sistema consulta também o dia UTC seguinte para jogos noturnos.
+A busca vazia NÃO quer dizer que o jogo foi cancelado ou terminou: se ele não aparecer, não vincule outro jogo parecido.
+O painel informa se a sincronização automática está ativa.
+
+6. FUNCIONAMENTO
+O servidor consulta de 60 em 60 segundos; visitantes releem os placares salvos a cada 30 segundos.
+Começa 15 minutos antes do horário marcado e acompanha até 12 horas após o início (incluindo correções pós-jogo).
+O resultado final depende de status 'finished', nunca do relógio de 90 minutos.
+Status desconhecido, placar inválido ou falha do fornecedor mantêm o último dado válido.
+Após 12 horas, jogo adiado/suspenso que não terminou precisa de acompanhamento manual ou novo vínculo/horário.
+É possível haver atraso do fornecedor somado aos ciclos do servidor e navegador; não é uma garantia de gol instantâneo.
+Ao salvar resultado manualmente de jogo automático, há confirmação e o vínculo automático é desativado.
+Ranking da tela é provisório enquanto houver partidas automáticas não encerradas. A premiação/histórico continuam com o fluxo administrativo existente.
+O jogo usa gols do placar retornado pelo fornecedor. Teste separadamente partidas com prorrogação/pênaltis antes de usá-las em rodadas cujas regras considerem só os 90 minutos.
+
+7. CRÉDITO
+O rodapé contém o link visível 'Powered by SportScore', exigido pelo fornecedor.
+
+8. LIMITES DO TESTE REALIZADO
+Consulta pública geral do SportScore respondeu HTTP 200 e retornou placar ao vivo.
+Também observamos HTTP 503 em consulta individual e jogos visíveis no site que não vieram na consulta do dia.
+A integração usa a lista diária, e não depende da consulta individual que falhou.
+O código passou testes automatizados com respostas simuladas; não houve implantação nem teste com gravação no banco real.
+Para desligar: SPORTSCORE_AUTO_SYNC=false no servidor e desative os vínculos pelo painel.
+
+SEÇÕES RECOLHÍVEIS DO ADMINISTRADOR
+Inclua também admin-collapse.js e admin-collapse.css na atualização.
+Cada seção tem uma seta para recolher/expandir. As preferências ficam salvas neste navegador; os campos são preservados ao recolher.

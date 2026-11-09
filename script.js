@@ -76,7 +76,8 @@ async function carregarRodadasSupabase(){
     logoFora: j.logo_fora || '',
     odds: [j.odd_casa || '1.80', j.odd_empate || '3.20', j.odd_fora || '4.20'],
     golsCasa: j.gols_casa ?? null,
-    golsFora: j.gols_fora ?? null
+    golsFora: j.gols_fora ?? null,
+    sportscoreUrl: j.sportscore_url || null, sportscoreInicio:j.sportscore_inicio, sportscoreAtivo:!!j.sportscore_ativo, placarStatus:j.placar_status, placarDetalhe:j.placar_detalhe, placarAtualizado:j.placar_atualizado_em
     
 })),
       bilhetes: (bilhetesBanco || [])
@@ -892,6 +893,7 @@ if (bLocal) {
 }
 function copiarPix(){const campo=document.getElementById('pixCopia');campo.select();document.execCommand('copy');alert('Pix copiado!')}
 function resultadoJogo(j){
+  if(j?.sportscoreAtivo && !['AO_VIVO','ENCERRADO'].includes(j.placarStatus)) return null;
   if(!j || j.golsCasa===null || j.golsFora===null || j.golsCasa==='' || j.golsFora==='' || typeof j.golsCasa==='undefined' || typeof j.golsFora==='undefined') return null;
   const casa = Number(j.golsCasa);
   const fora = Number(j.golsFora);
@@ -983,6 +985,7 @@ function setResultado(id,campo,valor){
   if(status){status.textContent='Não salvo';status.className='status-resultado pendente';}
 }
 async function salvarResultadoJogo(id){
+  if(jogos.find(x=>String(x.id)===String(id))?.sportscoreAtivo && !confirm('Salvar manualmente desativa o placar automático deste jogo. Continuar?')) return;
   const j = jogos.find(x => String(x.id) === String(id));
   if(!j) return;
 
@@ -995,6 +998,7 @@ async function salvarResultadoJogo(id){
     {
       gols_casa: golsCasa,
       gols_fora: golsFora,
+      sportscore_ativo: false, placar_status: 'ENCERRADO',
     },
   );
 
@@ -1109,6 +1113,7 @@ function campeaoJaSalvo(id=rodadaAtualId){
   return historico.some(h=>h.rodadaId===id);
 }
 function salvarCampeaoHistorico(silencioso=false){
+  if(jogos.some(j=>j.sportscoreAtivo && j.placarStatus!=='ENCERRADO')){if(!silencioso)alert('Ainda há partidas automáticas sem resultado final. Aguarde o encerramento antes de salvar campeões.');return false;}
   if(!ranking.length){if(!silencioso) alert('Calcule o ranking antes.'); return false;}
   if(campeaoJaSalvo()){if(!silencioso) alert('Campeão desta rodada já está salvo no histórico.'); return true;}
   const maior=ranking[0].pontos;
@@ -1269,9 +1274,9 @@ function timeComLogo(nome, logo){
 }
 function renderJogosRanking(){
   return jogos.map(j=>{
-    const temResultado=j.golsCasa!==null && j.golsCasa!=='' && j.golsFora!==null && j.golsFora!=='';
+    const temResultado=!!resultadoJogo(j);
     const vencedor=temResultado?resultadoJogo(j):(simulacaoAtiva?simulacaoResultados[j.id]:'');
-    const status=temResultado?'ENCERRADO':(simulacaoAtiva?'SIMULAÇÃO':'AGUARDANDO');
+    const status=j.sportscoreAtivo?(j.placarStatus||'AGENDADO'):(temResultado?'ENCERRADO':(simulacaoAtiva?'SIMULAÇÃO':'AGUARDANDO')); 
     const simControls=(!temResultado && simulacaoAtiva)?`
 <div class="sim-opcoes-mobile">
     <div class="sim-coluna">
