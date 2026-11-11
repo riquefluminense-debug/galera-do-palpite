@@ -32,3 +32,12 @@ Entradas extras, saídas manuais e saldo dos registros foram mantidos em uma ár
 A seção da rodada selecionada mostra também acumulado, lucro e taxa. A premiação normal agora usa o mesmo cálculo do ranking, sem o antigo campo de percentual independente.
 24 testes passaram. A visualização em navegador e celular ainda precisa ser conferida após a publicação.
 Arquivos alterados no conjunto completo desta atualização: index.html, script.js, premiacao.js, campeoes.js e premium.css. Substitua estes cinco no projeto e publique normalmente.
+
+BUSCA DE VÍNCULOS SPORTSCORE
+Atualize também sportscore-ui.js e sportscore.css. Nenhuma alteração no banco é necessária para estes filtros.
+O padrão é A iniciar e ao vivo + Relacionados ao jogo selecionado. Jogos encerrados ficam ocultos, mas podem ser encontrados pelo filtro Encerradas ou Todas as situações.
+Relacionados inclui pelo menos um dos times; confrontos com dois nomes compatíveis ficam no topo. Confira sempre categoria (sub-17, sub-19, feminino), mando, data e horário; não há vínculo automático nem equivalência garantida de categorias.
+Busca por time e filtro por competição são separados. Alguns nomes de seleções têm equivalências português/inglês, como Turquia/Turkey/Türkiye e Armênia/Armenia, Chipre/Cyprus. Não se trata de tradução universal de clubes.
+Se não houver resultados, confira a data e use Todos os jogos da data para ampliar. A contagem mostra resultados filtrados e total carregado. O filtro não adiciona partidas ausentes na fonte nem resolve indisponibilidade HTTP 428.
+Letras maiores e botão Vincular compacto. Contagem e rolagem atualizadas a cada filtro.
+28 testes automatizados passaram. Falta conferência visual em navegador/celular após publicar.

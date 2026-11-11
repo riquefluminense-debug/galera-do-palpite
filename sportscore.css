@@ -1,1 +1,15 @@
 .ss-panel{border:1px solid #247947;border-radius:14px;padding:18px;margin:18px 0;background:#071e13}.ss-panel p{font-size:13px;margin:10px 0}.ss-panel label{display:inline-flex;flex-direction:column;gap:5px;margin:8px;max-width:95%}.ss-panel select,.ss-panel input{padding:10px;max-width:100%;background:#09291a;color:#fff;border:1px solid #387957;border-radius:7px}.ss-match{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-bottom:1px solid #235238;font-size:13px}#ss-results{max-height:350px;overflow:auto}.ss-credit{padding:14px;text-align:center;font-size:13px;color:#90c5a2}.ss-credit a{color:#9deeb2;text-decoration:underline}.ss-panel button{margin:5px}@media(max-width:600px){.ss-match{align-items:flex-start;flex-direction:column}}
+
+/* Busca de partidas com filtros separados e ações compactas. */
+#sportscore-panel .ss-filters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}
+#sportscore-panel .ss-filters label{display:flex;margin:0;max-width:none;font-size:14px!important}
+#sportscore-panel select,#sportscore-panel input{font-size:14px!important;min-height:42px}
+#sportscore-panel .ss-match{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:18px;padding:16px 8px;font-size:15px!important}
+#sportscore-panel .ss-match-info{display:flex;flex-direction:column;gap:7px;min-width:0;overflow-wrap:anywhere}
+#sportscore-panel .ss-match-info strong{font-size:16px!important}
+#sportscore-panel .ss-match-info span,#sportscore-panel .ss-match-info small{font-size:13px!important;line-height:1.5}
+#sportscore-panel .ss-status{color:#7df6ae;font-weight:bold}
+#sportscore-panel .ss-bind{width:auto!important;min-width:100px!important;flex:none!important;margin:0!important;padding:12px 18px!important;font-size:14px!important}
+#sportscore-panel #ss-results{max-height:480px}
+#sportscore-panel .ss-empty{padding:18px;line-height:1.6;font-size:14px!important}
+@media(max-width:600px){#sportscore-panel .ss-filters{grid-template-columns:1fr}#sportscore-panel .ss-match{grid-template-columns:1fr!important}#sportscore-panel .ss-bind{justify-self:start}}
