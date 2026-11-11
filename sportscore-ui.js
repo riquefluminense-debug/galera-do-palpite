@@ -28,11 +28,12 @@ function ssFiltrar(lista,{jogo=null,status='ativos',escopo='relacionadas',busca=
   const parent=document.getElementById('adminJogos');if(!parent||document.getElementById('sportscore-panel'))return;
   found=[];jaBuscou=false;
   const el=document.createElement('section');el.id='sportscore-panel';el.className='ss-panel';
-  el.innerHTML='<h3>⚽ Placar automático · SportScore</h3><p>Cadastre os jogos normalmente. Depois escolha um jogo da rodada e a partida correspondente na fonte.</p><label>Jogo da rodada<select id="ss-game"></select></label><label>Data dos jogos<input id="ss-date" type="date"></label><button id="ss-search">Buscar partidas</button><div class="ss-filters"><label>Mostrar<select id="ss-status"><option value="ativos">A iniciar e ao vivo</option><option value="AO_VIVO">Somente ao vivo</option><option value="AGENDADO">Somente a iniciar</option><option value="ENCERRADO">Encerradas</option><option value="todos">Todas as situações</option></select></label><label>Confrontos<select id="ss-scope"><option value="relacionadas">Relacionados ao jogo selecionado</option><option value="todos">Todos os jogos da data</option></select></label><label>Buscar time<input id="ss-filter" placeholder="Ex.: Turquia ou Belgium"></label><label>Competição (opcional)<input id="ss-competition" placeholder="Filtrar competição"></label></div><p id="ss-count" aria-live="polite"></p><p id="ss-message" role="status"></p><div id="ss-results"></div><div id="ss-links"></div>';
+  el.innerHTML='<h3>⚽ Placar automático · SportScore</h3><p>Cadastre os jogos normalmente. Depois escolha um jogo da rodada e a partida correspondente na fonte.</p><label>Jogo da rodada<select id="ss-game"></select></label><label>Data dos jogos<input id="ss-date" type="date"></label><button id="ss-search">Buscar partidas</button><div class="ss-filters"><label>Mostrar<select id="ss-status"><option value="ativos">A iniciar e ao vivo</option><option value="AO_VIVO">Somente ao vivo</option><option value="AGENDADO">Somente a iniciar</option><option value="ENCERRADO">Encerradas</option><option value="todos">Todas as situações</option></select></label><label>Confrontos<select id="ss-scope"><option value="relacionadas">Relacionados ao jogo selecionado</option><option value="todos">Todos os jogos da data</option></select></label><label>Buscar time<input id="ss-filter" placeholder="Ex.: Turquia ou Belgium"></label><label>Competição (opcional)<input id="ss-competition" placeholder="Filtrar competição"></label></div><p id="ss-count" aria-live="polite"></p><p id="ss-message" role="status"></p><div id="ss-results"></div><div id="ss-links"></div><div class="ss-direct"><h4>Não encontrou? Consulte pelo link</h4><p>Copie o endereço da partida no SportScore. Confira o jogo selecionado acima antes de vincular.</p><label>Link da partida<input id="ss-direct-url" type="url" placeholder="https://sportscore.com/football/match/..."></label><button id="ss-direct-search" type="button">Consultar link</button><p id="ss-direct-message" role="status"></p><div id="ss-direct-result"></div></div>';
   parent.after(el);
   el.querySelector('#ss-game').innerHTML=jogos.filter(j=>j.dbId).map(j=>`<option value="${esc(j.dbId)}">${esc(j.casa)} × ${esc(j.fora)}</option>`).join('');
   el.querySelector('#ss-date').value=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/Sao_Paulo'}).format(new Date());
   el.querySelector('#ss-search').onclick=search;
+  el.querySelector('#ss-direct-search').onclick=consultarLink;
   el.querySelector('#ss-filter').oninput=renderResults;
   el.querySelector('#ss-competition').oninput=renderResults;
   el.querySelector('#ss-status').onchange=renderResults;
@@ -72,6 +73,22 @@ function ssFiltrar(lista,{jogo=null,status='ativos',escopo='relacionadas',busca=
   }
  }
 
+ async function consultarLink(){
+  const btn=document.getElementById('ss-direct-search'),out=document.getElementById('ss-direct-result'),msg=document.getElementById('ss-direct-message');
+  out.replaceChildren();btn.disabled=true;msg.textContent='Consultando a página da partida…';
+  try{
+   const url=document.getElementById('ss-direct-url').value.trim();
+   const data=await request('/api/sportscore/partida?url='+encodeURIComponent(url));const m=data.item;
+   if(!m?.casa||!m?.fora||!Number.isFinite(Date.parse(m.inicio)))throw Error('Resposta inválida da consulta.');
+   const row=document.createElement('div');row.className='ss-match';
+   const info=document.createElement('div');info.className='ss-match-info';
+   const title=document.createElement('strong');title.textContent=m.casa+' × '+m.fora;
+   const details=document.createElement('span');details.textContent=new Date(m.inicio).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo'})+' · '+m.competicao+' · '+m.status;
+   info.append(title,details);
+   const b=document.createElement('button');b.className='ss-bind';b.textContent='Vincular';b.onclick=()=>bind(m,b);
+   row.append(info,b);out.append(row);msg.textContent='Partida encontrada pelo link. Confira times, mando, categoria e horário. A consulta não criou vínculo.';
+  }catch(e){msg.textContent=e.message+' Se a rota não existir, publique também sportscore.js no servidor.';}finally{btn.disabled=false;}
+ }
  async function bind(m,b){const id=document.getElementById('ss-game').value;const j=jogos.find(j=>String(j.dbId)===id);if(!j)return message('Cadastre e selecione um jogo da rodada.');
   if(!confirm(`Vincular ${j.casa} × ${j.fora} a ${m.casa} × ${m.fora}, ${new Date(m.inicio).toLocaleString('pt-BR')}?\nConfira o mando e a data. O placar passará a ser automático.`))return;
   b.disabled=true;try{

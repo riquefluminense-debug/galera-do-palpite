@@ -49,6 +49,35 @@ async function fixtures(date,fetcher=fetch){
  const result={at:Date.now(),items:data.matches.map(normalize).filter(Boolean)};
  cache.set(date,result);if(cache.size>8)cache.delete(cache.keys().next().value);return result;
 }
+const directCache=new Map();
+function matchFromHtml(html,path){
+ const wanted=matchPath(path);if(!wanted)throw Error('Link de partida inválido.');
+ let event=null;
+ for(const block of html.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)){
+  try{
+   const data=JSON.parse(block[1]);
+   const entries=Array.isArray(data)?data:(Array.isArray(data['@graph'])?data['@graph']:[data]);
+   event=entries.find(x=>x['@type']==='SportsEvent'&&matchPath(x.url||String(x['@id']||'').split('#')[0])===wanted);
+   if(event)break;
+  }catch{}
+ }
+ if(!event||typeof event.homeTeam?.name!=='string'||typeof event.awayTeam?.name!=='string'||!Number.isFinite(Date.parse(event.startDate)))throw Error('A página não forneceu os times e o horário desta partida. Nenhum vínculo foi criado.');
+ const label=html.match(/data-live="status-label"[^>]*>([\s\S]*?)<\/span>/i)?.[1].replace(/<[^>]*>/g,'').trim()||'';
+ const readScore=side=>score(html.match(new RegExp('data-live="'+side+'-score"[^>]*>\\s*(\\d+)\\s*<','i'))?.[1]);
+ const status=/^(FT|AET|PEN)$/i.test(label)||/EventCompleted$/.test(event.eventStatus||'')?'ENCERRADO':(/^(HT|\d{1,3}(?:\s*\+\s*\d+)?['′]?)$/.test(label)||/InProgress$/.test(event.eventStatus||''))?'AO_VIVO':/EventScheduled$/.test(event.eventStatus||'')?'AGENDADO':'INDEFINIDO';
+ const match={url:wanted,casa:event.homeTeam.name,fora:event.awayTeam.name,inicio:event.startDate,competicao:event.superEvent?.name||'',status,golsCasa:readScore('home'),golsFora:readScore('away'),detalhe:label};
+ if(['AO_VIVO','ENCERRADO'].includes(status))return regulationFromHtml(html,match);
+ return {...match,golsCasa:null,golsFora:null};
+}
+async function directMatch(value,fetcher=fetch){
+ const path=matchPath(value);if(!path)throw Error('Cole um link de partida de https://sportscore.com/football/match/...');
+ const cached=directCache.get(path);if(cached&&Date.now()-cached.at<60000)return cached.match;
+ const r=await fetcher(BASE+path,{redirect:'error',signal:AbortSignal.timeout(15000),headers:{Accept:'text/html'}});
+ if(!r.ok)throw Error(`Não foi possível consultar o link no SportScore (HTTP ${r.status}).`);
+ const match=matchFromHtml(await r.text(),path);
+ directCache.set(path,{at:Date.now(),match});if(directCache.size>100)directCache.delete(directCache.keys().next().value);
+ return match;
+}
 function patchFor(row,match){
  if(matchPath(row.sportscore_url)!==match.url)return null;
  if(row.placar_status==='ENCERRADO'&&match.status!=='ENCERRADO'&&String(row.placar_detalhe||'').includes('90 minutos + acréscimos · confirmado'))return null;
@@ -65,6 +94,7 @@ function patchFor(row,match){
 function install(app,{supabaseUrl,key,enabled=false,fetcher=fetch}){
  let running=false,lastError='',lastSync=null;
  app.get('/api/sportscore/partidas',async(req,res)=>{try{const r=await fixtures(String(req.query.data||''),fetcher);res.json({items:r.items,atualizadoEm:new Date(r.at).toISOString()})}catch(e){res.status(502).json({erro:e.message})}});
+ app.get('/api/sportscore/partida',async(req,res)=>{try{res.json({item:await directMatch(String(req.query.url||''),fetcher)})}catch(e){res.status(502).json({erro:e.message})}});
  app.get('/api/sportscore/status',(req,res)=>res.json({automatico:!!(enabled&&supabaseUrl&&key),ultimaSincronizacao:lastSync,erro:lastError}));
  async function db(query,method='GET',body){
   const r=await fetcher(`${supabaseUrl}/rest/v1/jogos${query}`,{method,signal:AbortSignal.timeout(15000),headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',Prefer:'return=minimal'},...(body?{body:JSON.stringify(body)}:{})});
@@ -77,12 +107,14 @@ function install(app,{supabaseUrl,key,enabled=false,fetcher=fetch}){
    const rows=await db('?sportscore_ativo=eq.true&sportscore_url=not.is.null&select=id,sportscore_url,sportscore_inicio,placar_status,placar_detalhe');
    const now=Date.now();const active=rows.filter(r=>{const t=Date.parse(r.sportscore_inicio);return Number.isFinite(t)&&now>=t-15*60000&&(now<=t+12*3600000 || (now<=t+7*86400000 && !String(r.placar_detalhe||'').includes('90 minutos + acréscimos · confirmado')))});
    const dates=new Set();for(const r of active){const t=Date.parse(r.sportscore_inicio);dates.add(new Date(t).toISOString().slice(0,10));dates.add(new Date(t+3*3600000).toISOString().slice(0,10))}
-   const matches=new Map();for(const day of dates){const result=await fixtures(day,fetcher);for(const m of result.items)matches.set(m.url,m)}
-   for(const row of active){const m=matches.get(matchPath(row.sportscore_url));if(!m)continue;const checked=['AO_VIVO','ENCERRADO'].includes(m.status)?await regulation(m,fetcher):m;const patch=patchFor(row,checked);if(patch)await db(`?id=eq.${encodeURIComponent(row.id)}&sportscore_ativo=eq.true&sportscore_url=eq.${encodeURIComponent(row.sportscore_url)}`,'PATCH',patch)}
+   const matches=new Map();for(const day of dates){try{const result=await fixtures(day,fetcher);for(const m of result.items)matches.set(m.url,m)}catch(e){console.warn('[SportScore] Lista indisponível; tentando links salvos:',e.message)}}
+   const falhas=[];
+   for(const row of active){try{const m=matches.get(matchPath(row.sportscore_url))||await directMatch(row.sportscore_url,fetcher);const checked=['AO_VIVO','ENCERRADO'].includes(m.status)?await regulation(m,fetcher):m;const patch=patchFor(row,checked);if(patch)await db(`?id=eq.${encodeURIComponent(row.id)}&sportscore_ativo=eq.true&sportscore_url=eq.${encodeURIComponent(row.sportscore_url)}`,'PATCH',patch)}catch(e){falhas.push(`Jogo ${row.id}: ${e.message}`)}}
+   if(falhas.length)throw Error(falhas.join(' | '));
    lastSync=new Date().toISOString();lastError='';
   }catch(e){lastError=e.message;console.warn('[SportScore]',e.message)}finally{running=false}
  }
  if(enabled&&supabaseUrl&&key){setTimeout(sync,3000).unref();setInterval(sync,60000).unref()}
  return {sync};
 }
-module.exports={matchPath,normalize,fixtures,patchFor,regulationFromHtml,regulation,install};
+module.exports={matchPath,normalize,fixtures,patchFor,regulationFromHtml,regulation,install,matchFromHtml,directMatch};

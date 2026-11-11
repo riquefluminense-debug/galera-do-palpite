@@ -41,3 +41,11 @@ Busca por time e filtro por competição são separados. Alguns nomes de seleç�
 Se não houver resultados, confira a data e use Todos os jogos da data para ampliar. A contagem mostra resultados filtrados e total carregado. O filtro não adiciona partidas ausentes na fonte nem resolve indisponibilidade HTTP 428.
 Letras maiores e botão Vincular compacto. Contagem e rolagem atualizadas a cada filtro.
 28 testes automatizados passaram. Falta conferência visual em navegador/celular após publicar.
+
+CONSULTA POR LINK DIRETO
+Atualize sportscore.js (servidor), sportscore-ui.js e sportscore.css e publique/reinicie o servidor Render. A alteração não funcionará publicando somente a interface. As demais atualizações continuam incluídas.
+Em Placar automático, escolha o jogo da rodada e vá a Não encontrou? Consulte pelo link. Cole o endereço completo da partida no SportScore e clique Consultar link. Confira os times na ordem casa/fora, data, horário e categoria, depois clique Vincular e confirme.
+A consulta não cria vínculo automaticamente. Somente páginas de partidas em sportscore.com são aceitas; páginas sem dados suficientes e redirecionamentos são recusados. O horário é exibido em São Paulo.
+A sincronização tenta o link salvo quando o jogo não está na lista diária, inclusive quando a lista está indisponível. A configuração SPORTSCORE_AUTO_SYNC=true e as credenciais do servidor Supabase continuam necessárias.
+Falhas de consulta não inventam placares. Jogos agendados não atribuem pontos; placares finais continuam sujeitos à validação dos 90 minutos, sem prorrogação ou pênaltis.
+Verificado com a página real de Londrina PR x Nautico (PE), 11/11/2026 às 19h. 33 testes passaram, incluindo sincronização de um jogo ausente na lista diária. O funcionamento publicado e visual ainda deve ser conferido após o deploy.

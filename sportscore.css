@@ -13,3 +13,5 @@
 #sportscore-panel #ss-results{max-height:480px}
 #sportscore-panel .ss-empty{padding:18px;line-height:1.6;font-size:14px!important}
 @media(max-width:600px){#sportscore-panel .ss-filters{grid-template-columns:1fr}#sportscore-panel .ss-match{grid-template-columns:1fr!important}#sportscore-panel .ss-bind{justify-self:start}}
+
+#sportscore-panel .ss-direct{margin-top:20px;padding-top:18px;border-top:1px solid #387957}#sportscore-panel .ss-direct label{display:flex;max-width:none;margin:8px 0}#sportscore-panel .ss-direct h4{font-size:16px}
