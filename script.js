@@ -1859,11 +1859,7 @@ async function renderAdmin(){
  
  carregarPixAdmin();
 
-  const rodadaAdmin = rodadas.find(r => Number(r.id) === Number(rodadaAdminId));
-
-if (rodadaAdmin) {
-    aplicarRodada(rodadaAdmin);
-}
+  // Renderizar o painel não deve trocar a rodada escolhida pelo visitante.
   
   const sel=document.getElementById('rodadaAdminSelect');
   if(sel){

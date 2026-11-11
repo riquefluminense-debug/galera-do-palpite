@@ -9,9 +9,11 @@ test('consulta rejeita domínio externo antes de chamar rede e recusa redirecion
 test('sincronização consulta link quando jogo está ausente da lista diária',async()=>{
  const agora=new Date().toISOString();const patches=[];
  const fetcher=async(url,opts={})=>{
-  if(url.includes('/rest/v1/jogos')){if(opts.method==='PATCH'){patches.push(JSON.parse(opts.body));return {ok:true}}return {ok:true,json:async()=>[{id:1,sportscore_url:path,sportscore_inicio:agora}]};}
+  if(url.includes('/rest/v1/jogos')){if(opts.method==='PATCH'){patches.push(JSON.parse(opts.body));return {ok:true,json:async()=>[{id:1}]}}return {ok:true,json:async()=>[{id:1,sportscore_url:path,sportscore_inicio:agora}]};}
   if(url.includes('/api/v1/fixtures'))return {ok:true,json:async()=>({count:0,matches:[]})};
   return {ok:true,text:async()=>html('22:00',agora)};
  };
  const app={get(){}};const {sync}=install(app,{supabaseUrl:'https://db.example',key:'test',enabled:true,fetcher});await sync();a.equal(patches.length,1);a.equal(patches[0].placar_status,'AGENDADO');a.equal(patches[0].gols_casa,null);
 });
+
+test('90+ é ao vivo e aceita o placar regulamentar',()=>{const m=matchFromHtml(html('90+'),path);a.equal(m.status,'AO_VIVO');a.equal(m.golsCasa,2);a.equal(m.golsFora,1)});

@@ -8,3 +8,13 @@ test('refresh restores URL round and explicit selection overrides old URL',async
  await vm.runInContext('carregarRodadasSupabase()',c);assert.equal(c.current.id,'1');assert.equal(c.current.status,'Fechada');
  await vm.runInContext('carregarRodadasSupabase(2)',c);assert.equal(c.current.id,'2');
 });
+
+test('rendering hidden admin preserves each public round and its games',async()=>{
+ const el={};const c=vm.createContext({adminLiberado:false,carregarPixAdmin(){},rodadaAdminId:'61',rodadaAtualId:'57',rodadas:[],jogos:[],ranking:[],rodada:{},document:{getElementById:()=>el},aplicarRodada:r=>{c.rodadaAtualId=r.id;c.jogos=r.jogos;c.rodada=r},preencherPremiacaoAdmin(){},renderBilhetesPorRodadaAdmin(){return ''},renderRankingTabela(){return ''},renderFinanceiroAdmin(){},renderManualForm(){}});
+ vm.runInContext(source.slice(source.indexOf('async function renderAdmin(){'),source.indexOf('let mercadoFiltro=')),c);
+ for(const id of ['57','58','59','61']){
+  const round={id,nome:id,jogos:[{casa:'Casa '+id,fora:'Fora '+id}],bilhetes:[]};c.rodadas.push(round);
+  c.aplicarRodada(round);await vm.runInContext('renderAdmin()',c);
+  assert.equal(c.rodadaAtualId,id);assert.equal(c.jogos[0].casa,'Casa '+id);
+ }
+});

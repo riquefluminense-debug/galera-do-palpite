@@ -56,3 +56,11 @@ O servidor usa SUPABASE_SERVICE_ROLE_KEY quando configurada; caso contrário usa
 O site usa a sessão administrativa existente. Rodadas com qualquer bilhete ficam impedidas de perder jogos, evitando mudar a numeração dos palpites. O servidor valida o jogo e a rodada e só confirma sucesso após receber o registro excluído e verificar que saiu do banco.
 Após o deploy Live, atualize com Ctrl+F5 e tente Excluir na rodada TESTE NOVO. Os jogos vinculados continuam intactos se você excluir somente os outros quatro.
 37 testes automatizados passaram. Exclusão no banco de produção não foi executada pelo assistente: deve ser conferida após a publicação.
+
+CORREÇÃO DE SINCRONIZAÇÃO — 90+ E GRAVAÇÃO
+Publique sportscore.js atualizado e aguarde Live. Agora os jogos vinculados são consultados diretamente pelo link salvo, sem depender do estado da lista diária. Minuto 90+ é reconhecido como ao vivo. O banco precisa devolver os registros alterados, caso contrário o diagnóstico informa erro em vez de sucesso.
+A rota /api/sportscore/status inclui jogosLidos, jogosNoPeriodo e gravados para diagnóstico. Depois do deploy aguarde 60 a 90 segundos, atualize o ranking e confira essa rota. Caso não grave, conferir SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no Render: devem pertencer ao mesmo projeto do site. Nunca enviar os valores secretos pelo chat.
+38 testes passaram. O placar da página real de La Luz foi lido como 1–0 encerrado durante a investigação. A causa da ausência de gravação na produção ainda precisa ser confirmada pelo diagnóstico após a publicação.
+
+RANKING POR RODADA E CELULAR
+Renderizar o administrador não troca mais a rodada pública pela última rodada administrativa. Cada card mantém seu próprio ranking e jogos. Premiação no celular com fontes, margens e linhas menores, valores sem quebra. Cache dos arquivos atualizado. Publique também premium.css, script.js e index.html desta versão. Nenhuma alteração de banco necessária para esta correção.

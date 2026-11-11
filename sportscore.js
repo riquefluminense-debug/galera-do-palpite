@@ -22,7 +22,7 @@ function regulationFromHtml(html,match){
  const label=html.match(/data-live="status-label"[^>]*>([\s\S]*?)<\/span>/i)?.[1].replace(/<[^>]*>/g,'').trim() || '';
  const h=html.match(/data-live="home-score"[^>]*>\s*(\d+)\s*</i);
  const a=html.match(/data-live="away-score"[^>]*>\s*(\d+)\s*</i);
- const minute=label.match(/^(\d{1,3})(?:\s*\+\s*\d+)?['′]?$/);
+ const minute=label.match(/^(\d{1,3})(?:\s*\+\s*\d*)?['′]?$/);
  const regularLive=match.status==='AO_VIVO' && (label==='HT' || (minute && Number(minute[1])<=90));
  const regularFinal=match.status==='ENCERRADO' && label==='FT' && !/PEN|AET|ET\[|extra|shootout/i.test(note);
  if(h && a && (regularLive || regularFinal) && Number(h[1])===match.golsCasa && Number(a[1])===match.golsFora){
@@ -64,7 +64,7 @@ function matchFromHtml(html,path){
  if(!event||typeof event.homeTeam?.name!=='string'||typeof event.awayTeam?.name!=='string'||!Number.isFinite(Date.parse(event.startDate)))throw Error('A página não forneceu os times e o horário desta partida. Nenhum vínculo foi criado.');
  const label=html.match(/data-live="status-label"[^>]*>([\s\S]*?)<\/span>/i)?.[1].replace(/<[^>]*>/g,'').trim()||'';
  const readScore=side=>score(html.match(new RegExp('data-live="'+side+'-score"[^>]*>\\s*(\\d+)\\s*<','i'))?.[1]);
- const status=/^(FT|AET|PEN)$/i.test(label)||/EventCompleted$/.test(event.eventStatus||'')?'ENCERRADO':(/^(HT|\d{1,3}(?:\s*\+\s*\d+)?['′]?)$/.test(label)||/InProgress$/.test(event.eventStatus||''))?'AO_VIVO':/EventScheduled$/.test(event.eventStatus||'')?'AGENDADO':'INDEFINIDO';
+ const status=/^(FT|AET|PEN)$/i.test(label)||/EventCompleted$/.test(event.eventStatus||'')?'ENCERRADO':(/^(HT|\d{1,3}(?:\s*\+\s*\d*)?['′]?)$/.test(label)||/InProgress$/.test(event.eventStatus||''))?'AO_VIVO':/EventScheduled$/.test(event.eventStatus||'')?'AGENDADO':'INDEFINIDO';
  const match={url:wanted,casa:event.homeTeam.name,fora:event.awayTeam.name,inicio:event.startDate,competicao:event.superEvent?.name||'',status,golsCasa:readScore('home'),golsFora:readScore('away'),detalhe:label};
  if(['AO_VIVO','ENCERRADO'].includes(status))return regulationFromHtml(html,match);
  return {...match,golsCasa:null,golsFora:null};
@@ -92,24 +92,27 @@ function patchFor(row,match){
  return patch;
 }
 function install(app,{supabaseUrl,key,enabled=false,fetcher=fetch}){
- let running=false,lastError='',lastSync=null;
+ let running=false,lastError='',lastSync=null,diagnostico={jogosLidos:0,jogosNoPeriodo:0,gravados:0};
  app.get('/api/sportscore/partidas',async(req,res)=>{try{const r=await fixtures(String(req.query.data||''),fetcher);res.json({items:r.items,atualizadoEm:new Date(r.at).toISOString()})}catch(e){res.status(502).json({erro:e.message})}});
  app.get('/api/sportscore/partida',async(req,res)=>{try{res.json({item:await directMatch(String(req.query.url||''),fetcher)})}catch(e){res.status(502).json({erro:e.message})}});
- app.get('/api/sportscore/status',(req,res)=>res.json({automatico:!!(enabled&&supabaseUrl&&key),ultimaSincronizacao:lastSync,erro:lastError}));
+ app.get('/api/sportscore/status',(req,res)=>res.json({automatico:!!(enabled&&supabaseUrl&&key),ultimaSincronizacao:lastSync,erro:lastError,diagnostico}));
  async function db(query,method='GET',body){
-  const r=await fetcher(`${supabaseUrl}/rest/v1/jogos${query}`,{method,signal:AbortSignal.timeout(15000),headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',Prefer:'return=minimal'},...(body?{body:JSON.stringify(body)}:{})});
+  const r=await fetcher(`${supabaseUrl}/rest/v1/jogos${query}`,{method,signal:AbortSignal.timeout(15000),headers:{apikey:key,Authorization:`Bearer ${key}`,'Content-Type':'application/json',Prefer:method==='GET'?'return=minimal':'return=representation'},...(body?{body:JSON.stringify(body)}:{})});
   if(!r.ok)throw Error(`Sincronização do banco falhou (HTTP ${r.status}); confira migração e configuração`);
-  return method==='GET'?r.json():null;
+  const data=await r.json().catch(()=>null);
+  if(!Array.isArray(data))throw Error('Resposta inválida do banco na sincronização.');
+  if(method==='PATCH'&&!data.length)throw Error('O banco não confirmou a atualização. Confira se a chave secreta/service_role no Render pertence ao mesmo projeto Supabase do site.');
+  return data;
  }
  async function sync(){
   if(running||!enabled||!supabaseUrl||!key)return;running=true;
   try{
    const rows=await db('?sportscore_ativo=eq.true&sportscore_url=not.is.null&select=id,sportscore_url,sportscore_inicio,placar_status,placar_detalhe');
+   diagnostico={jogosLidos:rows.length,jogosNoPeriodo:0,gravados:0};
    const now=Date.now();const active=rows.filter(r=>{const t=Date.parse(r.sportscore_inicio);return Number.isFinite(t)&&now>=t-15*60000&&(now<=t+12*3600000 || (now<=t+7*86400000 && !String(r.placar_detalhe||'').includes('90 minutos + acréscimos · confirmado')))});
-   const dates=new Set();for(const r of active){const t=Date.parse(r.sportscore_inicio);dates.add(new Date(t).toISOString().slice(0,10));dates.add(new Date(t+3*3600000).toISOString().slice(0,10))}
-   const matches=new Map();for(const day of dates){try{const result=await fixtures(day,fetcher);for(const m of result.items)matches.set(m.url,m)}catch(e){console.warn('[SportScore] Lista indisponível; tentando links salvos:',e.message)}}
+   diagnostico.jogosNoPeriodo=active.length;
    const falhas=[];
-   for(const row of active){try{const m=matches.get(matchPath(row.sportscore_url))||await directMatch(row.sportscore_url,fetcher);const checked=['AO_VIVO','ENCERRADO'].includes(m.status)?await regulation(m,fetcher):m;const patch=patchFor(row,checked);if(patch)await db(`?id=eq.${encodeURIComponent(row.id)}&sportscore_ativo=eq.true&sportscore_url=eq.${encodeURIComponent(row.sportscore_url)}`,'PATCH',patch)}catch(e){falhas.push(`Jogo ${row.id}: ${e.message}`)}}
+   for(const row of active){try{const checked=await directMatch(row.sportscore_url,fetcher);const patch=patchFor(row,checked);if(patch){await db(`?id=eq.${encodeURIComponent(row.id)}&sportscore_ativo=eq.true&sportscore_url=eq.${encodeURIComponent(row.sportscore_url)}`,'PATCH',patch);diagnostico.gravados++;}}catch(e){falhas.push(`Jogo ${row.id}: ${e.message}`)}}
    if(falhas.length)throw Error(falhas.join(' | '));
    lastSync=new Date().toISOString();lastError='';
   }catch(e){lastError=e.message;console.warn('[SportScore]',e.message)}finally{running=false}
