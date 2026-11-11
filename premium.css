@@ -599,3 +599,17 @@
 .rodada-actions .btn-fechar-palpites{background:#b87900!important;color:#fff!important}.zona-exclusao{margin-top:28px;padding-top:18px;border-top:1px solid #784040}.zona-exclusao summary{cursor:pointer;color:#e7b4b4;font-weight:700}
 
 #statusRodadasInicio.rodadas-fechadas{background:#a82b36;color:#fff;box-shadow:0 0 18px rgba(200,40,55,.2)}
+
+/* Administração: visão financeira e resultados sem coluna lateral */
+#admin .admin-workspace.sem-ranking-lateral{grid-template-columns:minmax(0,1fr)!important}
+#admin .financeiro-visao-geral{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
+#admin .financeiro-visao-geral>div{min-width:0;padding:18px!important}
+#admin .financeiro-visao-geral b{display:block;font-size:26px!important;overflow-wrap:anywhere}
+#admin .financeiro-visao-geral small{font-size:12px!important}
+#admin .financeiro-visao-geral span{font-size:12px!important;line-height:1.5}
+#admin .fin-referencia{margin-top:20px;max-width:680px}
+#admin .fin-referencia label{display:block;margin-bottom:8px}
+#admin .fin-caixa-detalhes{margin-top:18px}
+#admin .fin-caixa-detalhes summary{cursor:pointer;padding:12px 0}
+@media(max-width:1100px){#admin .financeiro-visao-geral{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:560px){#admin .financeiro-visao-geral{grid-template-columns:minmax(0,1fr)!important}}

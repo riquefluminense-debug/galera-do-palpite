@@ -44,7 +44,6 @@
     <a onclick="mostrarTela('campeoes'); fecharMenuMobile()">💰 Campeões</a>
     <a onclick="mostrarTela('buscar'); fecharMenuMobile()">🔎 Buscar Bilhete</a>
     <a onclick="mostrarTela('ranking'); fecharMenuMobile()">🏆 Ranking</a>
-    <a onclick="mostrarTela('historico'); fecharMenuMobile()">🕘 Histórico</a>
 
     <div class="mobile-menu-separator"></div>
 
@@ -57,7 +56,6 @@
     <a onclick="mostrarTela('campeoes')">💰 Campeões</a>
     <a onclick="mostrarTela('buscar')">🔎 Buscar Bilhete</a>
     <a onclick="mostrarTela('ranking')">🏆 Ranking</a>
-    <a onclick="mostrarTela('historico')">📜 Histórico</a>
     <a class="admin" onclick="mostrarTela('admin')">⚙️ Admin</a>
   </aside>
 
@@ -110,19 +108,24 @@
             <div>
               <span class="live-badge small">💰 SETOR FINANCEIRO</span>
               <h2>Financeiro Geral + Rodadas</h2>
-              <p class="sub">O geral soma todas as rodadas. Abaixo, cada rodada mantém seu próprio caixa separado.</p>
+              <p class="sub">Arrecadação e pendências somam as rodadas cadastradas. Prêmios entregues vêm do cadastro de campeões. Lucro e taxas são estimativas.</p>
             </div>
-            <div class="financeiro-actions-top"><button class="btn-dourado btn-mini" onclick="renderFinanceiroAdmin()">Atualizar financeiro</button><button class="btn-outline-danger btn-mini" onclick="limparFinanceiroGeral()">Limpar valores geral</button></div>
+            <div class="financeiro-actions-top"><button class="btn-dourado btn-mini" onclick="atualizarFinanceiroCompleto()">Atualizar financeiro</button><button class="btn-outline-danger btn-mini" onclick="limparFinanceiroGeral()">Limpar valores geral</button></div>
           </div>
 
           <div class="financeiro-bloco geral">
             <h3>📊 Financeiro Geral</h3>
-            <div class="financeiro-kpis">
-              <div><small>Total arrecadado geral</small><b id="finGeralEntradas">R$ 0,00</b><span>Bilhetes pagos + entradas extras</span></div>
-              <div><small>Pendentes geral</small><b id="finGeralPendentes">R$ 0,00</b><span>Bilhetes aguardando confirmação</span></div>
-              <div><small>Saídas geral</small><b class="red-text" id="finGeralSaidas">R$ 0,00</b><span>Prêmios / custos pagos</span></div>
-              <div><small>Saldo geral</small><b id="finGeralSaldo">R$ 0,00</b><span>Saldo acumulado no sistema</span></div>
+            <div class="financeiro-kpis financeiro-visao-geral">
+              <div><small>Total arrecadado nas rodadas</small><b id="finGeralEntradas">R$ 0,00</b><span>Somente bilhetes com pagamento confirmado</span></div>
+              <div><small>Pendente geral</small><b id="finGeralPendentes">R$ 0,00</b><span>Bilhetes aguardando confirmação</span></div>
+              <div><small>Prêmios entregues</small><b id="finGeralEntregues">Carregar pagamentos</b><span>Todos os pagamentos de Gerenciar campeões</span></div>
+              <div><small>Acumulado atual</small><b id="finGeralAcumulado">R$ 0,00</b><span id="finAcumuladoReferencia"></span></div>
+              <div><small>Nosso lucro estimado</small><b id="finGeralLucro">R$ 0,00</b><span>10% por padrão; respeita o percentual de cada rodada</span></div>
+              <div><small>Taxas estimadas</small><b id="finGeralTaxas">R$ 0,00</b><span>Percentual de taxa de cada rodada sobre bilhetes pagos</span></div>
             </div>
+            <div class="fin-referencia"><label for="finReferenciaAcumulado">Rodada de referência do acumulado atual</label><select id="finReferenciaAcumulado" onchange="renderFinanceiroAdmin()"></select><p class="fin-note">O acumulado mostra apenas esta rodada: saldo anterior + reserva atual, ou o ajuste manual salvo. Não somamos saldos transportados entre rodadas. Após entregar o acumulado, informe o saldo restante na nova rodada.</p></div>
+            <p class="fin-note">Prêmios entregues incluem todos os campeões cadastrados, inclusive de rodadas já excluídas. Não são descontados novamente das saídas manuais. As taxas são estimativas, não um extrato bancário.</p>
+            <details class="fin-caixa-detalhes"><summary>Caixa registrado e entradas extras</summary><div class="financeiro-kpis"><div><small>Entradas extras</small><b id="finGeralExtras">R$ 0,00</b><span>Lançamentos manuais nas rodadas</span></div><div><small>Saídas registradas</small><b class="red-text" id="finGeralSaidas">R$ 0,00</b><span>Saídas manuais, sem classificação por tipo</span></div><div><small>Saldo dos registros</small><b id="finGeralSaldo">R$ 0,00</b><span>Bilhetes + extras − saídas manuais; não é lucro livre</span></div></div></details>
           </div>
 
           <div class="financeiro-bloco rodada-atual-fin">
@@ -131,14 +134,17 @@
               <div><small>Entradas confirmadas</small><b id="finEntradas">R$ 0,00</b><span>Bilhetes pagos + entradas extras</span></div>
               <div><small>Bilhetes pendentes</small><b id="finPendentes">R$ 0,00</b><span>Aguardando confirmação</span></div>
               <div><small>Saídas registradas</small><b class="red-text" id="finSaidas">R$ 0,00</b><span>Pagamentos / custos</span></div>
-              <div><small>Saldo da rodada</small><b id="finSaldo">R$ 0,00</b><span>Disponível nesta rodada</span></div>
+              <div><small>Saldo dos registros</small><b id="finSaldo">R$ 0,00</b><span>Entradas menos saídas manuais; não é lucro livre</span></div>
+              <div><small>Acumulado disponível</small><b id="finRodadaAcumulado">R$ 0,00</b><span>Saldo anterior + reserva, ou ajuste manual</span></div>
+              <div><small>Nosso lucro estimado</small><b id="finRodadaLucro">R$ 0,00</b><span>Percentual da rodada sobre bilhetes pagos</span></div>
+              <div><small>Taxa estimada</small><b id="finRodadaTaxas">R$ 0,00</b><span>Não representa a tarifa efetiva do banco</span></div>
             </div>
 
             <div class="financeiro-controls">
               <div>
-                <label>Percentual de premiação da rodada (%)</label>
-                <input id="finPercentualPremio" type="number" min="0" max="100" value="70" onchange="salvarPercentualPremio()">
-                <p class="fin-note">Premiação estimada: <b id="finPremiacao">R$ 0,00</b></p>
+                <label>Distribuição da premiação</label>
+                <p class="fin-note">Prêmio normal: <b id="finPremiacao">R$ 0,00</b></p>
+                <p class="fin-note">Configure os percentuais em Rodadas separadas → Premiação com acumulado.</p>
               </div>
               <div>
                 <label>Adicionar entrada manual nesta rodada</label>
@@ -203,14 +209,16 @@
             <input id="premio-total" type="number" min="0" step="0.01" placeholder="Vazio = normal + acumulado">
             <label>Campeão normal — 7 pontos ou menos (R$)</label>
             <input id="premio-normal" type="number" min="0" step="0.01" placeholder="Vazio = percentual da arrecadação paga">
-            <label>Acumulado disponível, incluindo rodadas anteriores (R$)</label>
-            <input id="premio-acumulado" type="number" min="0" step="0.01" placeholder="Vazio = reserva percentual desta rodada">
+            <label>Acumulado anterior (R$)</label>
+            <input id="premio-anterior" type="number" min="0" step="0.01" placeholder="Ex: 300,00">
+            <label>Acumulado total — ajuste manual opcional (R$)</label>
+            <input id="premio-acumulado" type="number" min="0" step="0.01" placeholder="Vazio = acumulado anterior + reserva desta rodada">
             <label>Prêmio normal (%)</label><input id="pct-normal" type="number" min="0" max="100" step="0.01" value="70">
             <label>Reserva para acumulado (%)</label><input id="pct-acumulado" type="number" min="0" max="100" step="0.01" value="18">
             <label>Taxa estimada do pagamento (%)</label><input id="pct-banco" type="number" min="0" max="100" step="0.01" value="2">
             <label>Lucro (%)</label><input id="pct-lucro" type="number" min="0" max="100" step="0.01" value="10">
             <p>Os percentuais calculam os valores automaticamente sobre os bilhetes pagos quando os campos de valores ficam vazios. Valores preenchidos manualmente substituem o cálculo correspondente. Percentuais devem somar 100%. Para taxa de 1%, use reserva de 19%. A taxa é uma estimativa; não altera a cobrança do banco.</p>
-            <p>Informe o acumulado completo por rodada. Não há transferência automática entre rodadas nem baixa automática ao pagar um campeão.</p>
+            <p>Informe no campo Acumulado anterior o saldo que veio das rodadas anteriores. O sistema soma a reserva desta rodada automaticamente, sem contar esse saldo como nova arrecadação. Deixe os ajustes de acumulado total e premiação total vazios para acompanhar as novas vendas. Não há transferência nem baixa automática entre rodadas.</p>
             <p id="premio-preview" aria-live="polite"></p>
             <button type="button" onclick="salvarPremiacaoAcumulada()">Salvar premiação e percentuais</button>
           </details>
@@ -224,7 +232,7 @@
           <details class="zona-exclusao"><summary>🗑️ Exclusão definitiva de rodada</summary><p>Remove a rodada do banco. Esta ação é diferente de fechar os palpites.</p><button class="btn-red" onclick="apagarRodadaAtual()">Apagar rodada definitivamente</button></details>
           <div>
           </div>
-          <small class="admin-note">Ao apagar uma rodada com ranking calculado, o campeão fica salvo no Histórico.</small>
+          <small class="admin-note">Ao apagar uma rodada com ranking calculado, o registro interno do campeão é preservado.</small>
           <hr class="admin-sep">
           <h3>Criar nova rodada</h3>
           <label>Nome da nova rodada</label>
@@ -274,7 +282,7 @@
         </div>
       </div>
 
-      <div class="admin-workspace bottom">
+      <div class="admin-workspace bottom sem-ranking-lateral">
         <div class="admin-main-column">
           <div class="card-admin wide resultados-admin-card painel-profissional">
             <div class="admin-section-head">
@@ -295,15 +303,6 @@
           </div>
         </div>
 
-        <div class="admin-side-column">
-          <div class="card-admin wide ranking-admin-card painel-profissional">
-            <h2>Ranking automático</h2>
-            <p class="sub">Fica ao lado dos resultados para você lançar placares e conferir a classificação rapidamente.</p>
-            <button onclick="calcularRanking()">Calcular ranking</button>
-            <button onclick="salvarCampeaoHistorico()" class="btn-dourado">Salvar campeão no histórico</button>
-            <div id="adminRanking" class="tabela ranking-admin"></div>
-          </div>
-        </div>
 
       </div>
         <section class="campeoes-admin">
@@ -407,7 +406,6 @@
       </div>
     </section>
     <section id="ranking" class="tela painel"><h1>🏆 Ranking da Rodada</h1><p class="sub">Ranking completo liberado após a rodada ser fechada.</p><div id="rankingPublico" class="ranking-lista"></div></section>
-    <section id="historico" class="tela painel"><h1>📜 Histórico de Vitórias</h1><p class="sub">Campeões salvos pelo administrador ao final de cada rodada.</p><div id="historicoVitorias" class="tabela"></div></section>
   </main>
 
   <button class="float cart" onclick="mostrarTela('mercado')">🛒<span id="cartBadge">0</span></button>
@@ -447,7 +445,7 @@ alt="WhatsApp">
           <div class="pix-actions">
             <button onclick="copiarPix()">Copiar Pix</button>
             <button id="pixAutoBtn" type="button">Verificar pagamento</button>
-            <button id="pixTicketBtn" type="button" style="display:none">Ver bilhete amarelo</button>
+            <button id="pixTicketBtn" type="button" style="display:none">BAIXAR BILHETE</button>
             <a id="whatsComprovante" target="_blank">WhatsApp suporte</a>
           </div>
         </div>

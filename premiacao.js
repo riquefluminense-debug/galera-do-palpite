@@ -8,10 +8,11 @@
   const banco=Math.round(revenue*pct.banco/100),lucro=Math.round(revenue*pct.lucro/100);
   const aporte=revenue-normalAuto-banco-lucro;
   const manual=v=>v!==null&&v!==undefined&&v!=='';
-  const acumulado=manual(config.acumulado)?cents(config.acumulado):aporte;
+  const anterior=cents(config.anterior);
+  const acumulado=manual(config.acumulado)?cents(config.acumulado):anterior+aporte;
   const normal=manual(config.normal)?cents(config.normal):normalAuto;
   const total=manual(config.total)?cents(config.total):normal+acumulado;
-  return {normal:normal/100,acumulado:acumulado/100,total:total/100,aporte:aporte/100,banco:banco/100,lucro:lucro/100,percentuais:pct};
+  return {normal:normal/100,acumulado:acumulado/100,total:total/100,aporte:aporte/100,anterior:anterior/100,banco:banco/100,lucro:lucro/100,percentuais:pct};
  }
  function premioCampeoes(p,lista,jogosFinalizados){
   if(!jogosFinalizados||!lista.length)return null;

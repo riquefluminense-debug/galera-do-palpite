@@ -20,3 +20,15 @@ test('empate divide uma única faixa; resultado parcial não confirma prêmio',(
  a.equal(premioCampeoes(p,[{pontos:8}],false),null);
  a.equal(premioCampeoes(p,[],true),null);
 });
+test('saldo anterior soma à reserva sem alterar arrecadação, taxa ou lucro',()=>{
+ const p=calcularPremiacao({anterior:300},1000);
+ a.equal(p.anterior,300);a.equal(p.aporte,180);a.equal(p.acumulado,480);a.equal(p.total,1180);
+ a.equal(p.normal,700);a.equal(p.banco,20);a.equal(p.lucro,100);
+ a.equal(calcularPremiacao({anterior:300},0).acumulado,300);
+ a.equal(calcularPremiacao({anterior:300},2000).acumulado,660);
+});
+test('ajuste legado substitui acumulado total, sem somar anterior duas vezes',()=>{
+ a.equal(calcularPremiacao({anterior:300,acumulado:500},1000).acumulado,500);
+ a.equal(calcularPremiacao({anterior:300,acumulado:0},1000).acumulado,0);
+ a.equal(calcularPremiacao({anterior:0.12},10.07).total,8.98);
+});

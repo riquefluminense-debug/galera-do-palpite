@@ -302,6 +302,10 @@ async function salvarDados(sync=true){
   }
 }
 function mostrarTela(id, salvarHistorico = true){
+    if(id === 'historico'){
+        id = 'campeoes';
+        history.replaceState({tela:id}, '', '#campeoes');
+    }
     document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
 
     const tela = document.getElementById(id);
@@ -335,9 +339,6 @@ function mostrarTela(id, salvarHistorico = true){
         }, 50);
     }
 
-    if (id === 'historico') {
-        renderHistorico();
-    }
 }
 // Mantém a tela atual após atualizar a página
 window.addEventListener('DOMContentLoaded', () => {
@@ -859,7 +860,7 @@ function simularWebhookPix(cod){
   consultarPixReal(cod,false);
 }
 function abrirBilhetePagoAtual(){
-  if(pixAtualCodigo) imprimirBilhete(pixAtualCodigo);
+  if(pixAtualCodigo) baixarBilhete(pixAtualCodigo);
 }
 
 function salvarPixAdmin(){pixConfig.chave=document.getElementById('pixChave').value.trim()||pixConfig.chave;pixConfig.nome=document.getElementById('pixNome').value.trim()||pixConfig.nome;pixConfig.msg=document.getElementById('pixMsg').value.trim()||pixConfig.msg;salvarDados();alert('Configuração Pix salva!')}
@@ -1252,13 +1253,77 @@ function encontrarBilheteGlobal(cod){
 }
 
 function htmlComprovante(b){
-  const dataValidade = new Date(Date.now()+24*60*60*1000).toLocaleString('pt-BR');
+  const dataValidade = b.pagoEm || b.data || 'Confirmado no sistema';
   const rBilhete = rodadas.find(r=>r.id===b.rodadaId) || rodadas.find(r=>r.nome===b.rodadaNome) || {nome:b.rodadaNome||rodada.nome,jogos:jogos};
   const jogosDoBilhete = (rBilhete.jogos&&rBilhete.jogos.length?rBilhete.jogos:jogos);
   const jogosHtml = jogosDoBilhete.map(j=>`<div class="rec-jogo"><b>${j.casa} x ${j.fora}</b><br>Palpite: <b>${nomePalpite(b,j)}</b><br>Data/Hora: ${j.data||''}</div>`).join('');
   return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Bilhete ${b.codigo}</title><style>
     *{box-sizing:border-box} body{margin:0;background:#ddd;font-family:Arial,Helvetica,sans-serif;color:#111}.recibo{width:310px;min-height:100vh;background:#f4f26d;margin:0 auto;padding:18px 12px;font-size:13px;line-height:1.35}.recibo h1{text-align:center;font-size:22px;margin:0 0 2px}.site{text-align:center;font-weight:bold;font-size:12px;margin-bottom:28px}.meta{font-weight:bold;margin-bottom:22px}.titulo{text-align:center;font-weight:bold;margin:14px 0 8px}.rec-jogo{border-bottom:1px dashed #111;padding:7px 0;font-weight:500}.footer{font-weight:bold;margin-top:28px}.print-actions{position:fixed;right:20px;top:20px;display:flex;gap:8px}.print-actions button{border:0;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer}.print{background:#118000;color:#fff}.close{background:#222;color:#fff}@media print{body{background:#fff}.recibo{margin:0;width:80mm;min-height:auto}.print-actions{display:none}@page{size:80mm auto;margin:0}}
   </style></head><body><div class="print-actions"><button class="print" onclick="window.print()">IMPRIMIR</button><button class="close" onclick="window.close()">FECHAR</button></div><div class="recibo"><h1>GALERA DO PALPITE</h1><div class="site">www.GaleraDoPalpite.com</div><div class="meta">COD BILHETE: ${b.codigo}<br>ID DA RODADA: ${b.rodadaNome||rodada.nome}<br>DATA: ${b.data}<br>CLIENTE: ${b.nome}<br>VALIDADO EM: ${dataValidade}<br>CORRETOR: online<br>VALOR: R$ ${Number(b.valor).toFixed(2).replace('.',',')}</div><div class="titulo">PALPITES</div>${jogosHtml}<div class="footer">Acesse www.GaleraDoPalpite.com e conheça o regulamento!</div></div><script>setTimeout(()=>window.print(),300)<\/script></body></html>`;
+}
+function desenharBilhetePNG(b){
+  const achado=encontrarBilheteGlobal(b.codigo);
+  const r=achado?.rodada;
+  const lista=r?.jogos?.length?r.jogos:jogos;
+  const canvas=document.createElement('canvas');
+  const ctx=canvas.getContext('2d');
+  const largura=310, margem=12, linhas=[];
+  function texto(value,tamanho=13,negrito=false,centro=false){
+    ctx.font=`${negrito?'bold ':''}${tamanho}px Arial`;
+    const max=largura-margem*2;
+    for(const paragrafo of String(value??'').split('\n')){
+      let atual='';
+      for(const letra of paragrafo){
+        if(atual && ctx.measureText(atual+letra).width>max){linhas.push({texto:atual,tamanho,negrito,centro});atual='';}
+        atual+=letra;
+      }
+      linhas.push({texto:atual,tamanho,negrito,centro});
+    }
+  }
+  const espaco=altura=>linhas.push({espaco:altura});
+  texto('GALERA DO PALPITE',22,true,true);
+  texto('www.GaleraDoPalpite.com',12,true,true);espaco(24);
+  texto(`COD BILHETE: ${b.codigo}`,13,true);
+  texto(`ID DA RODADA: ${b.rodadaNome||r?.nome||rodada.nome}`,13,true);
+  texto(`DATA: ${b.data||''}`,13,true);
+  texto(`CLIENTE: ${b.nome}`,13,true);
+  texto(`VALIDADO EM: ${b.pagoEm||b.data||'Confirmado no sistema'}`,13,true);
+  texto('CORRETOR: online',13,true);
+  texto(`VALOR: R$ ${Number(b.valor).toFixed(2).replace('.',',')}`,13,true);
+  espaco(22);texto('PALPITES',13,true,true);espaco(8);
+  for(const j of lista){
+    texto(`${j.casa} x ${j.fora}`,13,true);
+    texto(`Palpite: ${nomePalpite(b,j)}`,13,true);
+    texto(`Data/Hora: ${j.data||''}`);
+    linhas.push({divisor:true});
+  }
+  espaco(24);texto('Acesse www.GaleraDoPalpite.com e conheça o regulamento!',13,true);
+  const altura=36+linhas.reduce((sum,l)=>sum+(l.espaco|| (l.divisor?15:l.tamanho*1.35)),0);
+  canvas.width=largura*3;canvas.height=Math.ceil(altura*3);
+  ctx.scale(3,3);ctx.fillStyle='#f4f26d';ctx.fillRect(0,0,largura,altura);
+  ctx.fillStyle='#111';ctx.textBaseline='top';let y=18;
+  for(const l of linhas){
+    if(l.espaco){y+=l.espaco;continue;}
+    if(l.divisor){ctx.beginPath();ctx.setLineDash([3,3]);ctx.moveTo(margem,y+7);ctx.lineTo(largura-margem,y+7);ctx.stroke();ctx.setLineDash([]);y+=15;continue;}
+    ctx.font=`${l.negrito?'bold ':''}${l.tamanho}px Arial`;
+    ctx.textAlign=l.centro?'center':'left';ctx.fillText(l.texto,l.centro?largura/2:margem,y);y+=l.tamanho*1.35;
+  }
+  return canvas;
+}
+function baixarBilhete(cod){
+  const b=encontrarBilheteGlobal(cod)?.bilhete;
+  if(!b)return alert('Bilhete não encontrado.');
+  if(!bilhetePago(b))return alert('O download será liberado após a confirmação do pagamento.');
+  try{
+    const canvas=desenharBilhetePNG(b);
+    canvas.toBlob(blob=>{
+      if(!blob)return alert('Não foi possível gerar o bilhete. Tente novamente.');
+      const url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download=`bilhete-${String(b.codigo).replace(/[^a-zA-Z0-9_-]/g,'')}.png`;
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    },'image/png');
+  }catch(e){console.error(e);alert('Não foi possível baixar o bilhete. Tente novamente.');}
 }
 function imprimirBilhete(cod){
   const achado=encontrarBilheteGlobal(cod);
@@ -1489,23 +1554,25 @@ function dinheiro(v){return 'R$ '+Number(v||0).toFixed(2).replace('.',',')}
 function financeiroTotaisDaRodada(r=null){
   const listaBilhetes = r ? (r.bilhetes||[]) : bilhetes;
   const fin = r ? (r.financeiro||{entradasExtras:0,saidas:0,percentualPremio:70,transacoes:[]}) : financeiro;
-  const pagos=listaBilhetes.filter(b=>b.status==='Pago');
-  const pendentes=listaBilhetes.filter(b=>b.status!=='Pago');
+  const pagos=listaBilhetes.filter(b=>bilhetePago(b));
+  const pendentes=listaBilhetes.filter(b=>!bilhetePago(b));
   const entradasBilhetes=pagos.reduce((s,b)=>s+(Number(b.valor)||0),0);
   const entradas=entradasBilhetes+(Number(fin.entradasExtras)||0);
   const pendenteValor=pendentes.reduce((s,b)=>s+(Number(b.valor)||0),0);
   const saidas=Number(fin.saidas)||0;
   const saldo=entradas-saidas;
-  const premiacao=entradas*(Number(fin.percentualPremio)||0)/100;
+  const premios=premiosDaRodada(r);
+  const premiacao=premios.normal;
   const equivPagos=pagos.reduce((s,b)=>s+(Number(b.totalBilhetes)||1),0);
   const ticketMedio=pagos.length?entradasBilhetes/pagos.length:0;
-  return {pagos,pendentes,entradas,entradasBilhetes,pendenteValor,saidas,saldo,premiacao,equivPagos,ticketMedio,fin};
+  return {pagos,pendentes,entradas,entradasBilhetes,pendenteValor,saidas,saldo,premiacao,equivPagos,ticketMedio,fin,premios};
 }
 function financeiroTotais(){return financeiroTotaisDaRodada(null)}
 function financeiroTotaisGeral(){
-  const geral={entradas:0,pendenteValor:0,saidas:0,saldo:0,pagos:0,pendentes:0,equivPagos:0,premiacao:0};
+  const geral={entradas:0,pendenteValor:0,saidas:0,saldo:0,pagos:0,pendentes:0,equivPagos:0,premiacao:0,entradasBilhetes:0,extras:0,lucro:0,taxas:0};
   rodadas.forEach(r=>{
     const t=financeiroTotaisDaRodada(r);
+    geral.entradasBilhetes+=t.entradasBilhetes; geral.extras+=Number(t.fin.entradasExtras)||0; geral.lucro+=t.premios.lucro; geral.taxas+=t.premios.banco;
     geral.entradas+=t.entradas; geral.pendenteValor+=t.pendenteValor; geral.saidas+=t.saidas; geral.saldo+=t.saldo;
     geral.pagos+=t.pagos.length; geral.pendentes+=t.pendentes.length; geral.equivPagos+=t.equivPagos; geral.premiacao+=t.premiacao;
   });
@@ -1546,11 +1613,37 @@ function selecionarRodadaFinanceiro(id) {
             });
     }, 100);
 }
+let financeiroPremiosPagos=null;
+function atualizarTotalPremiosFinanceiro(){
+ const el=document.getElementById('finGeralEntregues');
+ if(el)el.textContent=financeiroPremiosPagos===null?'Carregar pagamentos':dinheiro(financeiroPremiosPagos);
+}
+async function atualizarFinanceiroCompleto(){
+ renderFinanceiroAdmin();
+ if(typeof carregarPremiosAdmin==='function')await carregarPremiosAdmin();
+}
 function renderFinanceiroAdmin(){
   const t=financeiroTotais();
   const g=financeiroTotaisGeral();
   const set=(id,txt)=>{const el=document.getElementById(id); if(el) el.textContent=txt};
-  set('finGeralEntradas',dinheiro(g.entradas));
+  set('finGeralEntradas',dinheiro(g.entradasBilhetes));
+  set('finGeralExtras',dinheiro(g.extras));
+  set('finGeralLucro',dinheiro(g.lucro));
+  set('finGeralTaxas',dinheiro(g.taxas));
+  set('finRodadaAcumulado',dinheiro(t.premios.acumulado));
+  set('finRodadaLucro',dinheiro(t.premios.lucro));
+  set('finRodadaTaxas',dinheiro(t.premios.banco));
+  const referencia=document.getElementById('finReferenciaAcumulado');
+  if(referencia){
+    const ordenadas=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0));
+    const escolhido=referencia.value;
+    referencia.innerHTML=ordenadas.map(r=>`<option value="${escaparHtml(r.id)}">${escaparHtml(r.nome)}</option>`).join('');
+    referencia.value=ordenadas.some(r=>String(r.id)===escolhido)?escolhido:String(ordenadas[0]?.id||'');
+    const ref=ordenadas.find(r=>String(r.id)===referencia.value);
+    set('finGeralAcumulado',dinheiro(ref?premiosDaRodada(ref).acumulado:0));
+    set('finAcumuladoReferencia',ref?'Referência: '+ref.nome:'Nenhuma rodada cadastrada');
+  }
+  atualizarTotalPremiosFinanceiro();
   set('finGeralPendentes',dinheiro(g.pendenteValor));
   set('finGeralSaidas',dinheiro(g.saidas));
   set('finGeralSaldo',dinheiro(g.saldo));
@@ -1655,7 +1748,7 @@ function renderBilhetesPorRodadaAdmin(){
     ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'Pago' : 'Pendente'}
     </span>
       <span class="bilhete-actions">${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago')
- ? `<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button>`
+ ? `<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button><button onclick="baixarBilhete('${b.codigo}')">BAIXAR BILHETE</button>`
  : `<button onclick="confirmarPagamentoManual('${b.codigo}')">Confirmar PG</button>`}</span>
     </div>`).join('') || '<p class="sub admin-empty">Nenhum bilhete recebido nesta rodada.</p>';
     return `<div class="rodada-bilhetes-card ${r.id===rodadaAtualId?'ativa':''}">
@@ -1789,10 +1882,10 @@ if (rodadaAdmin) {
   const rd=document.getElementById('rodadaData'); if(rd) rd.value=rodada.dataRodada||'';
   const rh=document.getElementById('rodadaHora'); if(rh) rh.value=rodada.horaRodada||'';
 
-  const jogosHtml=(jogos.length?`<div class="resultado-toolbar"><small><b>Rodada selecionada:</b> ${rodada.nome}<br>Digite os placares finais e salve. O ranking fica ao lado para conferir rápido.</small><button onclick="salvarTodosResultados()">Salvar todos resultados</button></div>`:'') + (jogos.map(j=>`<div class="resultado-jogo-card jogo-admin" id="jogoAdminLinha${j.id}"><div class="resultado-num">${j.id}</div><div class="resultado-times"><b>${j.casa}</b> <span>x</span> <b>${j.fora}</b><br><small>${j.data||''}</small><br><em id="statusResultado${j.id}" class="status-resultado salvo">SALVO</em></div><span class="placar-admin"><input type="number" min="0" placeholder="Casa" value="${j.golsCasa??''}" onchange="setResultado(${j.id},'golsCasa',this.value)"><b>x</b><input type="number" min="0" placeholder="Fora" value="${j.golsFora??''}" onchange="setResultado(${j.id},'golsFora',this.value)"></span><button class="btn-save-result" onclick="salvarResultadoJogo(${j.id})">Salvar</button><button class="excluir" onclick="excluirJogo(${j.id})">Excluir</button></div>`).join('')||'<p>Nenhum jogo cadastrado nessa competição/rodada.</p>');
+  const jogosHtml=(jogos.length?`<div class="resultado-toolbar"><small><b>Rodada selecionada:</b> ${rodada.nome}<br>Digite os placares finais e salve. Confira a classificação na opção Ranking do menu.</small><button onclick="salvarTodosResultados()">Salvar todos resultados</button></div>`:'') + (jogos.map(j=>`<div class="resultado-jogo-card jogo-admin" id="jogoAdminLinha${j.id}"><div class="resultado-num">${j.id}</div><div class="resultado-times"><b>${j.casa}</b> <span>x</span> <b>${j.fora}</b><br><small>${j.data||''}</small><br><em id="statusResultado${j.id}" class="status-resultado salvo">SALVO</em></div><span class="placar-admin"><input type="number" min="0" placeholder="Casa" value="${j.golsCasa??''}" onchange="setResultado(${j.id},'golsCasa',this.value)"><b>x</b><input type="number" min="0" placeholder="Fora" value="${j.golsFora??''}" onchange="setResultado(${j.id},'golsFora',this.value)"></span><button class="btn-save-result" onclick="salvarResultadoJogo(${j.id})">Salvar</button><button class="excluir" onclick="excluirJogo(${j.id})">Excluir</button></div>`).join('')||'<p>Nenhum jogo cadastrado nessa competição/rodada.</p>');
   document.getElementById('adminJogos').innerHTML=jogosHtml;
   document.getElementById('adminBilhetes').innerHTML=renderBilhetesPorRodadaAdmin();
-  document.getElementById('adminRanking').innerHTML=renderRankingTabela(ranking,10);
+  const rankingAdmin=document.getElementById('adminRanking'); if(rankingAdmin)rankingAdmin.innerHTML=renderRankingTabela(ranking,10);
   renderFinanceiroAdmin();
   renderManualForm();
 }
@@ -1838,7 +1931,7 @@ function buscarBilhete(){
   if(!alvo) return;
   const lista=filtrarPorCodigoOuCelular(q);
   if(!q.trim()){alvo.innerHTML='<p>Digite o código do bilhete ou celular para buscar.</p>';return}
-  alvo.innerHTML=lista.map(b=>`<div class="linha"><span><b>${b.codigo}</b> - ${b.nome}<br><small>${b.pontos||0} pts</small></span><span class="tag ${b.status==='Pago'?'pago':'pendente'}">${b.status}</span><span>R$ ${b.valor.toFixed(2).replace('.',',')}</span>${b.status==='Pago'?`<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button>`:''}</div>`).join('')||'<p>Nenhum bilhete encontrado.</p>';
+  alvo.innerHTML=lista.map(b=>`<div class="linha"><span><b>${b.codigo}</b> - ${b.nome}<br><small>${b.pontos||0} pts</small></span><span class="tag ${b.status==='Pago'?'pago':'pendente'}">${b.status}</span><span>R$ ${b.valor.toFixed(2).replace('.',',')}</span>${bilhetePago(b)?`<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button><button onclick="baixarBilhete('${b.codigo}')">BAIXAR BILHETE</button>`:''}</div>`).join('')||'<p>Nenhum bilhete encontrado.</p>';
 }
 
 function renderMercadoInicial(){
@@ -1894,7 +1987,7 @@ function renderMercadoLista(){
     </div>
     <div class="mercado-actions">
       <button onclick="verResumoBilhete('${b.codigo}')">Ver bilhete</button>
-      ${b.status==='Pago'?`<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button>`:`<button onclick="alert('Bilhete aguardando confirmação do pagamento pelo administrador.')">Aguardando pagamento</button>`}
+      ${bilhetePago(b)?`<button onclick="imprimirBilhete('${b.codigo}')">Imprimir</button><button onclick="baixarBilhete('${b.codigo}')">BAIXAR BILHETE</button>`:`<button onclick="alert('Bilhete aguardando confirmação do pagamento pelo administrador.')">Aguardando pagamento</button>`}
     </div>
   </div>`).join('');
 }
@@ -2040,16 +2133,16 @@ function htmlFaixasPremiacao(lista){
 }
 function preencherPremiacaoAdmin(){
  const c=rodada.premiacaoConfig || {},pct={normal:70,acumulado:18,banco:2,lucro:10,...c.percentuais};
- for(const key of ['total','normal','acumulado']){const el=document.getElementById('premio-'+key);if(el)el.value=c[key]??'';}
+ for(const key of ['total','normal','acumulado','anterior']){const el=document.getElementById('premio-'+key);if(el)el.value=c[key]??'';}
  for(const key of ['normal','acumulado','banco','lucro']){const el=document.getElementById('pct-'+key);if(el)el.value=pct[key];}
  const p=premiosDaRodada(),el=document.getElementById('premio-preview');
- if(el)el.textContent=`Normal: ${dinheiro(p.normal)} | Acumulado: ${dinheiro(p.acumulado)} | Total: ${dinheiro(p.total)} | Reserva desta rodada: ${dinheiro(p.aporte)} | Banco estimado: ${dinheiro(p.banco)} | Lucro: ${dinheiro(p.lucro)}`;
+ if(el)el.textContent=`Normal: ${dinheiro(p.normal)} | Acumulado anterior: ${dinheiro(p.anterior)} | Acumulado: ${dinheiro(p.acumulado)} | Total: ${dinheiro(p.total)} | Reserva desta rodada: ${dinheiro(p.aporte)} | Banco estimado: ${dinheiro(p.banco)} | Lucro: ${dinheiro(p.lucro)}`;
 }
 async function salvarPremiacaoAcumulada(){
  if(!adminLiberado)return alert('Entre como administrador.');
  const id=rodadaAtualId;
  const config={percentuais:{}};
- for(const key of ['total','normal','acumulado']){
+ for(const key of ['total','normal','acumulado','anterior']){
   const text=document.getElementById('premio-'+key).value.trim();
   const value=text===''?null:Number(text);
   if(value!==null&&(!Number.isFinite(value)||value<0))return alert('Informe valores válidos, iguais ou maiores que zero.');
@@ -2068,7 +2161,7 @@ async function salvarPremiacaoAcumulada(){
   await supabaseRequest('rodadas','PATCH',{premiacao_config:config},`?id=eq.${encodeURIComponent(id)}`);
   const r=rodadas.find(r=>String(r.id)===String(id));if(r)r.premiacaoConfig=config;
   rodada.premiacaoConfig=config;
-  salvarDados(false);preencherPremiacaoAdmin();renderRodadas();renderRankingPublico();
+  salvarDados(false);preencherPremiacaoAdmin();renderFinanceiroAdmin();renderRodadas();renderRankingPublico();
   alert('Premiação salva para esta rodada.');
  }catch(e){alert('Não foi possível salvar a premiação. Confira a conexão e execute PREMIACAO_ACUMULADA.sql no Supabase.');}
 }

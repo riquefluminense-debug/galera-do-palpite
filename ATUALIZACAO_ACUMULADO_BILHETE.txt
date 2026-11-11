@@ -1,0 +1,34 @@
+ATUALIZAÇÃO — ACUMULADO ANTERIOR E DOWNLOAD DO BILHETE
+
+Substitua os arquivos index.html, script.js e premiacao.js no projeto atual e publique pelo procedimento que você já utiliza. Os demais arquivos foram preservados. Não precisa criar tabela ou coluna nova se PREMIACAO_ACUMULADA.sql já foi aplicado: o novo valor fica no JSON premiacao_config existente.
+
+ACUMULADO ANTERIOR
+No administrador, selecione a rodada e abra Premiação com acumulado.
+Preencha Acumulado anterior com o saldo trazido de rodadas anteriores.
+Para somar automaticamente a reserva das vendas atuais, deixe Acumulado total e Premiação total vazios. Clique em Salvar premiação e percentuais.
+Exemplo: R$ 300 anteriores + R$ 180 de reserva das vendas atuais = R$ 480 acumulados. Com prêmio normal de R$ 700, o prêmio para 8 acertos é R$ 1.180.
+O saldo anterior não é uma nova entrada financeira, não paga nova taxa e não aumenta o lucro.
+O ajuste manual de acumulado total continua substituindo o valor completo, preservando as configurações antigas. A transferência para a rodada seguinte e a baixa após um ganhador continuam manuais.
+
+BAIXAR BILHETE
+Botão BAIXAR BILHETE na busca, na lista de bilhetes e no painel para os bilhetes pagos. No modal Pix, aparece depois da confirmação automática. Também funciona para confirmação manual, ao buscar novamente o bilhete ou atualizar a página.
+Gera uma imagem PNG amarela com os jogos, palpites, código, cliente, rodada e valor. Não depende de serviço externo ou biblioteca de imagem. Mantida a opção Imprimir.
+A função de download também verifica o status antes de gerar o arquivo; pendentes ficam bloqueados na interface.
+A data do comprovante usa o registro disponível do bilhete, sem criar uma validação futura fictícia.
+
+VERIFICAÇÃO
+24 testes automatizados passaram, incluindo soma do saldo, preservação de valores manuais, bloqueio do download pendente e acionamento do download PNG pago. Sintaxe JavaScript verificada. Ainda é necessário conferir o download em um celular real depois da publicação.
+
+REMOÇÃO DO HISTÓRICO
+Removida a opção Histórico dos menus desktop e mobile e removida a tela pública. Links antigos #historico abrem Campeões. Os registros internos já salvos continuam preservados.
+
+ORGANIZAÇÃO DO ADMINISTRADOR E FINANCEIRO
+Removido o quadro lateral Ranking automático. Mantido o cálculo do ranking público, assim como Gerenciar campeões. Resultados e bilhetes usam toda a largura disponível.
+O resumo geral mostra: bilhetes pagos arrecadados, pendente geral, prêmios entregues, acumulado atual, lucro estimado e taxas estimadas.
+Prêmios entregues vêm de todos os pagamentos cadastrados em Gerenciar campeões (não apenas TOP10), inclusive os de rodadas excluídas. Para atualizar, use Atualizar financeiro. Se não carregou o cadastro, aparece Carregar pagamentos, em vez de um zero fictício.
+O acumulado atual usa uma rodada de referência escolhida no seletor; inicialmente é a mais recente por data de criação. Escolha a rodada atual do bolão caso exista uma rodada de teste mais nova. Não soma acumulados transportados entre rodadas. Após pagar o acumulado, informe o saldo restante na rodada seguinte.
+Lucro e taxas usam os percentuais salvos de cada rodada (padrão 10% de lucro e 2% de taxa) sobre bilhetes pagos. São estimativas; não descontam tarifas bancárias efetivas e não incidem sobre acumulado anterior ou extras.
+Entradas extras, saídas manuais e saldo dos registros foram mantidos em uma área de detalhes. Prêmios cadastrados em Campeões são um indicador separado e não geram nova saída automática, evitando descontar duas vezes um pagamento que já foi lançado manualmente. O saldo dos registros não é o lucro disponível.
+A seção da rodada selecionada mostra também acumulado, lucro e taxa. A premiação normal agora usa o mesmo cálculo do ranking, sem o antigo campo de percentual independente.
+24 testes passaram. A visualização em navegador e celular ainda precisa ser conferida após a publicação.
+Arquivos alterados no conjunto completo desta atualização: index.html, script.js, premiacao.js, campeoes.js e premium.css. Substitua estes cinco no projeto e publique normalmente.
