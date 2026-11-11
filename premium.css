@@ -588,3 +588,14 @@
  .premio-estimado{font-size:17px;padding:9px 10px;max-width:100%}
  .rodada-card button{width:100%;min-height:48px;font-size:16px}
 }
+
+/* Acabamento final: premiação em caixa alta e logos soltas em todas as telas. */
+.rank-premio-card{text-transform:uppercase}
+.sidebar .brand.logo-brand,.sidebar .premium-brand,.rodada-card .gdp-card-logo,
+.mobile-menu .mobile-menu-brand{background:none!important;border:none!important;outline:none!important;box-shadow:none!important;border-radius:0!important;text-decoration:none!important}
+.sidebar .brand.logo-brand::before,.sidebar .brand.logo-brand::after,
+.rodada-card .gdp-card-logo::before,.rodada-card .gdp-card-logo::after{content:none!important}
+
+.rodada-actions .btn-fechar-palpites{background:#b87900!important;color:#fff!important}.zona-exclusao{margin-top:28px;padding-top:18px;border-top:1px solid #784040}.zona-exclusao summary{cursor:pointer;color:#e7b4b4;font-weight:700}
+
+#statusRodadasInicio.rodadas-fechadas{background:#a82b36;color:#fff;box-shadow:0 0 18px rgba(200,40,55,.2)}

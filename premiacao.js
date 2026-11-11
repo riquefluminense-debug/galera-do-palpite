@@ -18,7 +18,7 @@
   const maior=Math.max(...lista.map(b=>Number(b.pontos)||0));
   const vencedores=lista.filter(b=>Number(b.pontos)===maior);
   const valor=maior===8?p.total:p.normal;
-  return {pontos:maior,quantidade:vencedores.length,faixa:maior===8?'Campeão com acumulado':'Campeão normal',valor,porVencedor:Math.floor(cents(valor)/vencedores.length)/100};
+  return {pontos:maior,quantidade:vencedores.length,faixa:maior===8?'CAMPEÃO COM ACUMULADO':'CAMPEÃO',valor,porVencedor:Math.floor(cents(valor)/vencedores.length)/100};
  }
  const api={calcularPremiacao,premioCampeoes};
  if(typeof module!=='undefined')module.exports=api;else Object.assign(root,api);

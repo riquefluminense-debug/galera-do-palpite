@@ -397,18 +397,26 @@ function dataHoraRodada(r=null){
   return `${data} • ${hora}`;
 }
 function premioEstimadoRodada(r=null){
-  if((r||rodada).premiacaoConfig) return dinheiro(premiosDaRodada(r).total);
+
   const alvo=r||rodada;
   const manual=Number(String(alvo?.premioEstimadoManual||'').replace(',','.'));
   if(manual>0) return manual.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const listaBilhetes=r?.bilhetes||bilhetes;
   const fin=r?.financeiro||financeiro;
   const pagos=listaBilhetes.filter(b=>b.status==='Pago').reduce((s,b)=>s+(Number(b.valor)||0),0);
+  if(alvo?.premiacaoConfig)return dinheiro(premiosDaRodada(r).total);
   const perc=Number(fin?.percentualPremio ?? 70);
   const estimado=pagos>0 ? pagos*(perc/100) : 0;
   return estimado.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 }
+function atualizarStatusRodadasInicio(){
+ const badge=document.getElementById('statusRodadasInicio');if(!badge)return;
+ const aberta=rodadas.some(r=>(r.status||'Aberta')==='Aberta');
+ badge.textContent=aberta?'● RODADA ABERTA':'● RODADA FECHADA';
+ badge.classList.toggle('rodadas-fechadas',!aberta);
+}
 function renderRodadas(){
+  atualizarStatusRodadasInicio();
   const ordenadas=[...rodadas].sort((a,b)=>(b.criadaEm||0)-(a.criadaEm||0));
   const el=document.getElementById('listaRodadas');
   if(!el) return;
@@ -733,7 +741,22 @@ async function adicionarJogoAdmin(){
   renderRodadas();renderTicket();renderAdmin();
   alert('Jogo adicionado na rodada: '+r.nome);
 }
-function excluirJogo(id){jogos=jogos.filter(j=>j.id!==id).map((j,i)=>({...j,id:i+1}));delete palpites[id];salvarDados();renderRodadas();renderTicket();renderAdmin()}
+async function excluirJogo(id){
+ if(!adminLiberado)return alert('Entre como administrador.');
+ const jogo=jogos.find(j=>String(j.id)===String(id));if(!jogo?.dbId)return alert('Jogo não encontrado no banco. Atualize a página.');
+ if(bilhetes.length)return alert('Esta rodada já possui bilhetes. Excluir um jogo mudaria a numeração dos palpites. Use outra rodada para corrigir a lista de jogos.');
+ if(!confirm(`Excluir o jogo ${jogo.casa} x ${jogo.fora} da rodada ${rodada.nome}?`))return;
+ const roundId=rodadaAtualId;
+ try{
+  const result=await supabaseRequest('jogos','DELETE',null,`?id=eq.${encodeURIComponent(jogo.dbId)}&rodada_id=eq.${encodeURIComponent(roundId)}&select=id`);
+  if(!Array.isArray(result)||!result.some(j=>String(j.id)===String(jogo.dbId)))throw Error('O banco não confirmou a exclusão. Confira a permissão DELETE (RLS) da tabela jogos no Supabase.');
+  const remaining=await supabaseRequest('jogos','GET',null,`?id=eq.${encodeURIComponent(jogo.dbId)}&select=id`);
+  if(!Array.isArray(remaining)||remaining.length)throw Error('O jogo ainda aparece no banco.');
+  await carregarRodadasSupabase(roundId);Object.keys(palpites).forEach(k=>delete palpites[k]);
+  salvarDados(false);renderRodadas();renderTicket();renderAdmin();renderRankingPublico();
+  alert('Jogo excluído do banco.');
+ }catch(e){alert('Não foi possível excluir o jogo: '+e.message);}
+}
 async function confirmarPagamento(cod, origem='manual', abrirBilheteDepois=false){
   let b=bilhetes.find(x=>String(x.codigo)===String(cod));
 
@@ -1155,6 +1178,7 @@ async function apagarRodadaAtual() {
   }
 
   if (!confirm(aviso)) return;
+  if(prompt('Para excluir definitivamente, digite APAGAR:')!=='APAGAR')return;
 
   if (temRanking && !campeaoSalvo) {
     salvarCampeaoHistorico(true);
@@ -1173,9 +1197,13 @@ async function apagarRodadaAtual() {
       null,
       `?id=eq.${apagada}&select=id`
     );
+if(!Array.isArray(resultadoDelete)||!resultadoDelete.some(r=>Number(r.id)===apagada)){
+ throw new Error('O banco não confirmou a exclusão. Confira a permissão DELETE (RLS) da tabela rodadas no Supabase.');
+}
+const aindaExiste=await supabaseRequest('rodadas','GET',null,`?id=eq.${apagada}&select=id`);
+if(!Array.isArray(aindaExiste)||aindaExiste.length)throw new Error('A rodada ainda aparece no banco.');
+rodadaAdminId=null;
 await carregarRodadasSupabase();
-
-console.log("Rodadas após DELETE:", rodadas);
 
     rodadas = rodadas.filter(r => Number(r.id) !== apagada);
 
@@ -1438,7 +1466,7 @@ const pagos = totalBilhetes;
     <div class="ranking-page-modelo">
       <div class="rank-title-line"><span></span><b>Ranking da Rodada</b><small>(${rodada.nome} | ${jogos.length} Jogos)</small><span></span></div>
       <div class="rank-actions-top"><button onclick="mostrarTela('inicio')">🏠 TELA INICIAL</button><button onclick="window.print()">📄 PDF / IMPRIMIR</button></div>
-      <div class="rank-premio-card"><h3>🏆 PREMIAÇÃO DA RODADA</h3><div class="premio-total"><small>PREMIAÇÃO TOTAL</small><b>${premioEstimadoRodada()}</b></div>${htmlFaixasPremiacao(lista)}<p><span>🎟️ Bilhetes confirmados no site</span><b>${pagos}</b></p><p><span>📋 Total de bilhetes confirmados</span><b>${totalBilhetes}</b></p></div>
+      <div class="rank-premio-card"><h3>🏆 PREMIAÇÃO DA RODADA</h3><div class="premio-total"><small>PREMIAÇÃO TOTAL</small><b>${dinheiro(premiosDaRodada().total)}</b></div>${htmlFaixasPremiacao(lista)}<p><span>🎟️ Bilhetes confirmados no site</span><b>${pagos}</b></p><p><span>📋 Total de bilhetes confirmados</span><b>${totalBilhetes}</b></p></div>
       <div class="rank-simulador"><h3>📊 Simulador de jogos</h3><p>Use nos jogos que ainda não começaram para calcular possíveis resultados e ver quem ficaria campeão.</p><div class="sim-actions"><button onclick="iniciarSimulacaoRanking()">📈 Iniciar simulação</button><button class="cancel" onclick="cancelarSimulacaoRanking()" ${simulacaoAtiva?'':'disabled'}>✕ Cancelar simulação</button></div>${simulacaoAtiva?'<small class="sim-aviso">Simulação temporária ativa: clique em 1, X ou 2 nos jogos aguardando. Nada será salvo no ranking oficial.</small>':''}</div>
       <div class="rank-games-box"><h3>⚽ # Jogos</h3><div class="rank-games-list">${renderJogosRanking()}</div></div>
       <div class="rank-resumos"><div class="rank-resumo-card"><h3>Resumo do Ranking</h3>${rankingResumo(lista)}</div><div class="rank-legenda"><h3>Legenda de Cores</h3><p><span class="leg acerto"></span> Acertos</p><p><span class="leg erro"></span> Erros</p><p><span class="leg vencedor"></span> Vencedores</p></div></div>
@@ -2004,8 +2032,8 @@ function htmlFaixasPremiacao(lista){
  const p=premiosDaRodada();
  const finalizados=jogos.length===8 && jogos.every(j=>resultadoJogo(j)!==null && (!j.sportscoreAtivo||j.placarStatus==='ENCERRADO'));
  const premio=premioCampeoes(p,lista,finalizados);
- return `<p><span>🏆 Campeão com acumulado<br><small>8 pontos</small></span><b>${dinheiro(p.total)}</b></p>
- <p><span>🏆 Campeão normal<br><small>7 pontos ou menos</small></span><b>${dinheiro(p.normal)}</b></p>
+ return `<p><span>🏆 CAMPEÃO COM ACUMULADO<br><small>8 pontos</small></span><b>${dinheiro(p.total)}</b></p>
+ <p><span>🏆 CAMPEÃO<br><small>7 pontos ou menos</small></span><b>${dinheiro(p.normal)}</b></p>
  <p><span>➕ Acumulado</span><b>${dinheiro(p.acumulado)}</b></p>
  <small>O acumulado é liberado somente com 8 acertos. Sem 8 acertos, permanece para as próximas rodadas. Em empate, o prêmio da faixa é dividido.</small>
  ${premio?`<p><span>${premio.faixa} · ${premio.quantidade} vencedor(es)<br><small>Por bilhete vencedor</small></span><b>${dinheiro(premio.porVencedor)}</b></p>`:''}`;

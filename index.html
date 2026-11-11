@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Galera do Palpite - Palpite Agora</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="premium.css?v=5" />
+  <link rel="stylesheet" href="premium.css?v=8" />
   <link rel="stylesheet" href="campeoes.css?v=9" />
 <link rel="stylesheet" href="crest-picker.css?v=1">
 <link rel="stylesheet" href="sportscore.css?v=1">
@@ -71,7 +71,7 @@
     <section id="inicio" class="tela ativa">
       <section class="banner premium-hero">
         <div class="hero-card">
-          <span class="live-badge">● RODADA ABERTA</span>
+          <span id="statusRodadasInicio" class="live-badge" role="status" aria-live="polite">● CARREGANDO RODADAS</span>
           <p>Seu palpite vale prêmio</p>
           <h1>Palpite agora mesmo e concorra em dinheiro</h1>
           <div class="hero-stats"><span>⚡ Ranking automático</span><span>💸 Pix</span><span>🏆 Premiação dividida em empate</span></div>
@@ -193,8 +193,9 @@
           <input id="rodadaData" placeholder="Ex: 30/05/2026" />
           <label>Horário exibido no card</label>
           <input id="rodadaHora" placeholder="Ex: 21:30" />
-          <label>Prêmio estimado exibido para clientes</label>
+          <label>Prêmio anunciado no card inicial (estimativa para divulgação)</label>
           <input id="rodadaPremioEstimado" type="number" min="0" step="0.01" placeholder="Ex: 250,00" />
+          <p class="fin-note">Este valor aparece no card da página inicial para divulgar a rodada. Não altera os valores da premiação do ranking abaixo.</p>
           <details class="premiacao-admin" open>
             <summary><b>🏆 Premiação com acumulado</b></summary>
             <p>8 acertos: prêmio normal + acumulado. Maior pontuação de 7 ou menos: apenas prêmio normal.</p>
@@ -208,7 +209,7 @@
             <label>Reserva para acumulado (%)</label><input id="pct-acumulado" type="number" min="0" max="100" step="0.01" value="18">
             <label>Taxa estimada do pagamento (%)</label><input id="pct-banco" type="number" min="0" max="100" step="0.01" value="2">
             <label>Lucro (%)</label><input id="pct-lucro" type="number" min="0" max="100" step="0.01" value="10">
-            <p>Percentuais devem somar 100%. Para taxa de 1%, use reserva de 19%. A taxa é uma estimativa; não altera a cobrança do banco.</p>
+            <p>Os percentuais calculam os valores automaticamente sobre os bilhetes pagos quando os campos de valores ficam vazios. Valores preenchidos manualmente substituem o cálculo correspondente. Percentuais devem somar 100%. Para taxa de 1%, use reserva de 19%. A taxa é uma estimativa; não altera a cobrança do banco.</p>
             <p>Informe o acumulado completo por rodada. Não há transferência automática entre rodadas nem baixa automática ao pagar um campeão.</p>
             <p id="premio-preview" aria-live="polite"></p>
             <button type="button" onclick="salvarPremiacaoAcumulada()">Salvar premiação e percentuais</button>
@@ -217,9 +218,11 @@
           <select id="rodadaStatus"><option>Aberta</option><option>Encerrada</option></select>
           <button onclick="salvarRodada()">Salvar rodada atual</button>
           <div class="rodada-actions">
-            <button class="btn-red" onclick="fecharRodadaAtual()">Fechar palpites</button>
+            <button class="btn-fechar-palpites" onclick="fecharRodadaAtual()">🔒 Fechar palpites</button>
             <button onclick="abrirRodadaAtual()">Abrir palpites</button>
-            <button class="btn-red" onclick="apagarRodadaAtual()">Apagar rodada ultrapassada</button>
+            </div>
+          <details class="zona-exclusao"><summary>🗑️ Exclusão definitiva de rodada</summary><p>Remove a rodada do banco. Esta ação é diferente de fechar os palpites.</p><button class="btn-red" onclick="apagarRodadaAtual()">Apagar rodada definitivamente</button></details>
+          <div>
           </div>
           <small class="admin-note">Ao apagar uma rodada com ranking calculado, o campeão fica salvo no Histórico.</small>
           <hr class="admin-sep">
@@ -451,8 +454,8 @@ alt="WhatsApp">
     </div>
   </div>
 <script src="api.js?v=2000"></script>
-<script src="premiacao.js?v=1"></script>
-<script src="script.js?v=2005"></script>
+<script src="premiacao.js?v=2"></script>
+<script src="script.js?v=2008"></script>
 <script src="crest-picker.js?v=1"></script>
 <script src="campeoes.js?v=9"></script>
 <footer class="ss-credit"><a href="https://sportscore.com/" title="Sports data by SportScore">Powered by SportScore</a></footer>
