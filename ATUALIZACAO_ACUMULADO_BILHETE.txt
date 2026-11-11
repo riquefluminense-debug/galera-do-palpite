@@ -49,3 +49,10 @@ A consulta não cria vínculo automaticamente. Somente páginas de partidas em s
 A sincronização tenta o link salvo quando o jogo não está na lista diária, inclusive quando a lista está indisponível. A configuração SPORTSCORE_AUTO_SYNC=true e as credenciais do servidor Supabase continuam necessárias.
 Falhas de consulta não inventam placares. Jogos agendados não atribuem pontos; placares finais continuam sujeitos à validação dos 90 minutos, sem prorrogação ou pênaltis.
 Verificado com a página real de Londrina PR x Nautico (PE), 11/11/2026 às 19h. 33 testes passaram, incluindo sincronização de um jogo ausente na lista diária. O funcionamento publicado e visual ainda deve ser conferido após o deploy.
+
+CORREÇÃO DO BOTÃO EXCLUIR JOGO
+Publique também server.js, script.js e o novo jogos-admin-routes.js. A exclusão passa pelo servidor e exige token administrativo assinado. Não habilite DELETE para anon e não desative RLS.
+O servidor usa SUPABASE_SERVICE_ROLE_KEY quando configurada; caso contrário usa SUPABASE_KEY já existente. Ela precisa ser a chave secreta/service_role no Render, nunca a chave pública. Não coloque a chave secreta em script.js nem envie pelo chat. JWT_SECRET deve estar configurado, como no acesso de Campeões.
+O site usa a sessão administrativa existente. Rodadas com qualquer bilhete ficam impedidas de perder jogos, evitando mudar a numeração dos palpites. O servidor valida o jogo e a rodada e só confirma sucesso após receber o registro excluído e verificar que saiu do banco.
+Após o deploy Live, atualize com Ctrl+F5 e tente Excluir na rodada TESTE NOVO. Os jogos vinculados continuam intactos se você excluir somente os outros quatro.
+37 testes automatizados passaram. Exclusão no banco de produção não foi executada pelo assistente: deve ser conferida após a publicação.

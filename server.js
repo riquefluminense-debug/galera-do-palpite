@@ -154,6 +154,8 @@ function autenticarAdmin(req, res, next) {
   }
 }
 
+require('./jogos-admin-routes')(app, autenticarAdmin, {url:SUPABASE_URL,key:process.env.SUPABASE_SERVICE_ROLE_KEY || SUPABASE_KEY});
+
 async function gerarCodigoGDP() {
   const total = await Bilhete.countDocuments();
   let numero = total + 1;

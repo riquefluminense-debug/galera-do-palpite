@@ -749,10 +749,12 @@ async function excluirJogo(id){
  if(!confirm(`Excluir o jogo ${jogo.casa} x ${jogo.fora} da rodada ${rodada.nome}?`))return;
  const roundId=rodadaAtualId;
  try{
-  const result=await supabaseRequest('jogos','DELETE',null,`?id=eq.${encodeURIComponent(jogo.dbId)}&rodada_id=eq.${encodeURIComponent(roundId)}&select=id`);
-  if(!Array.isArray(result)||!result.some(j=>String(j.id)===String(jogo.dbId)))throw Error('O banco não confirmou a exclusão. Confira a permissão DELETE (RLS) da tabela jogos no Supabase.');
-  const remaining=await supabaseRequest('jogos','GET',null,`?id=eq.${encodeURIComponent(jogo.dbId)}&select=id`);
-  if(!Array.isArray(remaining)||remaining.length)throw Error('O jogo ainda aparece no banco.');
+  let token=localStorage.getItem('adminToken');
+  if(!token && typeof cpAutenticar==='function'){await cpAutenticar();token=campeoesToken;}
+  if(!token)throw Error('Faça login novamente como administrador.');
+  const response=await fetch(`${API_URL}/admin/jogos/${encodeURIComponent(jogo.dbId)}?rodada_id=${encodeURIComponent(roundId)}`,{method:'DELETE',headers:{Authorization:`Bearer ${token}`}});
+  const result=await response.json().catch(()=>({}));
+  if(!response.ok||!result.ok)throw Error(result.erro||'O servidor não confirmou a exclusão. Publique também server.js e jogos-admin-routes.js.');
   await carregarRodadasSupabase(roundId);Object.keys(palpites).forEach(k=>delete palpites[k]);
   salvarDados(false);renderRodadas();renderTicket();renderAdmin();renderRankingPublico();
   alert('Jogo excluído do banco.');
