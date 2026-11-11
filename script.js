@@ -39,7 +39,7 @@ async function supabaseRequest(tabela, metodo='GET', dados=null, query=''){
   }
   return json;
 }
-async function carregarRodadasSupabase(){
+async function carregarRodadasSupabase(preferredRoundId = null){
   try{
     const dados = await supabaseRequest('rodadas','GET',null,'?select=*&order=created_at.desc');
     const jogosBanco = await supabaseRequest('jogos','GET',null,'?select=*&order=id.asc');
@@ -61,6 +61,7 @@ async function carregarRodadasSupabase(){
       status: r.status || 'Aberta',
       criadaEm: r.created_at ? new Date(r.created_at).getTime() : Date.now(),
       premioEstimadoManual: r.premio_estimado ? String(r.premio_estimado) : '',
+      premiacaoConfig: r.premiacao_config || null,
       dataRodada: r.data_rodada || '',
       horaRodada: r.hora_rodada || '',
       pixConfig: {...pixConfig},
@@ -120,13 +121,15 @@ financeiro: {
     total: r.bilhetes?.length || 0
   }))
 );
-    rodadaAtualId = rodadas[0]?.id || null;
+    const requestedRound = preferredRoundId || new URLSearchParams(location.hash.split('?')[1] || '').get('rodada') || rodadaAtualId || sessionStorage.getItem('gdp_rodada_atual');
+    const selectedRound = rodadas.find(r => String(r.id) === String(requestedRound)) || rodadas[0];
+    rodadaAtualId = selectedRound?.id || null;
     if (!rodadaAdminId) {
     rodadaAdminId = rodadaAtualId;
 }
 
     if(rodadas.length){
-      aplicarRodada(rodadas[0]);
+      aplicarRodada(selectedRound);
     }else{
       jogos=[];
       bilhetes=[];
@@ -165,6 +168,7 @@ function sincronizarRodadaAtual(){
   r.nome=rodada.nome;
   r.valor=rodada.valor;
   r.status=rodada.status;
+  r.premiacaoConfig=rodada.premiacaoConfig || null;
   r.premioEstimadoManual=rodada.premioEstimadoManual||'';
   r.dataRodada=rodada.dataRodada||'';
   r.horaRodada=rodada.horaRodada||'';
@@ -177,7 +181,8 @@ function sincronizarRodadaAtual(){
 function aplicarRodada(r){
   if(!r) return;
   rodadaAtualId=r.id;
-  { const dh=extrairDataHoraJogos(r.jogos||jogos); rodada={nome:r.nome,valor:Number(r.valor)||10,status:r.status||'Aberta',criadaEm:r.criadaEm||Date.now(),premioEstimadoManual:r.premioEstimadoManual||'',dataRodada:r.dataRodada||dh.data||'26/05/2026',horaRodada:r.horaRodada||dh.hora||'21:30'}; }
+  sessionStorage.setItem('gdp_rodada_atual', String(r.id));
+  { const dh=extrairDataHoraJogos(r.jogos||jogos); rodada={premiacaoConfig:r.premiacaoConfig || null,nome:r.nome,valor:Number(r.valor)||10,status:r.status||'Aberta',criadaEm:r.criadaEm||Date.now(),premioEstimadoManual:r.premioEstimadoManual||'',dataRodada:r.dataRodada||dh.data||'26/05/2026',horaRodada:r.horaRodada||dh.hora||'21:30'}; }
   pixConfig=r.pixConfig||pixConfig;
   jogos=r.jogos||[];
   bilhetes=r.bilhetes||[];
@@ -198,8 +203,8 @@ async function selecionarRodada(id){
     rodadaAtualId = idSelecionado;
     aplicarRodada(r);
 
-    // Recarrega os dados do Supabase para evitar ranking vazio ao trocar de rodada
-    await carregarSupabase();
+    // Recarrega sem perder a seleção explícita.
+    await carregarRodadasSupabase(idSelecionado);
 
     // Garante que a rodada escolhida continue selecionada após o carregamento
     rodadaAtualId = idSelecionado;
@@ -304,8 +309,9 @@ function mostrarTela(id, salvarHistorico = true){
 
     tela.classList.add('ativa');
 
-    if (salvarHistorico && location.hash !== '#' + id) {
-        history.pushState({ tela: id }, '', '#' + id);
+    const route = '#' + id + (id === 'ranking' && rodadaAtualId ? '?rodada=' + encodeURIComponent(rodadaAtualId) : '');
+    if (salvarHistorico && location.hash !== route) {
+        history.pushState({ tela: id }, '', route);
     }
 
     if (id === 'admin') {
@@ -335,7 +341,7 @@ function mostrarTela(id, salvarHistorico = true){
 }
 // Mantém a tela atual após atualizar a página
 window.addEventListener('DOMContentLoaded', () => {
-    const telaSalva = location.hash.replace('#', '');
+    const telaSalva = location.hash.slice(1).split('?')[0];
 
     const telasPermitidas = [
         'inicio',
@@ -352,7 +358,10 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 });
 window.addEventListener('popstate', () => {
-  const tela = location.hash.replace('#', '') || 'inicio';
+  const tela = location.hash.slice(1).split('?')[0] || 'inicio';
+  const roundId = new URLSearchParams(location.hash.split('?')[1] || '').get('rodada');
+  const selected = rodadas.find(r => String(r.id) === String(roundId));
+  if(selected) aplicarRodada(selected);
   mostrarTela(tela, false);
 });
 function verificarAdmin(){
@@ -388,6 +397,7 @@ function dataHoraRodada(r=null){
   return `${data} • ${hora}`;
 }
 function premioEstimadoRodada(r=null){
+  if((r||rodada).premiacaoConfig) return dinheiro(premiosDaRodada(r).total);
   const alvo=r||rodada;
   const manual=Number(String(alvo?.premioEstimadoManual||'').replace(',','.'));
   if(manual>0) return manual.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -420,7 +430,7 @@ function renderRodadas(){
       <p>${qtd} jogos obrigatórios • Cartela R$ ${valor}</p>
       <div class="premio-estimado">PRÊMIO ESTIMADO: ${premio}</div>
       ${aberta
-        ? `<button onclick="selecionarRodada('${r.id}');abrirBilhete()">🎟️ Palpitar agora</button>`
+        ? `<button onclick="selecionarRodada('${r.id}').then(()=>abrirBilhete())">PALPITAR AGORA</button>`
         : `<button class="btn-ranking-publico" onclick="verRankingRodada('${r.id}')">🏆 Ver ranking</button>`}
     </div>`
   }).join('')
@@ -571,7 +581,7 @@ async function salvarRodada(){
     return;
   }
 
-  await carregarSupabase();
+  await carregarRodadasSupabase();
   renderRodadas();
   renderTicket();
   renderAdmin();
@@ -1018,7 +1028,7 @@ async function salvarResultadoJogo(id){
     status.className = 'status-resultado salvo';
   }
 
-  await carregarSupabase();
+  await carregarRodadasSupabase();
   renderAdmin();
   renderRankingPublico();
 }
@@ -1236,7 +1246,7 @@ function imprimirBilhete(cod){
   w.document.close();
 }
 
-function verRankingRodada(id){selecionarRodada(id);mostrarTela('ranking');setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),50);}
+async function verRankingRodada(id){await selecionarRodada(id);mostrarTela('ranking');setTimeout(()=>window.scrollTo({top:0,behavior:'smooth'}),50);}
 function palpiteCurto(op){
   if(op==='casa') return 'CASA';
   if(op==='empate') return 'EMPATE';
@@ -1428,7 +1438,7 @@ const pagos = totalBilhetes;
     <div class="ranking-page-modelo">
       <div class="rank-title-line"><span></span><b>Ranking da Rodada</b><small>(${rodada.nome} | ${jogos.length} Jogos)</small><span></span></div>
       <div class="rank-actions-top"><button onclick="mostrarTela('inicio')">🏠 TELA INICIAL</button><button onclick="window.print()">📄 PDF / IMPRIMIR</button></div>
-      <div class="rank-premio-card"><h3>🏆 PREMIAÇÃO DA RODADA</h3><div class="premio-total"><small>PREMIAÇÃO TOTAL</small><b>${premioEstimadoRodada()}</b></div><p><span>🏆 Campeão</span><b>${premioEstimadoRodada()}</b></p><p><span>🎟️ Bilhetes confirmados no site</span><b>${pagos}</b></p><p><span>📋 Total de bilhetes confirmados</span><b>${totalBilhetes}</b></p></div>
+      <div class="rank-premio-card"><h3>🏆 PREMIAÇÃO DA RODADA</h3><div class="premio-total"><small>PREMIAÇÃO TOTAL</small><b>${premioEstimadoRodada()}</b></div>${htmlFaixasPremiacao(lista)}<p><span>🎟️ Bilhetes confirmados no site</span><b>${pagos}</b></p><p><span>📋 Total de bilhetes confirmados</span><b>${totalBilhetes}</b></p></div>
       <div class="rank-simulador"><h3>📊 Simulador de jogos</h3><p>Use nos jogos que ainda não começaram para calcular possíveis resultados e ver quem ficaria campeão.</p><div class="sim-actions"><button onclick="iniciarSimulacaoRanking()">📈 Iniciar simulação</button><button class="cancel" onclick="cancelarSimulacaoRanking()" ${simulacaoAtiva?'':'disabled'}>✕ Cancelar simulação</button></div>${simulacaoAtiva?'<small class="sim-aviso">Simulação temporária ativa: clique em 1, X ou 2 nos jogos aguardando. Nada será salvo no ranking oficial.</small>':''}</div>
       <div class="rank-games-box"><h3>⚽ # Jogos</h3><div class="rank-games-list">${renderJogosRanking()}</div></div>
       <div class="rank-resumos"><div class="rank-resumo-card"><h3>Resumo do Ranking</h3>${rankingResumo(lista)}</div><div class="rank-legenda"><h3>Legenda de Cores</h3><p><span class="leg acerto"></span> Acertos</p><p><span class="leg erro"></span> Erros</p><p><span class="leg vencedor"></span> Vencedores</p></div></div>
@@ -1746,6 +1756,7 @@ if (rodadaAdmin) {
   const rn=document.getElementById('rodadaNome'); if(rn) rn.value=rodada.nome;
   const rv=document.getElementById('rodadaValor'); if(rv) rv.value=rodada.valor;
   const rs=document.getElementById('rodadaStatus'); if(rs) rs.value=rodada.status;
+  preencherPremiacaoAdmin();
   const rp=document.getElementById('rodadaPremioEstimado'); if(rp) rp.value=rodada.premioEstimadoManual||'';
   const rd=document.getElementById('rodadaData'); if(rd) rd.value=rodada.dataRodada||'';
   const rh=document.getElementById('rodadaHora'); if(rh) rh.value=rodada.horaRodada||'';
@@ -1867,7 +1878,10 @@ function verResumoBilhete(cod){
   alert(`Bilhete ${b.codigo}\nCliente: ${b.nome}\nStatus: ${b.status}\nValor: R$ ${b.valor.toFixed(2).replace('.',',')}\n\n${linhas}`);
 }
 
-carregarRodadasSupabase(); renderRodadas(); renderTicket(); renderAdmin(); renderRankingPublico(); renderHistorico();
+carregarRodadasSupabase().then(() => {
+  renderRodadas(); renderTicket(); renderAdmin(); renderRankingPublico(); renderHistorico();
+  mostrarTela(location.hash.slice(1).split('?')[0] || 'inicio', false);
+});
 
 /* Impressão A4 de cartelas manuais por rodada */
 function escaparHtml(txt){
@@ -1976,4 +1990,57 @@ function fecharMenuMobile() {
     if (menu) {
         menu.classList.remove('aberto');
     }
+}
+
+
+function premiosDaRodada(r=null){
+ const alvo=r||rodada,lista=r?.bilhetes||bilhetes;
+ const arrecadacao=lista.filter(b=>bilhetePago(b)).reduce((s,b)=>s+(Number(b.valor)||0),0);
+ // Rodadas antigas mantêm o prêmio previamente cadastrado até ativar a configuração.
+ const config=alvo.premiacaoConfig || {normal:alvo.premioEstimadoManual||null,acumulado:0};
+ return calcularPremiacao(config,arrecadacao);
+}
+function htmlFaixasPremiacao(lista){
+ const p=premiosDaRodada();
+ const finalizados=jogos.length===8 && jogos.every(j=>resultadoJogo(j)!==null && (!j.sportscoreAtivo||j.placarStatus==='ENCERRADO'));
+ const premio=premioCampeoes(p,lista,finalizados);
+ return `<p><span>🏆 Campeão com acumulado<br><small>8 pontos</small></span><b>${dinheiro(p.total)}</b></p>
+ <p><span>🏆 Campeão normal<br><small>7 pontos ou menos</small></span><b>${dinheiro(p.normal)}</b></p>
+ <p><span>➕ Acumulado</span><b>${dinheiro(p.acumulado)}</b></p>
+ <small>O acumulado é liberado somente com 8 acertos. Sem 8 acertos, permanece para as próximas rodadas. Em empate, o prêmio da faixa é dividido.</small>
+ ${premio?`<p><span>${premio.faixa} · ${premio.quantidade} vencedor(es)<br><small>Por bilhete vencedor</small></span><b>${dinheiro(premio.porVencedor)}</b></p>`:''}`;
+}
+function preencherPremiacaoAdmin(){
+ const c=rodada.premiacaoConfig || {},pct={normal:70,acumulado:18,banco:2,lucro:10,...c.percentuais};
+ for(const key of ['total','normal','acumulado']){const el=document.getElementById('premio-'+key);if(el)el.value=c[key]??'';}
+ for(const key of ['normal','acumulado','banco','lucro']){const el=document.getElementById('pct-'+key);if(el)el.value=pct[key];}
+ const p=premiosDaRodada(),el=document.getElementById('premio-preview');
+ if(el)el.textContent=`Normal: ${dinheiro(p.normal)} | Acumulado: ${dinheiro(p.acumulado)} | Total: ${dinheiro(p.total)} | Reserva desta rodada: ${dinheiro(p.aporte)} | Banco estimado: ${dinheiro(p.banco)} | Lucro: ${dinheiro(p.lucro)}`;
+}
+async function salvarPremiacaoAcumulada(){
+ if(!adminLiberado)return alert('Entre como administrador.');
+ const id=rodadaAtualId;
+ const config={percentuais:{}};
+ for(const key of ['total','normal','acumulado']){
+  const text=document.getElementById('premio-'+key).value.trim();
+  const value=text===''?null:Number(text);
+  if(value!==null&&(!Number.isFinite(value)||value<0))return alert('Informe valores válidos, iguais ou maiores que zero.');
+  config[key]=value;
+ }
+ for(const key of ['normal','acumulado','banco','lucro']){
+  const v=Number(document.getElementById('pct-'+key).value);
+  if(!Number.isFinite(v)||v<0||v>100)return alert('Percentuais devem estar entre 0 e 100.');
+  config.percentuais[key]=v;
+ }
+ if(Math.abs(Object.values(config.percentuais).reduce((s,v)=>s+v,0)-100)>0.00001)return alert('Os quatro percentuais precisam somar 100%.');
+ const arrecadacao=bilhetes.filter(b=>bilhetePago(b)).reduce((s,b)=>s+(Number(b.valor)||0),0);
+ const calculo=calcularPremiacao(config,arrecadacao);
+ if(Math.abs(calculo.total-calculo.normal-calculo.acumulado)>0.009)return alert('A premiação total precisa ser igual ao prêmio normal + acumulado. Deixe o total vazio para calcular automaticamente.');
+ try{
+  await supabaseRequest('rodadas','PATCH',{premiacao_config:config},`?id=eq.${encodeURIComponent(id)}`);
+  const r=rodadas.find(r=>String(r.id)===String(id));if(r)r.premiacaoConfig=config;
+  rodada.premiacaoConfig=config;
+  salvarDados(false);preencherPremiacaoAdmin();renderRodadas();renderRankingPublico();
+  alert('Premiação salva para esta rodada.');
+ }catch(e){alert('Não foi possível salvar a premiação. Confira a conexão e execute PREMIACAO_ACUMULADA.sql no Supabase.');}
 }

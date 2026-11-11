@@ -13,6 +13,32 @@ function normalize(m){
  const status=raw==='live'?'AO_VIVO':raw==='finished'?'ENCERRADO':raw==='upcoming'?'AGENDADO':'INDEFINIDO';
  return {url,casa:m.home,fora:m.away,inicio:kickoff,competicao:String(m.competition||''),golsCasa:home,golsFora:away,status,detalhe:String(m.status_text||'')};
 }
+// The fixture feed combines shootout goals with the match score. The match
+// page exposes the regulation result in its Note (e.g. FT[1-1],PEN[4-5]).
+function regulationFromHtml(html,match){
+ const note=html.match(/<span[^>]*class="label"[^>]*>\s*Note:\s*<\/span>([^<]*)/i)?.[1] || '';
+ const ft=note.match(/\bFT\[\s*(\d+)\s*[-–:]\s*(\d+)\s*\]/i);
+ if(ft)return {...match,golsCasa:Number(ft[1]),golsFora:Number(ft[2]),status:'ENCERRADO',detalhe:'90 minutos + acréscimos · confirmado'};
+ const label=html.match(/data-live="status-label"[^>]*>([\s\S]*?)<\/span>/i)?.[1].replace(/<[^>]*>/g,'').trim() || '';
+ const h=html.match(/data-live="home-score"[^>]*>\s*(\d+)\s*</i);
+ const a=html.match(/data-live="away-score"[^>]*>\s*(\d+)\s*</i);
+ const minute=label.match(/^(\d{1,3})(?:\s*\+\s*\d+)?['′]?$/);
+ const regularLive=match.status==='AO_VIVO' && (label==='HT' || (minute && Number(minute[1])<=90));
+ const regularFinal=match.status==='ENCERRADO' && label==='FT' && !/PEN|AET|ET\[|extra|shootout/i.test(note);
+ if(h && a && (regularLive || regularFinal) && Number(h[1])===match.golsCasa && Number(a[1])===match.golsFora){
+  return {...match,detalhe:regularFinal?'90 minutos + acréscimos · confirmado':label+' · tempo regulamentar'};
+ }
+ return {...match,status:'PENDENTE',golsCasa:null,golsFora:null,detalhe:'Conferir placar dos 90 minutos; prorrogação e pênaltis não contam'};
+}
+async function regulation(match,fetcher){
+ try{
+  const r=await fetcher(BASE+match.url,{signal:AbortSignal.timeout(15000),headers:{Accept:'text/html'}});
+  if(!r.ok)throw Error('Detalhes indisponíveis');
+  return regulationFromHtml(await r.text(),match);
+ }catch{
+  return {...match,status:'PENDENTE',golsCasa:null,golsFora:null,detalhe:'Aguardando confirmação do placar dos 90 minutos'};
+ }
+}
 async function fixtures(date,fetcher=fetch){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Date.parse(date+'T00:00:00Z')))throw Error('Data inválida');
  const old=cache.get(date);if(old&&Date.now()-old.at<60000)return old;
@@ -25,12 +51,12 @@ async function fixtures(date,fetcher=fetch){
 }
 function patchFor(row,match){
  if(matchPath(row.sportscore_url)!==match.url)return null;
- if(row.placar_status==='ENCERRADO'&&match.status!=='ENCERRADO')return null;
+ if(row.placar_status==='ENCERRADO'&&match.status!=='ENCERRADO'&&String(row.placar_detalhe||'').includes('90 minutos + acréscimos · confirmado'))return null;
  const patch={placar_status:match.status,placar_detalhe:match.detalhe,placar_atualizado_em:new Date().toISOString()};
  if(['AO_VIVO','ENCERRADO'].includes(match.status)){
   if(match.golsCasa===null||match.golsFora===null)return null;
   Object.assign(patch,{gols_casa:match.golsCasa,gols_fora:match.golsFora});
- }else if(match.status==='AGENDADO'){
+ }else if(match.status==='AGENDADO'||match.status==='PENDENTE'){
   // A scheduled 0-0 must never award a point.
   Object.assign(patch,{gols_casa:null,gols_fora:null});
  }else return null;
@@ -48,15 +74,15 @@ function install(app,{supabaseUrl,key,enabled=false,fetcher=fetch}){
  async function sync(){
   if(running||!enabled||!supabaseUrl||!key)return;running=true;
   try{
-   const rows=await db('?sportscore_ativo=eq.true&sportscore_url=not.is.null&select=id,sportscore_url,sportscore_inicio,placar_status');
-   const now=Date.now();const active=rows.filter(r=>{const t=Date.parse(r.sportscore_inicio);return Number.isFinite(t)&&now>=t-15*60000&&now<=t+12*3600000});
+   const rows=await db('?sportscore_ativo=eq.true&sportscore_url=not.is.null&select=id,sportscore_url,sportscore_inicio,placar_status,placar_detalhe');
+   const now=Date.now();const active=rows.filter(r=>{const t=Date.parse(r.sportscore_inicio);return Number.isFinite(t)&&now>=t-15*60000&&(now<=t+12*3600000 || (now<=t+7*86400000 && !String(r.placar_detalhe||'').includes('90 minutos + acréscimos · confirmado')))});
    const dates=new Set();for(const r of active){const t=Date.parse(r.sportscore_inicio);dates.add(new Date(t).toISOString().slice(0,10));dates.add(new Date(t+3*3600000).toISOString().slice(0,10))}
    const matches=new Map();for(const day of dates){const result=await fixtures(day,fetcher);for(const m of result.items)matches.set(m.url,m)}
-   for(const row of active){const m=matches.get(matchPath(row.sportscore_url));if(!m)continue;const patch=patchFor(row,m);if(patch)await db(`?id=eq.${encodeURIComponent(row.id)}&sportscore_ativo=eq.true&sportscore_url=eq.${encodeURIComponent(row.sportscore_url)}`,'PATCH',patch)}
+   for(const row of active){const m=matches.get(matchPath(row.sportscore_url));if(!m)continue;const checked=['AO_VIVO','ENCERRADO'].includes(m.status)?await regulation(m,fetcher):m;const patch=patchFor(row,checked);if(patch)await db(`?id=eq.${encodeURIComponent(row.id)}&sportscore_ativo=eq.true&sportscore_url=eq.${encodeURIComponent(row.sportscore_url)}`,'PATCH',patch)}
    lastSync=new Date().toISOString();lastError='';
   }catch(e){lastError=e.message;console.warn('[SportScore]',e.message)}finally{running=false}
  }
  if(enabled&&supabaseUrl&&key){setTimeout(sync,3000).unref();setInterval(sync,60000).unref()}
  return {sync};
 }
-module.exports={matchPath,normalize,fixtures,patchFor,install};
+module.exports={matchPath,normalize,fixtures,patchFor,regulationFromHtml,regulation,install};

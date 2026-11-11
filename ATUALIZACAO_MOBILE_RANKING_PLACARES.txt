@@ -1,0 +1,31 @@
+ATUALIZAÇÃO — MOBILE, RANKING E PLACARES
+
+Publicar o projeto completo, mantendo as configurações de ambiente existentes.
+Reiniciar/republicar também o backend Node: a correção dos placares está em sportscore.js.
+Não há migração SQL nova. A integração SportScore deve continuar habilitada conforme a configuração anterior.
+
+- Mobile: banner e espaçamento reduzidos; bolões em uma coluna.
+- Removidas molduras das logos e ocultados carrinho/WhatsApp flutuantes.
+- Preservados cards, prêmio roxo, status, datas e botão Ver ranking.
+- Rodadas abertas: PALPITAR AGORA.
+- Ranking preserva rodada na URL (#ranking?rodada=ID), aguarda os dados e restaura a seleção ao atualizar.
+- Corrigidas chamadas a carregarSupabase, função inexistente no arquivo original.
+- Placar: consulta também o detalhe do jogo para usar FT (tempo regulamentar + acréscimos), ignorando ET/PEN. Sem confirmação segura, fica PENDENTE e sem pontuar.
+- Jogos vinculados dos últimos 7 dias ainda não verificados são revisados. O teste Lito/Danubio foi validado com o detalhe real do fornecedor: 1 x 1, apesar do resumo 5 x 6. O banco online não foi alterado nesta edição; a sincronização ocorre após publicar o backend habilitado.
+- Mercado Pago permanece como antes.
+
+Validação: node --test tests/*.test.js
+Sintaxe: node --check script.js e node --check sportscore.js
+A verificação visual em navegador não foi concluída porque o ambiente bloqueou a inicialização do Chromium.
+
+
+PREMIAÇÃO COM ACUMULADO
+1. Execute PREMIACAO_ACUMULADA.sql no SQL Editor do Supabase uma vez.
+2. Publique todos os arquivos, inclusive premiacao.js e index.html.
+3. No ADM, selecione a rodada e abra Premiação com acumulado.
+4. Valores vazios usam cálculo automático sobre bilhetes pagos. Padrão: 70% normal, 18% reserva, 2% taxa estimada, 10% lucro. Alternativa: 70/19/1/10.
+5. O acumulado disponível informado manualmente deve incluir toda a reserva anterior e a reserva atual que você desejar oferecer. O valor manual substitui o cálculo percentual; não é somado novamente.
+6. Premiação total = prêmio normal + acumulado. O sistema valida a igualdade antes de salvar. Deixe o total vazio para somar automaticamente.
+7. Somente a maior pontuação recebe prêmio. Com 8 pontos, recebe o total; com 7 ou menos, recebe apenas o normal. Empate divide o prêmio da faixa entre bilhetes vencedores. O valor individual só aparece após encerrar os 8 jogos e não executa pagamentos.
+8. O acumulado é controlado manualmente por rodada: ao preparar a próxima rodada, informe a reserva restante mais o novo aporte. Se houve vencedor com 8 acertos, não reutilize a reserva já paga. A tela não baixa saldos nem move valores entre rodadas automaticamente.
+9. Rodadas antigas sem configuração mantêm o prêmio anterior, com acumulado zero. Para ativar o novo rateio, salve a premiação no ADM da rodada.

@@ -569,3 +569,22 @@
 .campeoes-actions{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.campeoes-scroll{overflow-x:auto;margin:22px 0}.campeoes-table{width:100%;border-collapse:collapse;text-align:left}.campeoes-table caption{text-align:left;font-weight:900;padding:16px 0;color:#00e676}.campeoes-table th,.campeoes-table td{padding:14px 12px;border-bottom:1px solid #ffffff22}.campeoes-table th{color:#00e676}.campeoes-table input{width:100%;min-width:140px;background:#10251a;color:#fff;border:1px solid #ffffff44;border-radius:8px;padding:12px}.campeoes-table td:first-child input{min-width:210px}.campeoes-table button{margin:3px;padding:9px 13px}.cp-status{display:block;margin:6px}.campeoes-podio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:28px 0}.cp-medalha{padding:25px 16px;text-align:center;border:2px solid;border-radius:18px;overflow-wrap:anywhere;background:linear-gradient(150deg,#132c1e,#08110c)}.cp-medalha>span{font-size:48px}.cp-medalha strong{font-size:26px}.cp-0{border-color:#ffd54f}.cp-1{border-color:#c0c0c0}.cp-2{border-color:#cd7f32}.campeoes-admin form{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.campeoes-admin label{display:block}.campeoes-admin [hidden]{display:none!important}.campeoes-admin button:disabled{opacity:.5;cursor:wait}#campeoesMensagem{color:#ffe082}@media(max-width:700px){.campeoes-podio{grid-template-columns:1fr}.campeoes-admin,.campeoes-page{padding:16px}.cp-medalha strong{font-size:24px}}
 
 .campeoes-admin button,.campeoes-page button{border:0;border-radius:10px;padding:12px 18px;background:#00b84d;color:#fff;font-weight:800;cursor:pointer}.campeoes-admin .cp-delete{background:#7d2530}.campeoes-table td:last-child{white-space:nowrap}
+
+/* Navegação mobile e logos sem molduras — novembro/2026. */
+.logo-brand,.premium-brand,.gdp-card-logo,.mobile-menu-brand{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important}
+.float.cart,.float.whats{display:none!important}
+@media(max-width:600px){
+ .premium-hero{height:auto;min-height:0;padding:12px 14px!important;text-align:left}
+ .hero-card{width:100%;padding:18px!important;border-radius:22px}
+ .banner h1{font-size:clamp(24px,6vw,32px);line-height:1.1}
+ .banner p{font-size:14px;margin:12px 0 8px}
+ .hero-stats{display:none}
+ .rodadas{padding:16px 14px!important}
+ .rodadas h2{font-size:23px;margin:6px 0 20px}
+ .grid-cards{grid-template-columns:minmax(0,1fr)!important;gap:18px}
+ .rodada-card.premium-card{width:100%;max-width:100%;padding:22px 16px;gap:9px}
+ .rodada-card h3{font-size:28px!important;overflow-wrap:anywhere}
+ .rodada-card p{font-size:13px}
+ .premio-estimado{font-size:17px;padding:9px 10px;max-width:100%}
+ .rodada-card button{width:100%;min-height:48px;font-size:16px}
+}
