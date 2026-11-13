@@ -1,4 +1,3 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -13,16 +12,12 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
 // SERVIR FRONTEND DA PASTA ATUAL1
-app.use((req,res,next) => {
-  if (/^\/(?:server\.js|pagbank\.js|package(?:-lock)?\.json|(?:tests|tools)(?:\/|$)|pagbank-evidencias-sandbox\.json|.*\.(?:sql|txt))$/i.test(req.path)) return res.sendStatus(404);
-  next();
-});
 app.use(express.static(__dirname));
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/galeradopalpite';
 const JWT_SECRET = process.env.JWT_SECRET || 'galera-do-palpite-chave-admin-local';
-
+const MP_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -388,22 +383,186 @@ app.post('/api/bilhetes', async (req, res) => {
     res.status(400).json({ erro: e.message });
   }
 });
-// PIX PAGBANK — valor obtido do bilhete persistido, nunca do navegador.
-require('./pagbank').install(app, {
-  mongoose,
-  async readTicket(codigo) {
-    if (!SUPABASE_URL || !SUPABASE_KEY) throw new Error('Configure SUPABASE_URL e SUPABASE_KEY no servidor');
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/bilhetes?codigo=eq.${encodeURIComponent(codigo)}&select=codigo,nome,valor,status`, {
-      headers: {apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`}, signal:AbortSignal.timeout(15000)
-    });
-    if (!response.ok) throw new Error('Não foi possível consultar o bilhete');
-    const rows = await response.json();
-    return rows[0];
+// PIX MERCADO PAGO
+app.post('/api/pix/criar', async (req, res) => {
+  try {
+    if (!MP_ACCESS_TOKEN) {
+      return res.status(500).json({ erro: 'MERCADO_PAGO_ACCESS_TOKEN não configurado' });
+    }
+
+    const { nome, telefone, valor, rodadaId, rodadaNome, palpites, combinacoes, totalBilhetes, quantidade } = req.body;
+const codigo = req.body.codigo;
+if (!codigo) return res.status(400).json({ erro: 'Código não recebido' });
+
+let bilheteBase = await Bilhete.findOne({ codigo });
+
+if (!bilheteBase) {
+  bilheteBase = await Bilhete.create({
+    codigo,
+    nome: nome || 'Cliente',
+    telefone: telefone || '',
+    valor: Number(valor || 1),
+    rodadaId: rodadaId || null,
+    rodadaNome: rodadaNome || '',
+    palpites: [],
+    pago: false,
+    statusPagamento: 'PENDENTE',
+    origem: 'SITE'
+  });
+
+  console.log('BILHETE CRIADO ANTES DO PIX:', codigo);
+}
+
+    const pagamento = {
+      transaction_amount: Number(valor || 1),
+      description: `Bilhete ${codigo} - Galera do Palpite`,
+      payment_method_id: 'pix',
+      payer: {
+        email: `${codigo}@galeradopalpite.com.br`,
+        first_name: nome || 'Cliente'
+      },
+      external_reference: codigo,
+      notification_url: 'https://galeradopalpite.com.br/api/pix/webhook'
+    };
+
+   const resposta = await fetch('https://api.mercadopago.com/v1/payments', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
+    'Content-Type': 'application/json',
+    'X-Idempotency-Key': `pix-${codigo}-${Date.now()}`
   },
-  async markPaid(codigo) {
-    const rows = await atualizarBilheteSupabase(codigo, {status:'Pago'});
-    if (!Array.isArray(rows) || !rows.length) throw new Error('Falha ao confirmar bilhete no banco');
-    await Bilhete.updateOne({codigo}, {$set:{pago:true,statusPagamento:'PAGO',pagoEm:new Date()}});
+  body: JSON.stringify(pagamento)
+});
+
+    const data = await resposta.json();
+
+    if (!resposta.ok) {
+      return res.status(400).json({ erro: data.message || 'Erro ao criar Pix', detalhes: data });
+    }
+   console.log('SALVANDO PAYMENT ID NO BILHETE:', codigo);
+   const bilheteAtualizado = await Bilhete.findOneAndUpdate(
+  { codigo: String(codigo) },
+  {
+    payment_id: data.id,
+    external_reference: codigo,
+    statusPagamento: data.status || 'PENDENTE'
+  },
+  { new: true }
+);
+
+if (!bilheteAtualizado) {
+  console.log('Bilhete não encontrado para salvar payment_id:', codigo);
+}
+    console.log('RESULTADO UPDATE:', bilheteAtualizado);
+
+    res.json({
+  ok: true,
+  codigo,
+  payment_id: data.id,
+  status: data.status,
+  qr_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
+  pix_copia_cola: data.point_of_interaction?.transaction_data?.qr_code
+});
+    
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+app.get('/api/pix/webhook', (req, res) => {
+  res.json({ ok: true, rota: 'webhook ativo' });
+});
+
+app.get('/api/pix/status/:codigo', async (req, res) => {
+  try {
+    const bilhete = await Bilhete.findOne({ codigo: req.params.codigo });
+
+    if (!bilhete) {
+  return res.json({
+    status: 'pending',
+    motivo: 'bilhete_nao_encontrado',
+    codigo: req.params.codigo
+  });
+}
+
+if (!bilhete.payment_id) {
+  return res.json({
+    status: 'pending',
+    motivo: 'payment_id_nao_salvo',
+    codigo: bilhete.codigo,
+    pago: bilhete.pago,
+    statusPagamento: bilhete.statusPagamento
+  });
+}
+
+    const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${bilhete.payment_id}`, {
+      headers: {
+        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+      }
+    });
+
+    const data = await resposta.json();
+
+    if (data.status === 'approved') {
+    bilhete.statusPagamento = 'PAGO';
+    bilhete.pago = true;
+    bilhete.status = 'Pago';
+    bilhete.pagoEm = new Date();
+    bilhete.payment_id = data.id;
+    await bilhete.save();
+    }
+
+    res.json({
+  status: data.status,
+  status_detail: data.status_detail,
+  payment_id: bilhete.payment_id,
+  codigo: bilhete.codigo,
+  pago: data.status === 'approved',
+  mercado_pago: data
+});
+
+  } catch (e) {
+    res.status(500).json({ erro: e.message });
+  }
+});
+
+app.post('/api/pix/webhook', async (req, res) => {
+  try {
+    const id = req.body?.data?.id || req.query.id;
+
+    if (id && MP_ACCESS_TOKEN) {
+      const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
+        }
+      });
+
+      const data = await resposta.json();
+
+      const codigoBilhete = data.external_reference || data.metadata?.codigo || data.description?.match(/GDP-\d+/)?.[0];
+
+if (data.status === 'approved' && codigoBilhete) {
+       await atualizarBilheteSupabase(codigoBilhete, {
+       status: 'Pago',
+       acertos: 0
+   });
+
+  const bilhete = await Bilhete.findOne({ codigo: codigoBilhete });
+  
+        if (bilhete) {
+          bilhete.statusPagamento = 'PAGO';
+          bilhete.pago = true;
+          bilhete.status = 'Pago';
+          bilhete.pagoEm = new Date();
+          bilhete.payment_id = data.id;
+          await bilhete.save();
+        }
+      }
+    }
+
+    res.sendStatus(200);
+  } catch (e) {
+    res.sendStatus(200);
   }
 });
 
