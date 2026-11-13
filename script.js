@@ -805,12 +805,16 @@ console.log('Atualizando bilhete:', cod);
 function confirmarPagamentoManual(cod){
   if(confirm('Confirmar pagamento manual deste bilhete?')) confirmarPagamento(cod,'manual',true);
 }
-async function criarPixMercadoPago(codigo,nome,tel,valorPix){
+async function criarPixPagBank(codigo,nome,tel,valorPix){
+  const email=prompt('E-mail do pagador para gerar o Pix:');
+  const cpf=prompt('CPF do pagador (somente números):');
+  if(!email || !cpf) throw new Error('Informe e-mail e CPF para gerar o Pix.');
   const resp=await fetch(`${API_PIX_URL}/api/pix/criar`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({
       codigo,
+      email, cpf,
       nome,
       telefone:tel,
       valor:Number(valorPix)||Number(rodada.valor)||10,
@@ -819,7 +823,7 @@ async function criarPixMercadoPago(codigo,nome,tel,valorPix){
     })
   });
   const data=await resp.json().catch(()=>({}));
-  if(!resp.ok || !data.ok) throw new Error(data.error||'Falha ao gerar Pix real.');
+  if(!resp.ok || !data.ok) throw new Error(data.erro||data.error||'Falha ao gerar Pix real.');
   return data;
 }
 async function consultarPixReal(cod,abrirDepois=false){
@@ -827,10 +831,14 @@ async function consultarPixReal(cod,abrirDepois=false){
   const btn=document.getElementById('pixAutoBtn');
   if(btn) btn.disabled=true;
   try{
-    if(status) status.innerHTML='<b>🔄 Consultando pagamento no Mercado Pago...</b><span>Aguardando retorno automático.</span>';
+    if(status) status.innerHTML='<b>🔄 Consultando pagamento no PagBank...</b><span>Aguardando retorno automático.</span>';
     const resp=await fetch(`${API_PIX_URL}/api/pix/status/${encodeURIComponent(cod)}`);
     const data=await resp.json().catch(()=>({}));
     if(data.status==='approved' || data.status==='paid'){
+      if(data.ambiente==='sandbox'){
+        if(status) status.innerHTML='<b>✅ Pagamento simulado confirmado</b><span>TESTE: nenhum dinheiro recebido. Este teste não libera participação real.</span>';
+        return true;
+      }
       await confirmarPagamento(cod,'webhook',false);
       if(status) status.innerHTML='<b>✅ Pagamento aprovado automaticamente</b><span>Bilhete ativo no ranking. O comprovante amarelo já foi liberado.</span>';
       const ticketBtn=document.getElementById('pixTicketBtn');
@@ -840,10 +848,10 @@ async function consultarPixReal(cod,abrirDepois=false){
       if(abrirDepois) imprimirBilhete(cod);
       return true;
     }
-    if(status) status.innerHTML='<b>⏳ Aguardando pagamento Pix</b><span>Ainda não consta aprovado. O sistema verifica sozinho em alguns segundos.</span>';
+    if(status) status.innerHTML=data.ambiente==='sandbox' ? '<b>🧪 TESTE — aguardando simulação</b><span>Sem dinheiro real. Não pague pelo aplicativo do banco.</span>' : '<b>⏳ Aguardando pagamento Pix</b><span>O sistema verifica sozinho em alguns segundos.</span>';
     return false;
   }catch(e){
-    if(status) status.innerHTML='<b>⚠️ Backend Pix não conectado</b><span>Abra pelo servidor Node e configure o Access Token do Mercado Pago.</span>';
+    if(status) status.innerHTML='<b>⚠️ Backend Pix não conectado</b><span>Abra pelo servidor Node e configure o token do PagBank no servidor.</span>';
     console.warn(e);
     return false;
   }finally{
@@ -880,7 +888,7 @@ async function mostrarPix(codigo,nome,tel,valorPix=rodada.valor){
   const status=document.getElementById('pixStatus');
   const btn=document.getElementById('pixAutoBtn');
   const ticketBtn=document.getElementById('pixTicketBtn');
-  if(status) status.innerHTML='<b>🔄 Gerando Pix real...</b><span>Conectando ao Mercado Pago.</span>';
+  if(status) status.innerHTML='<b>🔄 Gerando Pix real...</b><span>Conectando ao PagBank.</span>';
   if(btn){btn.disabled=true;btn.textContent='Verificar pagamento';btn.onclick=()=>consultarPixReal(codigo,false);}
   if(ticketBtn){ticketBtn.style.display='none';ticketBtn.onclick=abrirBilhetePagoAtual;}
   const box=document.getElementById('pixBox');
@@ -888,7 +896,7 @@ async function mostrarPix(codigo,nome,tel,valorPix=rodada.valor){
   const msg=encodeURIComponent(`Olá! Fiz o bilhete ${codigo} no Galera do Palpite e estou com dúvida no pagamento Pix.`);
   document.getElementById('whatsComprovante').href=`https://wa.me/559985114440?text=${msg}`;
   try{
-    const data=await criarPixMercadoPago(codigo,nome,tel,valorPix);
+    const data=await criarPixPagBank(codigo,nome,tel,valorPix);
     if(data.codigo) codigo = data.codigo;
     const msg = document.getElementById('mensagem');
 if (msg) msg.textContent = `Aposta confirmada! Código do bilhete: ${codigo}. Agora faça o Pix.`;
@@ -911,20 +919,16 @@ if (bLocal) {
 }
     const b=bilhetes.find(x=>x.codigo===codigo);
     if(b){b.payment_id=data.payment_id;b.external_reference=data.external_reference;salvarDados();}
-    if(status) status.innerHTML='<b>⏳ Aguardando pagamento Pix</b><span>Assim que pagar, o Mercado Pago avisa o sistema e o bilhete libera automaticamente.</span>';
+    if(status) status.innerHTML=data.ambiente==='sandbox' ? '<b>🧪 AMBIENTE DE TESTE — sem dinheiro real</b><span>Não pague este QR no aplicativo do banco. Aguarde a simulação no Sandbox PagBank.</span>' : '<b>⏳ Aguardando pagamento Pix</b><span>Após confirmação do PagBank, seu bilhete será liberado automaticamente.</span>';
     if(btn) btn.disabled=false;
     iniciarMonitoramentoPix(codigo);
   }catch(e){
     console.warn(e);
-    const texto=gerarPixCopiaCola({chave:pixConfig.chave,nome:pixConfig.nome,cidade:'RIO DE JANEIRO',valor:valorPix,txid:codigo.replace(/[^A-Za-z0-9]/g,''),descricao:pixConfig.msg});
-    document.getElementById('pixCopia').value=texto;
+    document.getElementById('pixCopia').value='';
     const qr=document.getElementById('pixQrImg');
-    if (qr) {
-    const qrSize = window.innerWidth <= 600 ? 220 : 240;
-    qr.src = `https://quickchart.io/qr?text=${encodeURIComponent(texto)}&size=${qrSize}&margin=4`;
-}
-    if(status) status.innerHTML='<b>⚠️ Pix real ainda não conectado</b><span>Use o servidor Node com MERCADO_PAGO_ACCESS_TOKEN. Este QR é apenas Pix copia e cola sem confirmação automática.</span>';
-    if(btn) btn.disabled=false;
+    if(qr) qr.removeAttribute('src');
+    if(status) { status.textContent='Não foi possível gerar o Pix automático: '+e.message; }
+    if(btn) btn.disabled=true;
   }
 }
 function copiarPix(){const campo=document.getElementById('pixCopia');campo.select();document.execCommand('copy');alert('Pix copiado!')}

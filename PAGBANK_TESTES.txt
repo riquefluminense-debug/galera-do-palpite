@@ -1,0 +1,52 @@
+PAGBANK — INTEGRAÇÃO PREPARADA PARA SANDBOX
+
+Esta versão contém código de integração e testes locais; não está publicada,
+não recebeu pagamentos reais e não constitui homologação pelo PagBank.
+Nenhum token foi incluído no ZIP.
+
+1. Configurar o servidor Node que já atende /api/pix, com npm install.
+2. Preencher as variáveis da .env.example no painel da hospedagem ou em .env
+   privado. PAGBANK_ENV=sandbox. Token de teste somente no servidor.
+3. SUPABASE_KEY deve ser uma chave privada do servidor com permissão de leitura
+   dos bilhetes e atualização de status. Nunca inserir essa chave no frontend.
+4. PAGBANK_WEBHOOK_URL deve apontar ao backend público HTTPS /api/pix/webhook.
+5. Iniciar com npm start. A página usa o mesmo domínio para a API Pix; se o
+   backend estiver em outro domínio, definir window.GDP_API_PIX_URL antes de
+   carregar script.js (manter a configuração existente se já houver).
+6. O checkout solicita CPF e e-mail do pagador. Não usar dados inventados em
+   produção. O servidor busca o valor do bilhete no Supabase.
+7. Criar bilhete de teste dedicado. O ambiente sandbox aparece na tela e NÃO
+   confirma o bilhete real no Supabase, ranking ou financeiro.
+8. Para gerar evidências reais: configurar PAGBANK_TEST_EMAIL e
+   PAGBANK_TEST_CPF e executar node tools/testar-pagbank.js no servidor.
+   O script cria cobrança de R$10 e consulta o pedido, gerando
+   pagbank-evidencias-sandbox.json. Não publicar esse arquivo no site.
+   Só anexar depois de conferir os resultados reais. Nenhum relatório de
+   execução PagBank foi fabricado ou incluído antecipadamente.
+
+COMO FUNCIONA O TESTE
+Na API de Pedidos, o simulador oficial usa o valor:
+Até R$100: pago automaticamente; acima de R$100 até R$200: pago após 5 minutos;
+acima de R$200 até R$300: aguardando; acima de R$300 até R$400: recusado;
+acima de R$400: aguardando. Não pagar o QR de sandbox no banco real.
+Fonte: https://developer.pagbank.com.br/docs/simulador
+Fluxo Pix: https://developer.pagbank.com.br/reference/criar-pedido-com-qr-code-pix-v2
+
+CONFIRMAÇÃO
+O webhook serve como gatilho e o servidor consulta o pedido pela API autenticada.
+Só aceita PAID para o pedido, referência, método PIX, moeda e valor esperados.
+Consulta periódica pelo navegador também reconcilia o status. A confirmação real
+é persistida no Supabase mesmo se o navegador estiver fechado (via webhook).
+Sem QR manual alternativo quando a API falha.
+
+LIMITES ANTES DE ATIVAR PRODUÇÃO
+Aguardar token/liberação de produção. Configurar produção em instância separada
+após validar o fluxo completo em sandbox. Não testar com bilhetes de clientes.
+Cobranças expiradas exigem novo bilhete/código nesta primeira versão.
+O script de evidências valida API, mas não comprova por si só entrega de webhook.
+Verificar o webhook no backend público durante o teste completo.
+O site recebido já contém autenticação administrativa no JavaScript e escrita
+pública direta ao Supabase. Antes de receber valores reais, revisar RLS e
+transferir criação/validação dos bilhetes e alterações administrativas ao backend:
+o valor persistido não pode continuar editável por clientes. Esta adaptação não
+constitui auditoria nem corrige todo o controle de acesso legado.
