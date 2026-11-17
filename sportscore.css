@@ -15,3 +15,9 @@
 @media(max-width:600px){#sportscore-panel .ss-filters{grid-template-columns:1fr}#sportscore-panel .ss-match{grid-template-columns:1fr!important}#sportscore-panel .ss-bind{justify-self:start}}
 
 #sportscore-panel .ss-direct{margin-top:20px;padding-top:18px;border-top:1px solid #387957}#sportscore-panel .ss-direct label{display:flex;max-width:none;margin:8px 0}#sportscore-panel .ss-direct h4{font-size:16px}
+
+/* Lista de partidas vinculadas */
+#sportscore-panel #ss-links{margin-top:20px;padding-top:18px;border-top:1px solid #387957}
+#sportscore-panel #ss-links h4{font-size:16px;margin:0 0 6px}
+#sportscore-panel .ss-linked-count{color:#90c5a2}
+#sportscore-panel .ss-match-info a{color:#9deeb2;text-decoration:underline;font-size:13px}

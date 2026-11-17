@@ -39,12 +39,33 @@ function ssFiltrar(lista,{jogo=null,status='ativos',escopo='relacionadas',busca=
   el.querySelector('#ss-status').onchange=renderResults;
   el.querySelector('#ss-scope').onchange=renderResults;
   el.querySelector('#ss-game').onchange=renderResults;
-  const links=el.querySelector('#ss-links');
-  for(const j of jogos.filter(j=>j.sportscoreAtivo)){
-   const row=document.createElement('p');row.textContent=`${j.casa} × ${j.fora}: ${j.placarStatus||'aguardando sincronização'} `;
-   const b=document.createElement('button');b.textContent='Desativar automático';b.onclick=async()=>{try{await supabaseRequest('jogos','PATCH',{sportscore_ativo:false},`?id=eq.${encodeURIComponent(j.dbId)}`);j.sportscoreAtivo=false;row.remove()}catch{message('Não foi possível desativar.')}};row.append(b);links.append(row);
-  }
+  renderLinks();
   request('/api/sportscore/status').then(s=>message(s.automatico?`Sincronização automática ativa.${s.erro?' Última tentativa: '+s.erro:''}`:'Busca disponível após atualizar o servidor. Para sincronizar sozinho, configure SPORTSCORE_AUTO_SYNC=true e o acesso do servidor ao Supabase.')).catch(e=>message(e.message+' — atualize também o servidor Node.'));
+ }
+
+ // Lista das partidas já vinculadas na rodada aberta no admin
+ function renderLinks(){
+  const box=document.getElementById('ss-links');if(!box)return;
+  box.innerHTML='';
+  const titulo=document.createElement('h4');titulo.textContent='Partidas vinculadas nesta rodada';box.append(titulo);
+  const lista=jogos.filter(j=>j.sportscoreAtivo);
+  if(!lista.length){const p=document.createElement('p');p.className='ss-empty';p.textContent='Nenhuma partida vinculada ainda. Escolha o jogo da rodada, busque a partida e clique em Vincular.';box.append(p);return;}
+  const resumo=document.createElement('p');resumo.className='ss-linked-count';resumo.textContent=`${lista.length} de ${jogos.filter(j=>j.dbId).length} jogo(s) com placar automático.`;box.append(resumo);
+  for(const j of lista){
+   const row=document.createElement('div');row.className='ss-match ss-linked';
+   const info=document.createElement('div');info.className='ss-match-info';
+   const nome=document.createElement('strong');nome.textContent=`${j.casa} × ${j.fora}`;
+   const quando=document.createElement('span');
+   quando.textContent=j.sportscoreInicio?new Date(j.sportscoreInicio).toLocaleString('pt-BR',{timeZone:'America/Sao_Paulo',dateStyle:'short',timeStyle:'short'}):'Horário não informado';
+   const situacao=document.createElement('small');situacao.className='ss-status';
+   const placar=(j.golsCasa!==null&&j.golsCasa!==undefined&&j.golsFora!==null&&j.golsFora!==undefined)?` · ${j.golsCasa} × ${j.golsFora}`:'';
+   situacao.textContent=(j.placarStatus||'AGENDADO')+placar+(j.placarDetalhe?` · ${j.placarDetalhe}`:'');
+   info.append(nome,quando,situacao);
+   if(j.sportscoreUrl){const a=document.createElement('a');a.href='https://sportscore.com'+j.sportscoreUrl;a.target='_blank';a.rel='noopener';a.textContent='Ver partida no SportScore';info.append(a);}
+   const b=document.createElement('button');b.type='button';b.className='ss-bind';b.textContent='Desativar automático';
+   b.onclick=async()=>{if(!confirm(`Desativar o placar automático de ${j.casa} × ${j.fora}?`))return;b.disabled=true;try{await supabaseRequest('jogos','PATCH',{sportscore_ativo:false},`?id=eq.${encodeURIComponent(j.dbId)}`);j.sportscoreAtivo=false;renderLinks();message('Placar automático desativado para '+j.casa+' × '+j.fora+'.')}catch{b.disabled=false;message('Não foi possível desativar.')}};
+   row.append(info,b);box.append(row);
+  }
  }
  function message(t){const e=document.getElementById('ss-message');if(e)e.textContent=t}
  async function search(){const b=document.getElementById('ss-search');b.disabled=true;message('Buscando partidas…');try{
@@ -96,6 +117,7 @@ function ssFiltrar(lista,{jogo=null,status='ativos',escopo='relacionadas',busca=
    await supabaseRequest('jogos','PATCH',data,`?id=eq.${encodeURIComponent(j.dbId)}`);
    Object.assign(j,{sportscoreUrl:m.url,sportscoreInicio:m.inicio,sportscoreAtivo:true,placarStatus:'AGENDADO',golsCasa:null,golsFora:null});
    message('Vínculo salvo. O servidor fará a primeira consulta no próximo ciclo, próximo ao início da partida.');
+   renderLinks();
   }catch{message('Falha ao salvar vínculo. Execute SPORTScore_MIGRACAO.sql no Supabase antes de usar.')}finally{b.disabled=false}
  }
  const original=renderAdmin;renderAdmin=async function(...args){await original.apply(this,args);document.getElementById('sportscore-panel')?.remove();panel()};
