@@ -1,0 +1,2 @@
+Coloque aqui o certificado da Efí (ex.: homologacao.p12 ou producao.p12).
+Este arquivo é secreto: não envie para o GitHub nem para o front-end.

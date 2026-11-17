@@ -3,7 +3,10 @@
   "version": "1.5.1",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "efi:testar": "node scripts/efi-testar-conexao.js",
+    "efi:webhook": "node scripts/efi-configurar-webhook.js",
+    "test": "node --test"
   },
   "dependencies": {
     "cors": "^2.8.5",

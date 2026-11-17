@@ -1,29 +1,64 @@
-GALERA DO PALPITE - PIX REAL MERCADO PAGO
+GALERA DO PALPITE - PIX REAL EFÍ (substitui o Mercado Pago)
 
-1) Instale o Node.js no PC/servidor.
-2) Abra a pasta do projeto no terminal.
-3) Rode: npm install
-4) Copie .env.example para .env
-5) No .env, cole seu Access Token do Mercado Pago:
-   MERCADO_PAGO_ACCESS_TOKEN=APP_USR-...
-6) Rode: npm start
-7) Abra: http://localhost:3000
+O QUE MUDOU
+- server.js: rotas /api/pix/criar, /api/pix/status/:codigo e /api/pix/webhook agora usam a API Pix da Efí.
+- efi-pix.js (novo): autenticação com certificado, cobrança, QR Code, consulta e webhook.
+- script.js / index.html: só os textos que citavam "Mercado Pago" e o uso da imagem do QR Code enviada pela Efí.
+- O visual, o ranking, o financeiro e o bilhete amarelo continuam iguais.
+
+1) CONFIGURAR (homologação)
+   a. Copie o certificado de homologação para a pasta certs/ (ex.: certs/homologacao.p12).
+   b. Copie .env.example para .env e preencha:
+        EFI_SANDBOX=true
+        EFI_CLIENT_ID=...        (Client ID de HOMOLOGAÇÃO da aplicação)
+        EFI_CLIENT_SECRET=...    (Client Secret de HOMOLOGAÇÃO)
+        EFI_PIX_KEY=...          (chave Pix cadastrada na sua conta Efí)
+        EFI_CERT_PATH=./certs/homologacao.p12
+   c. Na aplicação da Efí, deixe marcados os escopos: cob.write, cob.read, pix.read,
+      webhook.write e webhook.read.
+
+2) TESTAR A CONEXÃO
+   npm install
+   npm run efi:testar
+   -> Deve mostrar "Autenticação OK", "Cobrança criada" e um Pix Copia e Cola.
+
+   Se aparecer erro de leitura do .p12 (Node 17 ou mais novo), converta para .pem:
+   openssl pkcs12 -in certs/homologacao.p12 -out certs/homologacao.pem -nodes -legacy
+   (se pedir senha, só aperte Enter) e troque EFI_CERT_PATH para ./certs/homologacao.pem
+
+3) RODAR O SITE
+   npm start  ->  http://localhost:3000
 
 COMO FUNCIONA
-- O cliente monta o bilhete.
-- O sistema cria Pix real no Mercado Pago.
-- O QR Code e o copia/cola vêm do Mercado Pago.
-- O sistema consulta o pagamento automaticamente a cada 5 segundos.
-- Quando o pagamento fica approved, o bilhete muda para Pago.
-- O ranking, financeiro e bilhete amarelo são liberados.
+- O cliente monta o bilhete e o servidor cria uma cobrança Pix na Efí (txid salvo em payment_id).
+- O QR Code (imagem) e o Pix Copia e Cola vêm da Efí.
+- A tela consulta o status a cada 5 segundos; com status CONCLUIDA o bilhete vira Pago.
+- O webhook confirma mesmo se o cliente fechar a página.
+- Se o cliente gerar o Pix de novo para o mesmo bilhete, a cobrança ativa é reaproveitada.
 
-WEBHOOK EM PRODUÇÃO
-Para notificação automática real sem depender da tela aberta:
-1) Hospede esse projeto em um domínio HTTPS.
-2) Configure no .env:
-   MP_NOTIFICATION_URL=https://seudominio.com/api/mercadopago/webhook
-3) Configure também o webhook no painel do Mercado Pago, se necessário.
+4) WEBHOOK (precisa de domínio HTTPS público)
+   No .env:
+     EFI_WEBHOOK_URL=https://galeradopalpite.com.br/api/pix/webhook
+     EFI_WEBHOOK_SECRET=um-texto-aleatorio-longo
+   Com o site já no ar, rode uma vez:
+     npm run efi:webhook
+   Para conferir: npm run efi:webhook -- ver
+   (O webhook usa skip-mTLS + segredo hmac; antes de liberar o bilhete o servidor
+    sempre reconsulta a cobrança na Efí, então um aviso falso não libera nada.)
+
+5) HOSPEDAGEM (ex.: Render)
+   Em vez de enviar o arquivo do certificado, pode usar EFI_CERT_BASE64:
+     Linux/Mac:  base64 -w0 certs/homologacao.p12
+     Windows:    certutil -encode certs\homologacao.p12 cert.txt  (copie só o miolo, sem as linhas BEGIN/END)
+   e cole o resultado na variável EFI_CERT_BASE64 do painel.
+
+6) IR PARA PRODUÇÃO
+   - Gere o certificado de PRODUÇÃO e use o Client ID/Secret de PRODUÇÃO.
+   - EFI_SANDBOX=false e EFI_CERT_PATH apontando para o certificado de produção.
+   - Rode npm run efi:testar (cria um Pix de R$ 0,01 só para teste) e npm run efi:webhook de novo.
 
 IMPORTANTE
-Nunca coloque o Access Token dentro do script.js/front-end.
-Ele deve ficar somente no .env do servidor.
+- Nunca coloque Client ID, Client Secret ou certificado no script.js/front-end.
+- Não envie .env nem a pasta certs/ para o GitHub (já estão no .gitignore).
+- Bilhetes antigos pendentes criados no Mercado Pago não são consultados na Efí;
+  se algum for pago por lá, confirme manualmente no admin.

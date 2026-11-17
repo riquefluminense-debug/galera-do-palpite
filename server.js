@@ -1,3 +1,4 @@
+try { require('dotenv').config(); } catch (e) { /* dotenv opcional */ }
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -17,7 +18,13 @@ app.use(express.static(__dirname));
 const PORT = process.env.PORT || 3000;
 const MONGO_URL = process.env.MONGO_URL || 'mongodb://127.0.0.1:27017/galeradopalpite';
 const JWT_SECRET = process.env.JWT_SECRET || 'galera-do-palpite-chave-admin-local';
-const MP_ACCESS_TOKEN = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+const efiPix = require('./efi-pix');
+const EFI = efiPix.criarClienteEfi(efiPix.lerConfig());
+if (EFI.configurado) {
+  console.log(`💸 Pix Efí ativo (${EFI.config.sandbox ? 'HOMOLOGAÇÃO' : 'PRODUÇÃO'})`);
+} else {
+  console.warn('⚠️ Pix Efí não configurado. Faltam: ' + EFI.faltando.join(', '));
+}
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
@@ -106,6 +113,8 @@ const BilheteSchema = new mongoose.Schema({
   origem: { type: String, default: 'SITE' },
   payment_id: String,
   external_reference: String,
+  gateway: String,
+  endToEndId: String,
   pagoEm: Date,
   observacao: String,
   criadoEm: { type: Date, default: Date.now },
@@ -383,94 +392,139 @@ app.post('/api/bilhetes', async (req, res) => {
     res.status(400).json({ erro: e.message });
   }
 });
-// PIX MERCADO PAGO
+// =====================================================================
+// PIX EFÍ (QR Code + Copia e Cola + confirmação automática)
+// O txid da cobrança Efí fica salvo em bilhete.payment_id
+// =====================================================================
+function respostaErroPix(res, status, mensagem, detalhes) {
+  return res.status(status).json({ ok: false, erro: mensagem, error: mensagem, detalhes });
+}
+
+function respostaPixSite(codigo, pix) {
+  return {
+    ok: true,
+    gateway: 'EFI',
+    codigo,
+    payment_id: pix.txid,
+    txid: pix.txid,
+    external_reference: codigo,
+    status: pix.status,
+    status_efi: pix.status_efi,
+    valor: pix.valor,
+    qr_base64: pix.qr_base64,
+    pix_copia_cola: pix.pix_copia_cola,
+    expiracao: pix.expiracao
+  };
+}
+
+// Marca o bilhete como pago (Mongo) e, na primeira confirmação, avisa o Supabase
+async function marcarBilhetePagoEfi(bilhete, cob) {
+  if (!bilhete) return null;
+  const jaEstavaPago = bilhete.pago === true;
+  const pix = Array.isArray(cob?.pix) ? cob.pix[0] : null;
+
+  bilhete.statusPagamento = 'PAGO';
+  bilhete.pago = true;
+  bilhete.status = 'Pago';
+  if (!bilhete.pagoEm) bilhete.pagoEm = pix?.horario ? new Date(pix.horario) : new Date();
+  if (cob?.txid) bilhete.payment_id = cob.txid;
+  if (pix?.endToEndId) bilhete.endToEndId = pix.endToEndId;
+  bilhete.gateway = 'EFI';
+  await bilhete.save();
+
+  if (!jaEstavaPago) {
+    console.log('PIX EFÍ CONFIRMADO:', bilhete.codigo, cob?.txid, pix?.endToEndId || '');
+    if (SUPABASE_URL && SUPABASE_KEY) {
+      await atualizarBilheteSupabase(bilhete.codigo, { status: 'Pago', acertos: 0 })
+        .catch(e => console.error('Erro ao atualizar Supabase após Pix:', e.message));
+    }
+  }
+  return bilhete;
+}
+
 app.post('/api/pix/criar', async (req, res) => {
   try {
-    if (!MP_ACCESS_TOKEN) {
-      return res.status(500).json({ erro: 'MERCADO_PAGO_ACCESS_TOKEN não configurado' });
+    if (!EFI.configurado) {
+      return respostaErroPix(res, 500, 'Pix Efí não configurado no servidor. Faltam: ' + EFI.faltando.join(', '));
     }
 
-    const { nome, telefone, valor, rodadaId, rodadaNome, palpites, combinacoes, totalBilhetes, quantidade } = req.body;
-const codigo = req.body.codigo;
-if (!codigo) return res.status(400).json({ erro: 'Código não recebido' });
+    const { nome, telefone, valor, rodadaId, rodadaNome } = req.body;
+    const codigo = req.body.codigo;
+    if (!codigo) return respostaErroPix(res, 400, 'Código não recebido');
 
-let bilheteBase = await Bilhete.findOne({ codigo });
+    let bilheteBase = await Bilhete.findOne({ codigo });
 
-if (!bilheteBase) {
-  bilheteBase = await Bilhete.create({
-    codigo,
-    nome: nome || 'Cliente',
-    telefone: telefone || '',
-    valor: Number(valor || 1),
-    rodadaId: rodadaId || null,
-    rodadaNome: rodadaNome || '',
-    palpites: [],
-    pago: false,
-    statusPagamento: 'PENDENTE',
-    origem: 'SITE'
-  });
+    if (!bilheteBase) {
+      bilheteBase = await Bilhete.create({
+        codigo,
+        nome: nome || 'Cliente',
+        telefone: telefone || '',
+        valor: Number(valor || 1),
+        rodadaId: rodadaId || null,
+        rodadaNome: rodadaNome || '',
+        palpites: [],
+        pago: false,
+        statusPagamento: 'PENDENTE',
+        origem: 'SITE'
+      });
 
-  console.log('BILHETE CRIADO ANTES DO PIX:', codigo);
-}
+      console.log('BILHETE CRIADO ANTES DO PIX:', codigo);
+    }
 
-    const pagamento = {
-      transaction_amount: Number(valor || 1),
-      description: `Bilhete ${codigo} - Galera do Palpite`,
-      payment_method_id: 'pix',
-      payer: {
-        email: `${codigo}@galeradopalpite.com.br`,
-        first_name: nome || 'Cliente'
+    const valorPix = Number(valor || bilheteBase.valor || 1);
+
+    // Reaproveita a cobrança ainda ativa (evita gerar 2 Pix para o mesmo bilhete)
+    if (bilheteBase.gateway === 'EFI' && efiPix.txidValido(bilheteBase.payment_id)) {
+      try {
+        const cobAtual = await EFI.consultarCobranca(bilheteBase.payment_id);
+
+        if (efiPix.cobrancaPaga(cobAtual)) {
+          await marcarBilhetePagoEfi(bilheteBase, cobAtual);
+          const pixPago = await EFI.montarRespostaPix(cobAtual);
+          return res.json({ ...respostaPixSite(codigo, pixPago), pago: true });
+        }
+
+        const mesmoValor = cobAtual?.valor?.original === efiPix.formatarValor(valorPix);
+        if (cobAtual.status === 'ATIVA' && mesmoValor) {
+          const pixAtual = await EFI.montarRespostaPix(cobAtual);
+          if (pixAtual.pix_copia_cola) return res.json(respostaPixSite(codigo, pixAtual));
+        }
+      } catch (e) {
+        console.warn('Não foi possível reaproveitar a cobrança Efí, gerando nova:', e.message);
+      }
+    }
+
+    const pix = await EFI.criarPix({
+      codigo,
+      valor: valorPix,
+      descricao: `Bilhete ${codigo} - Galera do Palpite`
+    });
+
+    console.log('SALVANDO TXID EFÍ NO BILHETE:', codigo, pix.txid);
+    const bilheteAtualizado = await Bilhete.findOneAndUpdate(
+      { codigo: String(codigo) },
+      {
+        payment_id: pix.txid,
+        gateway: 'EFI',
+        external_reference: codigo,
+        statusPagamento: 'PENDENTE'
       },
-      external_reference: codigo,
-      notification_url: 'https://galeradopalpite.com.br/api/pix/webhook'
-    };
+      { new: true }
+    );
 
-   const resposta = await fetch('https://api.mercadopago.com/v1/payments', {
-  method: 'POST',
-  headers: {
-    'Authorization': `Bearer ${MP_ACCESS_TOKEN}`,
-    'Content-Type': 'application/json',
-    'X-Idempotency-Key': `pix-${codigo}-${Date.now()}`
-  },
-  body: JSON.stringify(pagamento)
-});
-
-    const data = await resposta.json();
-
-    if (!resposta.ok) {
-      return res.status(400).json({ erro: data.message || 'Erro ao criar Pix', detalhes: data });
+    if (!bilheteAtualizado) {
+      console.log('Bilhete não encontrado para salvar txid:', codigo);
     }
-   console.log('SALVANDO PAYMENT ID NO BILHETE:', codigo);
-   const bilheteAtualizado = await Bilhete.findOneAndUpdate(
-  { codigo: String(codigo) },
-  {
-    payment_id: data.id,
-    external_reference: codigo,
-    statusPagamento: data.status || 'PENDENTE'
-  },
-  { new: true }
-);
 
-if (!bilheteAtualizado) {
-  console.log('Bilhete não encontrado para salvar payment_id:', codigo);
-}
-    console.log('RESULTADO UPDATE:', bilheteAtualizado);
-
-    res.json({
-  ok: true,
-  codigo,
-  payment_id: data.id,
-  status: data.status,
-  qr_base64: data.point_of_interaction?.transaction_data?.qr_code_base64,
-  pix_copia_cola: data.point_of_interaction?.transaction_data?.qr_code
-});
-    
+    res.json(respostaPixSite(codigo, pix));
   } catch (e) {
-    res.status(500).json({ erro: e.message });
+    console.error('ERRO AO CRIAR PIX EFÍ:', e.message, e.detalhes || '');
+    respostaErroPix(res, e.status && e.status < 500 ? 400 : 500, e.message || 'Erro ao criar Pix', e.detalhes);
   }
 });
+
 app.get('/api/pix/webhook', (req, res) => {
-  res.json({ ok: true, rota: 'webhook ativo' });
+  res.json({ ok: true, rota: 'webhook ativo', gateway: 'EFI' });
 });
 
 app.get('/api/pix/status/:codigo', async (req, res) => {
@@ -478,93 +532,89 @@ app.get('/api/pix/status/:codigo', async (req, res) => {
     const bilhete = await Bilhete.findOne({ codigo: req.params.codigo });
 
     if (!bilhete) {
-  return res.json({
-    status: 'pending',
-    motivo: 'bilhete_nao_encontrado',
-    codigo: req.params.codigo
-  });
-}
-
-if (!bilhete.payment_id) {
-  return res.json({
-    status: 'pending',
-    motivo: 'payment_id_nao_salvo',
-    codigo: bilhete.codigo,
-    pago: bilhete.pago,
-    statusPagamento: bilhete.statusPagamento
-  });
-}
-
-    const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${bilhete.payment_id}`, {
-      headers: {
-        'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
-      }
-    });
-
-    const data = await resposta.json();
-
-    if (data.status === 'approved') {
-    bilhete.statusPagamento = 'PAGO';
-    bilhete.pago = true;
-    bilhete.status = 'Pago';
-    bilhete.pagoEm = new Date();
-    bilhete.payment_id = data.id;
-    await bilhete.save();
+      return res.json({
+        status: 'pending',
+        motivo: 'bilhete_nao_encontrado',
+        codigo: req.params.codigo
+      });
     }
+
+    if (bilhete.pago) {
+      return res.json({
+        status: 'approved',
+        pago: true,
+        codigo: bilhete.codigo,
+        payment_id: bilhete.payment_id,
+        statusPagamento: bilhete.statusPagamento
+      });
+    }
+
+    if (bilhete.gateway !== 'EFI' || !efiPix.txidValido(bilhete.payment_id)) {
+      return res.json({
+        status: 'pending',
+        motivo: 'cobranca_efi_nao_encontrada',
+        codigo: bilhete.codigo,
+        pago: bilhete.pago,
+        statusPagamento: bilhete.statusPagamento
+      });
+    }
+
+    const cob = await EFI.consultarCobranca(bilhete.payment_id);
+    const pago = efiPix.cobrancaPaga(cob);
+    if (pago) await marcarBilhetePagoEfi(bilhete, cob);
 
     res.json({
-  status: data.status,
-  status_detail: data.status_detail,
-  payment_id: bilhete.payment_id,
-  codigo: bilhete.codigo,
-  pago: data.status === 'approved',
-  mercado_pago: data
-});
-
+      status: efiPix.statusParaSite(cob.status),
+      status_efi: cob.status,
+      payment_id: bilhete.payment_id,
+      txid: bilhete.payment_id,
+      codigo: bilhete.codigo,
+      pago,
+      efi: { status: cob.status, valor: cob.valor, pix: cob.pix || [] }
+    });
   } catch (e) {
-    res.status(500).json({ erro: e.message });
+    console.error('ERRO AO CONSULTAR PIX EFÍ:', e.message);
+    res.status(500).json({ erro: e.message, status: 'pending' });
   }
 });
 
-app.post('/api/pix/webhook', async (req, res) => {
-  try {
-    const id = req.body?.data?.id || req.query.id;
+// Webhook Efí: a Efí envia POST para <EFI_WEBHOOK_URL>/pix.
+// Registrando a URL com "?hmac=SEGREDO&ignorar=", o "/pix" vira parâmetro.
+// Por segurança, o status é sempre reconsultado na API antes de liberar.
+async function webhookPixEfi(req, res) {
+  if (!efiPix.segredoWebhookValido(req.query.hmac, EFI.config.webhookSecret)) {
+    console.warn('Webhook Pix recusado: hmac inválido');
+    return res.sendStatus(401);
+  }
 
-    if (id && MP_ACCESS_TOKEN) {
-      const resposta = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${MP_ACCESS_TOKEN}`
-        }
-      });
+  res.sendStatus(200);
 
-      const data = await resposta.json();
+  const lista = Array.isArray(req.body?.pix) ? req.body.pix : [];
+  for (const item of lista) {
+    try {
+      if (!efiPix.txidValido(item?.txid)) continue;
+      const cob = await EFI.consultarCobranca(item.txid);
+      if (!efiPix.cobrancaPaga(cob)) continue;
 
-      const codigoBilhete = data.external_reference || data.metadata?.codigo || data.description?.match(/GDP-\d+/)?.[0];
-
-if (data.status === 'approved' && codigoBilhete) {
-       await atualizarBilheteSupabase(codigoBilhete, {
-       status: 'Pago',
-       acertos: 0
-   });
-
-  const bilhete = await Bilhete.findOne({ codigo: codigoBilhete });
-  
-        if (bilhete) {
-          bilhete.statusPagamento = 'PAGO';
-          bilhete.pago = true;
-          bilhete.status = 'Pago';
-          bilhete.pagoEm = new Date();
-          bilhete.payment_id = data.id;
-          await bilhete.save();
-        }
+      let bilhete = await Bilhete.findOne({ payment_id: item.txid });
+      if (!bilhete) {
+        const codigoInfo = (cob.infoAdicionais || []).find(i => i.nome === 'Bilhete')?.valor
+          || String(cob.solicitacaoPagador || '').match(/GDP-\d+/)?.[0];
+        if (codigoInfo) bilhete = await Bilhete.findOne({ codigo: codigoInfo });
       }
-    }
 
-    res.sendStatus(200);
-  } catch (e) {
-    res.sendStatus(200);
+      if (bilhete) {
+        await marcarBilhetePagoEfi(bilhete, cob);
+      } else {
+        console.warn('Webhook Pix: bilhete não encontrado para txid', item.txid);
+      }
+    } catch (e) {
+      console.error('Erro ao processar webhook Pix Efí:', e.message);
+    }
   }
-});
+}
+
+app.post(['/api/pix/webhook', '/api/pix/webhook/pix'], webhookPixEfi);
 
 app.post('/api/bilhetes/manual', async (req, res) => {
   try {
