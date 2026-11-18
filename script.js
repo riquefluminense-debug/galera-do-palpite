@@ -39,13 +39,56 @@ async function supabaseRequest(tabela, metodo='GET', dados=null, query=''){
   }
   return json;
 }
+function mapearBilhetesDaRodada(bilhetesBanco, rodadaBanco){
+  return (bilhetesBanco || [])
+  .filter(b => String(b.rodada_id) === String(rodadaBanco.id))
+  .map(b => ({
+    codigo: b.codigo,
+    nome: b.nome,
+    tel: b.telefone,
+    rodadaId: String(b.rodada_id),
+    rodadaNome: rodadaBanco.nome,
+    status: String(b.status || '').trim().toLowerCase() === 'pago' ? 'Pago' : b.status || 'Aguardando Pix',
+    valor: Number(b.valor) || 0,
+    pontos: Number(b.acertos) || 0,
+    acertos: Number(b.acertos) || 0,
+    palpites: b.palpites || {},
+    combinacoes: b.combinacoes || [],
+    data: b.created_at ? new Date(b.created_at).toLocaleString('pt-BR') : ''
+  }));
+}
+
+async function atualizarBilhetesAdmin(botao){
+  if(!adminLiberado || botao.disabled) return;
+  const secao = botao.closest('.bilhetes-admin-card');
+  const alternar = secao.querySelector('.admin-fold-toggle[aria-expanded="false"]');
+  if(alternar) alternar.click();
+  const aviso = secao.querySelector('#adminBilhetesAviso');
+  botao.disabled = true;
+  aviso.textContent = 'Buscando bilhetes no Supabase…';
+  try {
+    const registros = await supabaseRequest('bilhetes', 'GET', null, '?select=*&order=id.asc');
+    if(!adminLiberado) return;
+    for(const item of rodadas){
+      item.bilhetes = mapearBilhetesDaRodada(registros, item);
+    }
+    const atual = rodadas.find(item => item.id === rodadaAtualId);
+    if(atual) bilhetes = atual.bilhetes;
+    document.getElementById('adminBilhetes').innerHTML = renderBilhetesPorRodadaAdmin();
+    renderFinanceiroAdmin();
+    aviso.textContent = '';
+  } catch {
+    aviso.textContent = 'Falha ao atualizar os bilhetes. A lista anterior foi mantida.';
+  } finally {
+    botao.disabled = false;
+  }
+}
+
 async function carregarRodadasSupabase(preferredRoundId = null){
   try{
     const dados = await supabaseRequest('rodadas','GET',null,'?select=*&order=created_at.desc');
     const jogosBanco = await supabaseRequest('jogos','GET',null,'?select=*&order=id.asc');
     const bilhetesBanco = await supabaseRequest('bilhetes','GET',null,'?select=*&order=id.asc');
-   console.log('BILHETES DO SUPABASE:', bilhetesBanco);
-   console.log('TOTAL DE BILHETES:', bilhetesBanco?.length);
     
     const rankingBanco = await supabaseRequest(
   'ranking',
@@ -81,22 +124,7 @@ async function carregarRodadasSupabase(preferredRoundId = null){
     sportscoreUrl: j.sportscore_url || null, sportscoreInicio:j.sportscore_inicio, sportscoreAtivo:!!j.sportscore_ativo, placarStatus:j.placar_status, placarDetalhe:j.placar_detalhe, placarAtualizado:j.placar_atualizado_em
     
 })),
-      bilhetes: (bilhetesBanco || [])
-  .filter(b => String(b.rodada_id) === String(r.id))
-  .map(b => ({
-    codigo: b.codigo,
-    nome: b.nome,
-    tel: b.telefone,
-    rodadaId: String(b.rodada_id),
-    rodadaNome: r.nome,
-    status: b.status || 'Aguardando Pix',
-    valor: Number(b.valor) || 0,
-    pontos: Number(b.acertos) || 0,
-    acertos: Number(b.acertos) || 0,
-    palpites: b.palpites || {},
-    combinacoes: b.combinacoes || [],
-    data: b.created_at ? new Date(b.created_at).toLocaleString('pt-BR') : ''
-  })),
+      bilhetes: mapearBilhetesDaRodada(bilhetesBanco, r),
       ranking: (rankingBanco || [])
   .filter(item => String(item.rodada_id) === String(r.id))
   .map(item => ({
@@ -1745,7 +1773,7 @@ function renderBilhetesPorRodadaAdmin(){
     const totalPendente=pendentes.reduce((s,b)=>s+(Number(b.valor)||0),0);
     const totalPago=pagos.reduce((s,b)=>s+(Number(b.valor)||0),0);
     const cards=lista.map(b=>`<div class="linha bilhete-admin-row ${b.status==='Pago'?'bilhete-pago':'bilhete-pendente'}">
-      <span><b>${b.codigo}</b> - ${b.nome} ${b.origem==='Manual'?'<em class="manual-badge">📝 MANUAL</em>':''}<br><small>${b.totalBilhetes||1} bilhete(s) • ${dinheiro(b.valor)} • ${b.pontos||0} pts • ${b.data||''}</small></span>
+      <span><b>${b.codigo}</b> - ${escaparHtml(b.nome)} ${b.origem==='Manual'?'<em class="manual-badge">📝 MANUAL</em>':''}<br><small>${b.totalBilhetes||1} bilhete(s) • ${dinheiro(b.valor)} • ${b.pontos||0} pts • ${b.data||''}</small></span>
       <span class="tag ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'pago' : 'pendente'}">
     ${(b.pago === true || b.statusPagamento === 'PAGO' || b.status === 'Pago') ? 'Pago' : 'Pendente'}
     </span>
